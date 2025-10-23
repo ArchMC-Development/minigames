@@ -1,16 +1,23 @@
-# Tropic Practice
-A highly-scalable practice plugin used on the `tropic.gg` and `duels.us` servers.
+# Minigames
+ArchMC's minigame systems & implementation monorepo.
 
-## Docs
-- [Infrastructure Overview](docs/infrastructure.md)
-- [Setup](docs/setup.md)
+## Structure:
+- `services`: contain the microservice controllers that power & orchestrate our minigames
+- `minigames`, `microgames`, `persistentgames`: implementations of games
+- `shared`, `versioned`: common functionality
+- `game`: core plugin powering our game servers
 
------
-![yklogo](https://github.com/tropicserver/tropic-practice/assets/62861393/45cbbfbd-f936-4347-8516-61ca24a0d1f4)
+## Why:
+Additional common libraries and minigame implementations are kept closed-source. However, this will serve as the new primary repo for core minigame systems, allowing the public to see how ArchMC's minigame infrastructure works.
 
-YourKit supports open source projects with innovative and intelligent tools
-for monitoring and profiling Java and .NET applications.
-YourKit is the creator of <a href="https://yourkit.com/java/profiler/">YourKit Java Profiler</a>,
-<a href="https://yourkit.com/dotnet-profiler/features/">YourKit .NET Profiler</a>,
-and <a href="https://yourkit.com/youmonitor/download/">YourKit YouMonitor</a>.
-for monitoring and profiling Java and .NET applications.
+## How It Works:
+- Minigames are spread across multiple game servers. 
+- Any minigame can start on any minigame server, granted it has the plugin enabled. A queue system is used to allocate requested games to their respective game servers, and other criteria such as server version, drain state, persistent world support, etc. are used to sort, filter, and decide on a game server.
+  - Once a game is allocated, a new world is generated with a unique identifier based on an in-memory template of the arena.
+  - Players are routed, and once all players are logged onto the server, game systems start.
+- A singleton microservice application is used as the single source of truth for all data being fed into and out of game and lobby servers.
+- Redis based RPC is used for the majority of cross-service communications.
+- Performance is observed through Grafana:
+![img.png](img.png)
+![img_1.png](img_1.png)
+
