@@ -188,7 +188,10 @@ fun main(args: Array<String>) = mainBody {
             override fun forceDisableRedisThreshold() = true
         }
 
-    Zoo.build(parsedArgs.zookeeperConnectionUri)
+    Zoo.build(ScalaCommons
+        .bundle()
+        .globals()
+        .redis())
 
     ScalaStoreUuidCache.configure(
         DistributedRedisUuidCacheTranslator(),
