@@ -1,12 +1,12 @@
 [submodule "minigames/miniwalls"]
-    path = minigames/miniwalls
-    url = git@github.com:GrowlyX/minigames-miniwalls.git
+	path = minigames/miniwalls
+	url = git@github.com:GrowlyX/minigames-miniwalls.git
 [submodule "minigames/miniwalls-lobby"]
-    path = minigames/miniwalls-lobby
-    url = git@github.com:GrowlyX/minigames-miniwalls-lobby.git
+	path = minigames/miniwalls-lobby
+	url = git@github.com:GrowlyX/minigames-miniwalls-lobby.git
 [submodule "minigames/miniwalls-shared"]
-    path = minigames/miniwalls-shared
-    url = git@github.com:GrowlyX/minigames-miniwalls-shared.git
+	path = minigames/miniwalls-shared
+	url = git@github.com:GrowlyX/minigames-miniwalls-shared.git
 [submodule "microgames/events"]
 	path = microgames/events
 	url = git@github.com:GrowlyX/microgames-events.git
