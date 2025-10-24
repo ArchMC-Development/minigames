@@ -82,13 +82,6 @@ class ApplicationServerArgs(parser: ArgParser)
         )
         .default("redis-master.databases.svc.cluster.local")
 
-    val zookeeperConnectionUri by parser
-        .storing(
-            "--zookeeperuri",
-            help = "The connection URI of the Zookeeper server"
-        )
-        .default("archmc-cluster-zookeeper.databases.svc.cluster.local:2181")
-
     val redisPort by parser
         .storing(
             "--redisport",

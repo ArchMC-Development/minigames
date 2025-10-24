@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":services:application:api"))
 
     implementation(project(":minigames:skywars-shared"))
+    implementation(project(":minigames:miniwalls-shared"))
     implementation(project(":minigames:bedwars-shared"))
     implementation(project(":microgames:bridging-api"))
     implementation(project(":microgames:events-api"))

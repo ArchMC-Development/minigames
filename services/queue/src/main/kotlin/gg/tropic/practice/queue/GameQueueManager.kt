@@ -28,6 +28,7 @@ import gg.tropic.practice.provider.MiniProviderType
 import gg.tropic.practice.provider.MiniProviderVersion
 import gg.tropic.practice.queue.variants.BedWarsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.EventsSubscribableMinigamePlayerQueue
+import gg.tropic.practice.queue.variants.MiniWallsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.SkyWarsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.robot.SubscribableDuoRobotPlayerQueue
 import gg.tropic.practice.queue.variants.robot.SubscribableSoloRobotPlayerQueue
@@ -39,6 +40,7 @@ import gg.tropic.practice.serializable.Message
 import gg.tropic.practice.suffixWhenDev
 import mc.arch.commons.communications.rpc.CommunicationGateway
 import mc.arch.minigame.bedwars.neo.BedWarsMode
+import mc.arch.minigame.miniwalls.MiniWallsMode
 import mc.arch.minigames.microgames.events.EventType
 import mc.arch.minigames.skywars.SkyWarsMode
 import net.evilblock.cubed.serializers.Serializers
@@ -618,6 +620,16 @@ object GameQueueManager
             {
                 queueHolder.forgetPlayerQueue(it.second)
             }
+        }
+
+        val kitId = MiniWallsMode.MAIN to "mw_main"
+        val miniWallsKit = KitDataSync.cached().kits[kitId.second]
+        if (miniWallsKit != null)
+        {
+            queueHolder.trackPlayerQueue(MiniWallsSubscribableMinigamePlayerQueue(miniWallsKit, kitId.first))
+        } else
+        {
+            queueHolder.forgetPlayerQueue(kitId.second)
         }
 
         // cleanup queues for kits that no longer exist

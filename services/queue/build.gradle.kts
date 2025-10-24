@@ -6,6 +6,7 @@ dependencies {
 
     api("lol.arch.symphony:api:1.1.1")
 
+    compileOnly(project(":minigames:miniwalls-shared"))
     compileOnly(project(":minigames:skywars-shared"))
     compileOnly(project(":minigames:bedwars-shared"))
     compileOnly(project(":microgames:events-api"))
