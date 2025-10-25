@@ -49,7 +49,7 @@ object MapManageCommands : ScalaCommand()
     @Subcommand("create")
     @CommandCompletion("@slime-templates")
     @Description("Creates a new map on a new Slime world template.")
-    fun onCreate(player: ScalaPlayer, @Single slimeTemplate: String, @Single mapName: String)
+    fun onCreate(player: ScalaPlayer, @Single slimeTemplate: String, @Single mapName: String, @Optional unsafe: Boolean?)
     {
         if (MapService.mapWithID(mapName) != null)
         {
@@ -82,7 +82,7 @@ object MapManageCommands : ScalaCommand()
             val metadata = MapMetadataScanUtilities.buildMetadataFor(devToolsMap)
 
             var success = false
-            if (metadata.metadata.filterIsInstance<MapSpawnMetadata>().size >= 2)
+            if ((unsafe != null && unsafe) || metadata.metadata.filterIsInstance<MapSpawnMetadata>().size >= 2)
             {
                 sendMessage("${CC.B_GRAY}(!)${CC.GRAY} Created a metadata copy! We're now going to build the map data model...")
 

@@ -730,7 +730,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                 metadata.synthetic = synthetics.map(PreparedSyntheticSignModel::signMetadataModel)
 
                 val availableSpawnMetadata = metadata.metadata.filterIsInstance<MapSpawnMetadata>()
-                if (availableSpawnMetadata.size >= 2)
+                if (newMapName.startsWith("mw_standard_") || availableSpawnMetadata.size >= 2)
                 {
                     player.sendMessage("${CC.B_GRAY}(!)${CC.GRAY} Created a metadata copy! We're now going to build the map data model & store the map in MongoDB...")
                     prepareSlimeWorld(newMapName)
