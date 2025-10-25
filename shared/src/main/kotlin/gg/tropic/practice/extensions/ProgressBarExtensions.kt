@@ -19,3 +19,17 @@ fun createProgressBar(progress: Double, total: Double): String
 
     return "$completedPart$remainingPart"
 }
+
+fun createProgressBarAlt(color: String, progress: Double, total: Double): String
+{
+    if (progress > total) return "$color${CC.STRIKE_THROUGH}█".repeat(18)
+
+    val segments = 10
+    val progressRatio = (progress / total).coerceIn(0.0, 1.0)
+    val completedSegments = (segments * progressRatio).toInt()
+
+    val completedPart = "${color}${"█".repeat(completedSegments)}"
+    val remainingPart = "${CC.GRAY}${"█".repeat(segments - completedSegments)}"
+
+    return "$completedPart$remainingPart"
+}
