@@ -626,6 +626,7 @@ object GameQueueManager
         val miniWallsKit = KitDataSync.cached().kits[kitId.second]
         if (miniWallsKit != null)
         {
+            println("tracked mini walls queue")
             queueHolder.trackPlayerQueue(MiniWallsSubscribableMinigamePlayerQueue(miniWallsKit, kitId.first))
         } else
         {

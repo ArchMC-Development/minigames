@@ -729,29 +729,22 @@ class Editor(private val player: Player) : SyntheticsEditor
                 val metadata = MapMetadataScanUtilities.buildMetadataFor(visiting!!.world)
                 metadata.synthetic = synthetics.map(PreparedSyntheticSignModel::signMetadataModel)
 
-                val availableSpawnMetadata = metadata.metadata.filterIsInstance<MapSpawnMetadata>()
-                if (newMapName.startsWith("mw_standard_") || availableSpawnMetadata.size >= 2)
-                {
-                    player.sendMessage("${CC.B_GRAY}(!)${CC.GRAY} Created a metadata copy! We're now going to build the map data model & store the map in MongoDB...")
-                    prepareSlimeWorld(newMapName)
+                player.sendMessage("${CC.B_GRAY}(!)${CC.GRAY} Created a metadata copy! We're now going to build the map data model & store the map in MongoDB...")
+                prepareSlimeWorld(newMapName)
 
-                    val map = gg.tropic.practice.map.Map(
-                        name = newMapName.lowercase(),
-                        metadata = metadata,
-                        displayName = newMapName.capitalize(),
-                        associatedSlimeTemplate = "Map${newMapName.capitalize()}"
-                    )
+                val map = gg.tropic.practice.map.Map(
+                    name = newMapName.lowercase(),
+                    metadata = metadata,
+                    displayName = newMapName.capitalize(),
+                    associatedSlimeTemplate = "Map${newMapName.capitalize()}"
+                )
 
-                    with(MapService.cached()) {
-                        maps[map.name] = map
-                        MapService.sync(this)
+                with(MapService.cached()) {
+                    maps[map.name] = map
+                    MapService.sync(this)
 
-                        player.playSound(player.location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
-                        player.sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Successfully created map ${CC.YELLOW}${map.name}${CC.GREEN}!")
-                    }
-                } else
-                {
-                    player.sendMessage("${CC.B_RED}(!) Failed to create a metadata copy! We found no spawn locations in the map. Please try again.")
+                    player.playSound(player.location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
+                    player.sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Successfully created map ${CC.YELLOW}${map.name}${CC.GREEN}!")
                 }
             }
         })
