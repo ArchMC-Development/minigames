@@ -24,12 +24,12 @@ object RawStatisticCRUD
         val statistics = profile.get("statistics", Document::class.java)
         if (statistics == null)
         {
-            profile.put("statistics", Document().append(id.toId(), newValue.toString()))
+            profile["statistics"] = Document().append(id.toId(), newValue.toString())
             return
         }
 
         statistics.put(id.toId(), newValue.toString())
-        profile.put("statistics", statistics)
+        profile["statistics"] = statistics
     }
 
     fun add(profile: Document, addValue: Long, id: StatisticID)
@@ -55,11 +55,11 @@ object RawStatisticCRUD
 
         if (statistics == null)
         {
-            profile.put("statistics", Document().append(id.toId(), newValue.toString()))
+            profile["statistics"] = Document().append(id.toId(), newValue.toString())
             return
         }
 
-        statistics.put(id.toId(), newValue.toString())
-        profile.put("statistics", statistics)
+        statistics[id.toId()] = newValue.toString()
+        profile["statistics"] = statistics
     }
 }
