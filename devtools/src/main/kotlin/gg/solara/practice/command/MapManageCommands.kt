@@ -46,6 +46,17 @@ object MapManageCommands : ScalaCommand()
         }
     }
 
+    @Subcommand("manipulate")
+    fun onManipulate(player: ScalaPlayer)
+    {
+        MapService.editAndSave {
+            maps.values.forEach { map ->
+                map.associatedKitGroups += "mw_main"
+                map.associatedKitGroups -= "__default__"
+            }
+        }
+    }
+
     @Subcommand("create")
     @CommandCompletion("@slime-templates")
     @Description("Creates a new map on a new Slime world template.")
