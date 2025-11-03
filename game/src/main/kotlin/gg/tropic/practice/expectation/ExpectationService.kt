@@ -41,6 +41,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerPreLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import java.util.*
@@ -89,6 +90,7 @@ object ExpectationService
 
                 game.expectedSpectators += it.player
             }
+            .bindWith(plugin)
 
         Events
             .subscribe(PlayerRedirectExpectationEvent::class.java)
@@ -103,11 +105,12 @@ object ExpectationService
                     expectedRejoinWithTokens[event.uniqueId] = token
                 }
             }
+            .bindWith(plugin)
 
         Events
             .subscribe(
                 AsyncPlayerPreLoginEvent::class.java,
-                EventPriority.HIGHEST
+                EventPriority.HIGH
             )
             .filter { it.loginResult == AsyncPlayerPreLoginEvent.Result.ALLOWED }
             .handler { event ->
@@ -204,6 +207,14 @@ object ExpectationService
 
                     GameService.playerToGameMappings[event.uniqueId] = game
                 }
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(AsyncPlayerPreLoginEvent::class.java)
+            .filter { event -> event.result != PlayerPreLoginEvent.Result.ALLOWED }
+            .handler {
+                expectedRejoinWithTokens.remove(it.uniqueId)
             }
             .bindWith(plugin)
 
@@ -355,6 +366,7 @@ object ExpectationService
 
                 it.spawnLocation = event.location
             }
+            .bindWith(plugin)
 
         Events
             .subscribe(
