@@ -6,6 +6,7 @@ import gg.scala.basics.plugin.settings.defaults.values.StateSettingValue
 import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.agnostic.sync.server.impl.GameServer
+import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.commons.playerstatus.PlayerStatusPreUpdateEvent
 import gg.scala.commons.playerstatus.isVirtuallyInvisibleToSomeExtent
 import gg.scala.commons.spatial.toPosition
@@ -23,6 +24,7 @@ import gg.tropic.practice.configuration.minigame.teleportWithVelocityPreset
 import gg.tropic.practice.parkour.extractPlaySession
 import gg.tropic.practice.parkour.formatDurationIntoTwoDecimal
 import gg.tropic.practice.parkour.isPlayingParkour
+import gg.tropic.practice.player.prevention.PreventionListeners
 import gg.tropic.practice.profile.PracticeProfileService
 import gg.tropic.practice.quests.QuestsService
 import gg.tropic.practice.quests.model.tracker.QuestTrackerState
@@ -223,29 +225,34 @@ object LobbyPlayerService
 
         EquipOnLoginCosmeticService.defaultFunctionality = false
 
-        Events
-            .subscribe(PlayerToggleFlightEvent::class.java)
-            .filter {
-                it.player.gameMode == GameMode.SURVIVAL &&
-                    (MinigameLobby.isMinigameLobby() || MinigameLobby.isMainLobby())
-            }
-            .handler {
-                val vector = it.player.location
-                    .direction
-                    .multiply(
-                        Vector(
-                            0.85,
-                            1.0,
-                            0.85
+        if (!SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+        {
+            PreventionListeners.plugin.logger.info { "skipping lobby prevention listeners" }
+            Events
+                .subscribe(PlayerToggleFlightEvent::class.java)
+                .filter {
+                    it.player.gameMode == GameMode.SURVIVAL &&
+                        (MinigameLobby.isMinigameLobby() || MinigameLobby.isMainLobby())
+                }
+                .handler {
+                    val vector = it.player.location
+                        .direction
+                        .multiply(
+                            Vector(
+                                0.85,
+                                1.0,
+                                0.85
+                            )
                         )
-                    )
-                    .setY(1.1)
+                        .setY(1.1)
 
-                it.isCancelled = true
-                it.player.velocity = vector
+                    it.isCancelled = true
+                    it.player.velocity = vector
 
-                XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(it.player, 0.5f, 0.75f)
-            }
+                    XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(it.player, 0.5f, 0.75f)
+                }
+        }
+
 
         Events
             .subscribe(

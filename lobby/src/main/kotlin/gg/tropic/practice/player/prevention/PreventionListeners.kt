@@ -1,5 +1,6 @@
 package gg.tropic.practice.player.prevention
 
+import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -31,6 +32,12 @@ object PreventionListeners
     @Configure
     fun configure()
     {
+        if (SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+        {
+            plugin.logger.info { "skipping lobby prevention listeners" }
+            return
+        }
+
         Events.subscribe(PlayerItemConsumeEvent::class.java)
             .handler { event ->
                 if (hasBuilderMetadata(event.player)) return@handler

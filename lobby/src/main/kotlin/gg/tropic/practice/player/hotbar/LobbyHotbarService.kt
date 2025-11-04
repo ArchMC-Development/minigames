@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.basics.plugin.settings.SettingMenu
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.issuer.ScalaPlayer
+import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -560,15 +561,18 @@ object LobbyHotbarService
         HotbarPresetHandler.startTrackingHotbar("inPartyMember", inPartyMemberPreset)
         hotbarCache[PlayerState.InPartyAsMember] = inPartyMemberPreset
 
-        Events
-            .subscribe(
-                PlayerJoinEvent::class.java,
-                EventPriority.LOW
-            )
-            .handler { event ->
-                idlePreset.applyToPlayer(event.player)
-            }
-            .bindWith(plugin)
+        if (!SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+        {
+            Events
+                .subscribe(
+                    PlayerJoinEvent::class.java,
+                    EventPriority.LOW
+                )
+                .handler { event ->
+                    idlePreset.applyToPlayer(event.player)
+                }
+                .bindWith(plugin)
+        }
     }
 
     fun get(state: PlayerState) = hotbarCache[state]!!

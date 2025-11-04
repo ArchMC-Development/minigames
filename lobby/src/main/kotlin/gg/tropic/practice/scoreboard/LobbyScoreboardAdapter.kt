@@ -4,6 +4,7 @@ import gg.scala.basics.plugin.profile.BasicsProfileService
 import gg.scala.basics.plugin.tablist.TabListService
 import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.agnostic.sync.ServerSync.getLocalGameServer
+import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.commons.playerstatus.toPlayerStatus
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -113,9 +114,19 @@ object LobbyScoreboardAdapter : ScoreboardAdapter()
                 }
             } else
             {
-                board += MinigameLobby.customizer()
-                    .scoreboard()
-                    .provideIdleLines(player, profile)
+                if (SpigotNetworkMetadataDataSync.isFlagged("BOARD_OVERRIDE_LOBBY"))
+                {
+                    board.clear()
+                    board += MinigameLobby.customizer()
+                        .scoreboard()
+                        .provideIdleLines(player, profile)
+                    return
+                } else
+                {
+                    board += MinigameLobby.customizer()
+                        .scoreboard()
+                        .provideIdleLines(player, profile)
+                }
             }
         }
 
