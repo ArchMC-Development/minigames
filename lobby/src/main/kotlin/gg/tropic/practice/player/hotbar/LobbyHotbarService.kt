@@ -787,6 +787,11 @@ object LobbyHotbarService
 
     fun reset(player: Player)
     {
+        if (SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+        {
+            return
+        }
+
         val lobbyPlayer = LobbyPlayerService.find(player.uniqueId)
 
         if (lobbyPlayer != null)
