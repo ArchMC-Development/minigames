@@ -211,7 +211,7 @@ object ExpectationService
             .bindWith(plugin)
 
         Events
-            .subscribe(AsyncPlayerPreLoginEvent::class.java)
+            .subscribe(AsyncPlayerPreLoginEvent::class.java, EventPriority.HIGHEST)
             .filter { event -> event.result != PlayerPreLoginEvent.Result.ALLOWED }
             .handler {
                 expectedRejoinWithTokens.remove(it.uniqueId)
