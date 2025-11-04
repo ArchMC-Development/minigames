@@ -135,6 +135,7 @@ open class GameImpl(
     var shouldShowAllPlayers = false
     var shouldAllowCrafting = false
     var shouldBeMinMaxEligible = true
+    var shouldBroadcastRespawnChatMsg = true
 
     var isMinMaxLevelRange = false
     var minMaxLevelRange = 0..1
