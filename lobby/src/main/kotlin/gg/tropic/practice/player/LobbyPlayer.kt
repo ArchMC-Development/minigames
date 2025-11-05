@@ -1,5 +1,6 @@
 package gg.tropic.practice.player
 
+import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.queue.shared.models.Queue
 import gg.scala.queue.spigot.stream.SpigotRedisService
 import gg.tropic.practice.kit.KitService
@@ -32,6 +33,11 @@ data class LobbyPlayer(
             {
                 val bukkit = Bukkit.getPlayer(uniqueId)
                     ?: return
+
+                if (SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+                {
+                    return
+                }
 
                 get(value)
                     .applyToPlayer(bukkit)
