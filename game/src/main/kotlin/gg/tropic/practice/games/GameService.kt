@@ -1154,11 +1154,12 @@ object GameService
                         return@handler
                     }
 
-                    val yAxis = game
-                        .flagMetaData(
-                            FeatureFlag.DeathBelowYAxis, "level"
-                        )
-                        ?.toIntOrNull()
+                    val yAxis = game.voidDamageMin
+                        ?: game
+                            .flagMetaData(
+                                FeatureFlag.DeathBelowYAxis, "level"
+                            )
+                            ?.toIntOrNull()
 
                     if (yAxis != null && it.to.y < yAxis)
                     {
