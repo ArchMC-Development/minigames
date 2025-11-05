@@ -2298,52 +2298,55 @@ object GameService
                     return@handler
                 }
 
-                if (!game.isMinMaxLevelRange)
+                if (!game.isMinIndependent)
                 {
-                    val levelRestrictions = game.map.findMapLevelRestrictions()
-
-                    if (levelRestrictions != null)
+                    if (!game.isMinMaxLevelRange)
                     {
-                        if (it.block.y !in levelRestrictions.range)
+                        val levelRestrictions = game.map.findMapLevelRestrictions()
+
+                        if (levelRestrictions != null)
                         {
-                            if (
-                                !levelRestrictions.allowBuildOnBlockSideBlockFaces ||
-                                validBlockPlace
-                                    .any { face ->
-                                        it.blockPlaced.getRelative(face)
-                                            .hasMetadata("placed")
-                                    }
-                            )
+                            if (it.block.y !in levelRestrictions.range)
                             {
-                                it.isCancelled = true
-                                it.player.sendMessage(
-                                    "${CC.RED}You cannot build in this area!"
+                                if (
+                                    !levelRestrictions.allowBuildOnBlockSideBlockFaces ||
+                                    validBlockPlace
+                                        .any { face ->
+                                            it.blockPlaced.getRelative(face)
+                                                .hasMetadata("placed")
+                                        }
                                 )
+                                {
+                                    it.isCancelled = true
+                                    it.player.sendMessage(
+                                        "${CC.RED}You cannot build in this area!"
+                                    )
+                                }
+                                return@handler
                             }
-                            return@handler
                         }
+                    } else if (it.block.y !in game.minMaxLevelRange)
+                    {
+                        it.isCancelled = true
+                        it.player.sendMessage(
+                            "${CC.RED}You cannot build in this area!"
+                        )
+                        return@handler
                     }
-                } else if (it.block.y !in game.minMaxLevelRange)
-                {
-                    it.isCancelled = true
-                    it.player.sendMessage(
-                        "${CC.RED}You cannot build in this area!"
-                    )
-                    return@handler
-                }
 
-                if (it.block.type == Material.TNT &&
-                    (game.minigameType() == "bedwars" || game.miniGameLifecycle == null))
-                {
-                    it.blockPlaced.type = Material.AIR
+                    if (it.block.type == Material.TNT &&
+                        (game.minigameType() == "bedwars" || game.miniGameLifecycle == null))
+                    {
+                        it.blockPlaced.type = Material.AIR
 
-                    val tnt = it.block.location.world.spawn(
-                        it.block.location.add(0.5, 0.0, 0.5),
-                        TNTPrimed::class.java
-                    )
-                    tnt.fuseTicks = 40
-                    setSource(tnt, it.player)
-                    return@handler
+                        val tnt = it.block.location.world.spawn(
+                            it.block.location.add(0.5, 0.0, 0.5),
+                            TNTPrimed::class.java
+                        )
+                        tnt.fuseTicks = 40
+                        setSource(tnt, it.player)
+                        return@handler
+                    }
                 }
 
                 it.blockPlaced.setMetadata(

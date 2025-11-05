@@ -138,6 +138,7 @@ open class GameImpl(
     var shouldBroadcastRespawnChatMsg = true
     var voidDamageMin: Int? = 0
 
+    var isMinIndependent = false
     var isMinMaxLevelRange = false
     var minMaxLevelRange = 0..1
 
