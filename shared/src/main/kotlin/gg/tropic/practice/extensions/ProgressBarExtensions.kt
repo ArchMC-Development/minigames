@@ -42,9 +42,9 @@ fun createProgressBarAlt(color: String, progress: Double, total: Double): String
 
 fun createProgressBarAlt2(color: String, progress: Double, total: Double): String
 {
-    if (progress > total) return "$color${CC.STRIKE_THROUGH}${Constants.THICK_VERTICAL_LINE}".repeat(18)
+    if (progress > total) return "$color${CC.STRIKE_THROUGH}${Constants.THICK_VERTICAL_LINE}".repeat(20)
 
-    val segments = 10
+    val segments = 20
     val progressRatio = (progress / total).coerceIn(0.0, 1.0)
     val completedSegments = (segments * progressRatio).toInt()
 
