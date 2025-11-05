@@ -18,6 +18,7 @@ object MetadataScannerUtilities
         MapShopKeeperMetadataScanner,
         MapSpawnMetadataScanner,
         MapSpawnProtExpandMetadataScanner,
+        MapWitherMetadataScanner,
         MapTeamUpgraderMetadataScanner,
         MapZoneMetadataScanner
     )
