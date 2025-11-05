@@ -42,7 +42,6 @@ object SpawnCommand : ScalaCommand()
                             .get(state)
                             .applyToPlayer(player.bukkit())
                     }
-
             }
 
             if (player.bukkit().isPlayingParkour())
