@@ -8,6 +8,7 @@ import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.agnostic.sync.server.impl.GameServer
 import gg.scala.commons.spatial.Bounds
+import gg.scala.commons.spatial.Box
 import gg.scala.lemon.handler.PlayerHandler
 import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.game.extensions.cosmetics.CosmeticRegistry
@@ -121,7 +122,7 @@ open class GameImpl(
     val expectedQueueRejoin = ConcurrentHashMap.newKeySet<UUID>()
 
     val placedBlocks = mutableSetOf<Vector>()
-    val spawnProtectionZones = mutableListOf<Bounds>()
+    val spawnProtectionZones = mutableListOf<Box>()
     val robotInstance = mutableSetOf<RobotInstance>()
 
     val consumedBots = AtomicInteger(0)
