@@ -18,6 +18,7 @@ object TeamVisuals
         ChatColor.RED to Color.RED,
         ChatColor.BLUE to Color.BLUE,
         ChatColor.GREEN to Color.LIME,
+        ChatColor.DARK_GREEN to Color.GREEN,
         ChatColor.YELLOW to Color.YELLOW,
         ChatColor.AQUA to Color.AQUA,
         ChatColor.WHITE to Color.WHITE,
