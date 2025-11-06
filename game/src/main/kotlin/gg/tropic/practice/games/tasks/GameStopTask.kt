@@ -327,7 +327,7 @@ class GameStopTask(
             game.toBukkitPlayers()
                 .filterNotNull()
                 .forEach { player ->
-                    MapRatingService.sendMapRatingRequest(player, game.map)
+                    MapRatingService.sendMapRatingRequest(player, game._map)
                         .thenRun {
                             val feedback = playerFeedback[player.uniqueId]
                                 ?: return@thenRun

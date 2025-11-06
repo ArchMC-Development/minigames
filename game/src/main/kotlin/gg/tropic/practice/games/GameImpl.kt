@@ -7,7 +7,6 @@ import gg.scala.basics.plugin.settings.defaults.values.StateSettingValue
 import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.agnostic.sync.server.impl.GameServer
-import gg.scala.commons.spatial.Bounds
 import gg.scala.commons.spatial.Box
 import gg.scala.lemon.handler.PlayerHandler
 import gg.scala.lemon.util.QuickAccess.username
@@ -46,6 +45,7 @@ import gg.tropic.practice.statistics.*
 import gg.tropic.practice.strategies.WorldEvictionStrategy
 import gg.tropic.practice.extensions.BotMessages
 import gg.tropic.practice.games.player.CosmeticPlayerResources
+import gg.tropic.practice.map.instance.InstanceMap
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.composite.CompositeTerminable
@@ -101,8 +101,14 @@ open class GameImpl(
 
     private val snapshots = mutableMapOf<UUID, GameReportSnapshot>()
 
-    val map: gg.tropic.practice.map.Map
+    val _map: gg.tropic.practice.map.Map
         get() = MapService.mapByAbsoluteID(mapId)!!
+
+    val map = InstanceMap(
+        map = _map,
+        world = arenaWorld,
+        compositeMeta = _map.metadata.composite(arenaWorld)
+    )
 
     var replication: BuiltMapReplication? = null
 

@@ -270,7 +270,7 @@ object MapReplicationService
         Schedulers
             .sync()
             .run {
-                newGame.map.prepare(scheduledMap.world)
+                newGame._map.prepare(scheduledMap.world)
             }
             .join()
 
