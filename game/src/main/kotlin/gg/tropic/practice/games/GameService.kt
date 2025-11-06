@@ -2051,7 +2051,8 @@ object GameService
             }
         }
 
-        Events.subscribe(BlockBreakEvent::class.java)
+        Events
+            .subscribe(BlockBreakEvent::class.java, EventPriority.LOWEST)
             .handler {
                 if (isSpectating(it.player))
                 {
@@ -2075,6 +2076,16 @@ object GameService
                 {
                     it.isCancelled = true
                     return@handler
+                }
+
+                if (game.spawnProtectionZones.isNotEmpty())
+                {
+                    val position = it.block.location.toPosition()
+                    if (game.spawnProtectionZones.any { bounds -> bounds.contains(position) })
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
                 }
 
                 if (game.flag(FeatureFlag.BreakAllBlocks))
@@ -2225,7 +2236,7 @@ object GameService
                 deathEvent.deathMessage = null
             }
 
-        Events.subscribe(BlockPlaceEvent::class.java)
+        Events.subscribe(BlockPlaceEvent::class.java, EventPriority.LOWEST)
             .handler {
                 if (isSpectating(it.player))
                 {
