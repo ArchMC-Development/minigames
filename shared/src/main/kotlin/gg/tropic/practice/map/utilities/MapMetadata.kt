@@ -35,7 +35,11 @@ data class MapMetadata(
                         world.getBlockAt(it.blockX, it.blockY, it.blockZ)
                     }
                     .forEach {
-                        if (it.type == Material.SIGN || it.type == Material.SIGN_POST)
+                        if (
+                            it.type == Material.SIGN ||
+                            it.type == Material.SIGN_POST ||
+                            it.type == Material.WALL_SIGN
+                        )
                         {
                             it.type = Material.AIR
                         }
