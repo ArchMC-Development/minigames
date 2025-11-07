@@ -129,6 +129,7 @@ open class GameImpl(
 
     val placedBlocks = mutableSetOf<Vector>()
     val spawnProtectionZones = mutableListOf<Box>()
+    val spawnProtectionZonesUnplaced = mutableListOf<Box>()
     val robotInstance = mutableSetOf<RobotInstance>()
 
     val consumedBots = AtomicInteger(0)
@@ -143,6 +144,7 @@ open class GameImpl(
     var shouldAllowCrafting = false
     var shouldBeMinMaxEligible = true
     var shouldBroadcastRespawnChatMsg = true
+    var unplacedSpawnProtectionZone = false
     var voidDamageMin: Int? = 0
 
     var isMinIndependent = false
@@ -655,7 +657,13 @@ open class GameImpl(
                         return@forEach
                     }
 
-                    spawnProtectionZones += spawnProtectionExpandZone.fromCenter(metadata.position)
+                    if (unplacedSpawnProtectionZone)
+                    {
+                        spawnProtectionZonesUnplaced += spawnProtectionExpandZone.fromCenter(metadata.position)
+                    } else
+                    {
+                        spawnProtectionZones += spawnProtectionExpandZone.fromCenter(metadata.position)
+                    }
                 }
         }
 

@@ -2078,6 +2078,16 @@ object GameService
                     return@handler
                 }
 
+                if (game.spawnProtectionZonesUnplaced.isNotEmpty() && !it.block.hasMetadata("placed"))
+                {
+                    val position = it.block.location.toPosition()
+                    if (game.spawnProtectionZonesUnplaced.any { bounds -> bounds.contains(position) })
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+                }
+
                 if (game.spawnProtectionZones.isNotEmpty())
                 {
                     val position = it.block.location.toPosition()
