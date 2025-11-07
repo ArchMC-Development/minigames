@@ -313,6 +313,11 @@ object LobbyPlayerService
 
                 EquipOnLoginCosmeticService.callOnLoginFor(event.player)
 
+                if (SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
+                {
+                    return@handler
+                }
+
                 if (
                     basicsProfile.setting<StateSettingValue>(
                         "tropicprac:join-message",
