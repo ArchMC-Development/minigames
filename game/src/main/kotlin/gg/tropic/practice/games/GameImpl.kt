@@ -621,8 +621,10 @@ open class GameImpl(
 
     fun initializeTeamObjectives()
     {
-        val minMax = map.metadata.metadata.filterIsInstance<MapLevelMetadata>()
-        if (minMax.size == 2 && shouldBeMinMaxEligible)
+        val minMax = map.metadata.metadata
+            .filterIsInstance<MapLevelMetadata>()
+            .sortedBy { metadata -> metadata.yAxis }
+        if (minMax.size >= 2 && shouldBeMinMaxEligible)
         {
             val first = minMax.first().yAxis
             val last = minMax.last().yAxis
