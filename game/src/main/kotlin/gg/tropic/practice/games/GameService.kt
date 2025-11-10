@@ -1710,7 +1710,10 @@ object GameService
 
                         if (health > 0.0)
                         {
-                            shooter.sendHealthHUD(entity)
+                            if (game.shouldSendHealthHUD)
+                            {
+                                shooter.sendHealthHUD(entity)
+                            }
                             shooter.sendMessage("${CC.GREEN}${entity.name}${CC.YELLOW} is now at ${CC.RED}${
                                 "%.2f".format(health.toFloat())
                             }${HEART_SYMBOL} HP${CC.YELLOW}!")
@@ -1816,7 +1819,7 @@ object GameService
                     computed
                 }
 
-                if (game.flag(FeatureFlag.HeartsBelowNameTag))
+                if (game.flag(FeatureFlag.HeartsBelowNameTag) && game.shouldSendHealthHUD)
                 {
                     (it.damager as Player).sendHealthHUD(it.entity as Player)
                 }

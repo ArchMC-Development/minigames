@@ -144,6 +144,7 @@ open class GameImpl(
     var shouldAllowCrafting = false
     var shouldBeMinMaxEligible = true
     var shouldBroadcastRespawnChatMsg = true
+    var shouldSendHealthHUD = true
     var unplacedSpawnProtectionZone = false
     var voidDamageMin: Int? = 0
 
@@ -744,6 +745,30 @@ open class GameImpl(
             .mapNotNull(Bukkit::getPlayer)
             .forEach {
                 message.forEach { msg ->
+                    it.sendMessage(msg)
+                }
+            }
+    }
+
+    fun sendPersonalizedCenteredMessage(message: Player.() -> List<String>) =
+        sendPersonalizedMessage {
+            this.message().map { TextUtil.getCentered(it) }
+        }
+
+    fun sendPersonalizedMessage(message: Player.() -> List<String>)
+    {
+        this.toBukkitPlayers()
+            .filterNotNull()
+            .forEach {
+                message(it).forEach { msg ->
+                    it.sendMessage(msg)
+                }
+            }
+
+        this.expectedSpectators
+            .mapNotNull(Bukkit::getPlayer)
+            .forEach {
+                message(it).forEach { msg ->
                     it.sendMessage(msg)
                 }
             }

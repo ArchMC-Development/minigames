@@ -39,29 +39,6 @@ fun GameImpl.resetPlayerForFight(player: Player, noUpdateVisibility: Boolean = f
         resetAttributes()
     }
 
-    if (flag(FeatureFlag.HeartsBelowNameTag))
-    {
-        val objective = player.scoreboard
-            .getObjective(heartsBelowNametagTeam)
-            ?: player.scoreboard
-                .registerNewObjective(
-                    heartsBelowNametagTeam, "health"
-                )
-
-        objective.displaySlot = DisplaySlot.BELOW_NAME
-        objective.displayName = "${CC.D_RED}${Constants.HEART_SYMBOL}"
-
-        val objectivePlayerList = player.scoreboard
-            .getObjective(heartsInTablistTeam)
-            ?: player.scoreboard
-                .registerNewObjective(
-                    heartsInTablistTeam, "health"
-                )
-
-        objectivePlayerList.displaySlot = DisplaySlot.PLAYER_LIST
-        objectivePlayerList.displayName = CC.YELLOW
-    }
-
     if (flag(FeatureFlag.EntityDisguise))
     {
         val type = flagMetaData(FeatureFlag.EntityDisguise, "type")
@@ -98,18 +75,6 @@ fun GameImpl.enterSpectatorAfterLifeEnd(player: Player, final: Boolean = false)
         {
             DisguiseService.provider().undisguise(player)
         }
-
-        scoreboard
-            .getObjective(heartsInTablistTeam)
-            ?.apply {
-                displaySlot = null
-            }
-
-        scoreboard
-            .getObjective(heartsBelowNametagTeam)
-            ?.apply {
-                displaySlot = null
-            }
     }
 }
 
