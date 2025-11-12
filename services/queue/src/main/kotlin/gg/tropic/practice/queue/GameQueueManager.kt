@@ -622,15 +622,21 @@ object GameQueueManager
             }
         }
 
-        val kitId = MiniWallsMode.MAIN to "mw_main"
-        val miniWallsKit = KitDataSync.cached().kits[kitId.second]
-        if (miniWallsKit != null)
-        {
-            println("tracked mini walls queue")
-            queueHolder.trackPlayerQueue(MiniWallsSubscribableMinigamePlayerQueue(miniWallsKit, kitId.first))
-        } else
-        {
-            queueHolder.forgetPlayerQueue(kitId.second)
+        val kitId = listOf(
+            MiniWallsMode.MAIN to "mw_main",
+            MiniWallsMode.DM_FASTTRACK to "dm_fasttrack",
+        )
+
+        kitId.forEach { pair ->
+            val miniWallsKit = KitDataSync.cached().kits[pair.second]
+            if (miniWallsKit != null)
+            {
+                println("tracked mini walls queue")
+                queueHolder.trackPlayerQueue(MiniWallsSubscribableMinigamePlayerQueue(miniWallsKit, pair.first))
+            } else
+            {
+                queueHolder.forgetPlayerQueue(pair.second)
+            }
         }
 
         // cleanup queues for kits that no longer exist
