@@ -1,48 +1,48 @@
 [submodule "minigames/miniwalls"]
 	path = minigames/miniwalls
-	url = git@github.com:GrowlyX/minigames-miniwalls.git
+	url = git@github.com:ArchMC-Development/minigames-miniwalls.git
 [submodule "minigames/miniwalls-lobby"]
 	path = minigames/miniwalls-lobby
-	url = git@github.com:GrowlyX/minigames-miniwalls-lobby.git
+	url = git@github.com:ArchMC-Development/minigames-miniwalls-lobby.git
 [submodule "minigames/miniwalls-shared"]
 	path = minigames/miniwalls-shared
-	url = git@github.com:GrowlyX/minigames-miniwalls-shared.git
+	url = git@github.com:ArchMC-Development/minigames-miniwalls-shared.git
 [submodule "microgames/events"]
 	path = microgames/events
-	url = git@github.com:GrowlyX/microgames-events.git
+	url = git@github.com:ArchMC-Development/microgames-events.git
 [submodule "microgames/events-api"]
 	path = microgames/events-api
-	url = git@github.com:GrowlyX/microgames-events-api.git
+	url = git@github.com:ArchMC-Development/microgames-events-api.git
 [submodule "microgames/events-lobby"]
 	path = microgames/events-lobby
-	url = git@github.com:GrowlyX/microgames-events-lobby.git
+	url = git@github.com:ArchMC-Development/microgames-events-lobby.git
 [submodule "microgames/bridging-api"]
 	path = microgames/bridging-api
-	url = git@github.com:GrowlyX/microgames-bridging-api.git
+	url = git@github.com:ArchMC-Development/microgames-bridging-api.git
 [submodule "microgames/bridging"]
 	path = microgames/bridging
-	url = git@github.com:GrowlyX/microgames-bridging.git
+	url = git@github.com:ArchMC-Development/microgames-bridging.git
 [submodule "minigames/bedwars"]
 	path = minigames/bedwars
-	url = git@github.com:GrowlyX/minigames-bedwars.git
+	url = git@github.com:ArchMC-Development/minigames-bedwars.git
 [submodule "minigames/bedwars-shared"]
 	path = minigames/bedwars-shared
-	url = git@github.com:GrowlyX/minigames-bedwars-shared.git
+	url = git@github.com:ArchMC-Development/minigames-bedwars-shared.git
 [submodule "minigames/bedwars-lobby"]
 	path = minigames/bedwars-lobby
-	url = git@github.com:GrowlyX/minigames-bedwars-lobby.git
+	url = git@github.com:ArchMC-Development/minigames-bedwars-lobby.git
 [submodule "minigames/skywars"]
 	path = minigames/skywars
-	url = git@github.com:GrowlyX/minigames-skywars.git
+	url = git@github.com:ArchMC-Development/minigames-skywars.git
 [submodule "minigames/skywars-shared"]
 	path = minigames/skywars-shared
-	url = git@github.com:GrowlyX/minigames-skywars-shared.git
+	url = git@github.com:ArchMC-Development/minigames-skywars-shared.git
 [submodule "minigames/skywars-lobby"]
 	path = minigames/skywars-lobby
-	url = git@github.com:GrowlyX/minigames-skywars-lobby.git
+	url = git@github.com:ArchMC-Development/minigames-skywars-lobby.git
 [submodule "sbb"]
 	path = sbb
-	url = git@github.com:GrowlyX/minigames-robots.git
+	url = git@github.com:ArchMC-Development/minigames-robots.git
 [submodule "persistentgames/housing-lobby"]
 	path = persistentgames/housing-lobby
-	url = git@github.com:GrowlyX/persistentgames-housing-lobby.git
+	url = git@github.com:ArchMC-Development/persistentgames-housing-lobby.git
