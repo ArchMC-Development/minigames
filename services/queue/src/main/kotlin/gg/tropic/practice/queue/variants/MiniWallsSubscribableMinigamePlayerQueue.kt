@@ -19,7 +19,6 @@ class MiniWallsSubscribableMinigamePlayerQueue(
     private val mode: MiniWallsMode
 ) : AbstractSubscribableMinigamePlayerQueue(
     miniGameMode = mode,
-    selectNewestInstance = true,
     kit = kit,
     queueType = QueueType.Casual // No support for ranked yet
 )
