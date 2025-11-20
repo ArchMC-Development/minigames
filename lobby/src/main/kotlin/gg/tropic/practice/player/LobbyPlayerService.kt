@@ -227,7 +227,7 @@ object LobbyPlayerService
 
         if (!SpigotNetworkMetadataDataSync.isFlagged("STRIPPED_LOBBY"))
         {
-            PreventionListeners.plugin.logger.info { "skipping lobby prevention listeners" }
+            plugin.logger.info { "skipping lobby prevention listeners" }
             Events
                 .subscribe(PlayerToggleFlightEvent::class.java)
                 .filter {
