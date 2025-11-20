@@ -623,8 +623,8 @@ object GameQueueManager
         }
 
         val kitId = listOf(
-            MiniWallsMode.MAIN to "mw_main",
-            MiniWallsMode.DM_FASTTRACK to "dm_fasttrack",
+            MiniWallsMode.SQUADS to "mw_main",
+            MiniWallsMode.SOLO to "mw_main",
         )
 
         kitId.forEach { pair ->
