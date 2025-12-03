@@ -20,6 +20,7 @@ class MiniWallsSubscribableMinigamePlayerQueue(
 ) : AbstractSubscribableMinigamePlayerQueue(
     miniGameMode = mode,
     kit = kit,
+    selectNewestInstance = true,
     queueType = QueueType.Casual // No support for ranked yet
 )
 {
