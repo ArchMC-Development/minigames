@@ -1,6 +1,6 @@
-package gg.tropic.practice.ugc.attribute
+package gg.tropic.practice.ugc
 
-interface HostedWorldInstanceAttributes
+interface HostedWorldAttribute
 {
     val name: String
     val displayName: String
