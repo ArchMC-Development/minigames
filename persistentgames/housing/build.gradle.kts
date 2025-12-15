@@ -3,5 +3,5 @@ dependencies {
     compileOnly(project(":shared"))
     compileOnly(fileTree("spigot"))
     compileOnly(project(":spigot-integration"))
-    api(project(":microgames:bridging-api"))
+    api(project(":persistentgames:housing-api"))
 }
