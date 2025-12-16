@@ -5,6 +5,7 @@ import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
+import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
 
 @AutoRegister
@@ -18,5 +19,8 @@ object HouseCommand : ScalaCommand()
                 "You are not currently visiting a house!"
             )
         }
+
+        MainHouseMenu(house, house.playerIsOrAboveAdministrator(sender.uniqueId))
+            .openMenu(sender.bukkit())
     }
 }

@@ -24,29 +24,7 @@ data class PlayerHouse(
     var maxPlayers: Int = 20,
     var plotSizeBlocks: Int = 200,
     val tags: MutableList<String> = mutableListOf(),
-    val roles: MutableMap<String, HouseRole> = mutableMapOf(
-        "guest" to HouseRole(
-            name = "guest",
-            permissions = mutableListOf(),
-            color = "&7",
-            default = true,
-        ),
-        "resident" to HouseRole(
-            name = "resident",
-            permissions = mutableListOf("house.interact"),
-            color = "&6",
-        ),
-        "co-owner" to HouseRole(
-            name = "co-owner",
-            permissions = mutableListOf("house.manager"),
-            color = "&e",
-        ),
-        "owner" to HouseRole(
-            name = "owner",
-            permissions = mutableListOf("house.owner"),
-            color = "&c",
-        ),
-    ),
+    val roles: MutableMap<String, HouseRole> = HouseRole.defaults(),
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(
         VisitationStatus.PRIVATE to true,
     ),
@@ -58,6 +36,9 @@ data class PlayerHouse(
     override val description: MutableList<String> = mutableListOf()
 ) : IDataStoreObject, HostedWorldAttribute
 {
+
+    fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
+
     fun playerCanJoin(uuid: UUID): CompletableFuture<Boolean> {
         if (visitationStatuses[VisitationStatus.PUBLIC] == true)
         {
@@ -66,6 +47,10 @@ data class PlayerHouse(
 
         return CompletableFuture.completedFuture(uuid == owner)
     }
+
+    fun playerIsOrAboveAdministrator(player: UUID): Boolean = owner == player || hasPermission(player, "house.manage")
+
+    fun hasPermission(player: UUID, permission: String) = getRole(player).permissions.contains(permission)
 
     fun getRoleByName(name: String) = roles[name.lowercase()]
 
