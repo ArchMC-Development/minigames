@@ -1,5 +1,6 @@
 package mc.arch.minigames.persistent.housing.api.service
 
+import com.mongodb.client.model.Filters
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.scala.store.controller.DataStoreObjectControllerCache
@@ -20,9 +21,12 @@ object PlayerHousingService
 
         controller.mongo()
             .createIndexesFor(
-                "owner"
+                "owner",
+                "name"
             )
     }
+
+    fun findByName(name : String) = controller.mongo().loadWithFilter(Filters.eq("name", name.lowercase()))
 
     fun findById(uuid: UUID) = controller.load(uuid, DataStoreStorageType.MONGO)
 }
