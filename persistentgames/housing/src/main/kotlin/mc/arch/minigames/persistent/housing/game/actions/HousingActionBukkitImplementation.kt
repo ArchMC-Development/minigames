@@ -7,7 +7,7 @@ import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 @Service
 object HousingActionBukkitImplementation
 {
-    private var tasks: MutableMap<String, Task> = mutableMapOf()
+    private var tasks: MutableMap<String, Task<*>> = mutableMapOf()
 
     @Configure
     fun configure()
@@ -15,7 +15,7 @@ object HousingActionBukkitImplementation
 
     }
 
-    fun registerTask(task: Task)
+    fun registerTask(task: Task<*>)
     {
         tasks[task.id] = task
     }
