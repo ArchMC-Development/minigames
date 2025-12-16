@@ -70,11 +70,6 @@ class HousingHostedWorldInstance(
     override fun onLogin(player: Player)
     {
         player.updateInventory()
-
-        if (player.uniqueId != ownerPlayerId)
-        {
-            markSpectator(player)
-        }
     }
 
     override fun playerResourcesOf(player: Player) = HousingPlayerResources(
