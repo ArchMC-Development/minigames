@@ -2,7 +2,7 @@ package mc.arch.minigames.persistent.housing.api.action
 
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
-import mc.arch.minigames.persistent.housing.api.action.events.ActionEvent
+import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 
 @Service
 object HousingActionService

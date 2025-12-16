@@ -6,10 +6,11 @@ import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
 import org.bukkit.Bukkit
+import org.bukkit.event.player.PlayerJoinEvent
 import java.util.UUID
 
 @Service
-object SendMessageTask : Task(
+object SendMessageTask : Task<PlayerJoinEvent>(
     "sendMessage",
     "Send Message",
     mutableMapOf(
@@ -27,7 +28,7 @@ object SendMessageTask : Task(
         HousingActionBukkitImplementation.registerTask(this)
     }
 
-    override fun apply(playerId: UUID)
+    override fun apply(playerId: UUID?, event: PlayerJoinEvent)
     {
         val player = Bukkit.getPlayer(playerId)
             ?: return

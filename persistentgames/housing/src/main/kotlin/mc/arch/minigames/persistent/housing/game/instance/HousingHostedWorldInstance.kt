@@ -1,6 +1,5 @@
 package mc.arch.minigames.persistent.housing.game.instance
 
-import com.cryptomorin.xseries.XMaterial
 import gg.scala.lemon.handler.PlayerHandler
 import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
@@ -9,10 +8,11 @@ import mc.arch.minigames.persistent.housing.api.VisitHouseConfiguration
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
-import net.evilblock.cubed.entity.EntityHandler
+import net.evilblock.cubed.entity.hologram.HologramEntity
+import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
+import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.bukkit.util.Vector
 import java.util.concurrent.CompletableFuture
 
 class HousingHostedWorldInstance(
@@ -27,6 +27,9 @@ class HousingHostedWorldInstance(
 )
 {
     var configuration = (request.configuration as VisitHouseConfiguration)
+    
+    private val holograms: MutableMap<Location, HologramEntity> = mutableMapOf()
+    private val npcs: MutableMap<Location, NpcEntity> = mutableMapOf()
 
     override fun onLoad()
     {
@@ -44,27 +47,35 @@ class HousingHostedWorldInstance(
 
     override fun onUnload()
     {
-        destroyConfigurationEntity()
-        destroyHologramEntity()
-    }
+        destroyNPCEntities()
+        destroyHologramEntities()
+    } 
 
-    private fun destroyHologramEntity()
+    private fun destroyHologramEntities()
     {
-
+        holograms.values.forEach { 
+            it.destroyForCurrentWatchers()
+        }
+        
+        holograms.clear()
     }
 
-    private fun destroyConfigurationEntity()
+    private fun destroyNPCEntities()
     {
-
+        npcs.values.forEach {
+            it.destroyForCurrentWatchers()
+        }
+        
+        npcs.clear()
     }
 
-    override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}HOUSING"
+    override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
     override fun generateScoreboardLines(player: Player) = listOf<String>()
 
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
         .supplyAsync {
-            destroyConfigurationEntity()
-            destroyHologramEntity()
+            destroyNPCEntities()
+            destroyHologramEntities()
         }
 
     override fun onLogin(player: Player)

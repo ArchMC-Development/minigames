@@ -1,4 +1,4 @@
-package mc.arch.minigames.persistent.housing.api.action.events
+package mc.arch.minigames.persistent.housing.api.action.player
 
 interface ActionEvent
 {

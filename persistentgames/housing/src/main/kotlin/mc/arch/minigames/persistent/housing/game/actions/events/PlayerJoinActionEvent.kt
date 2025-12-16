@@ -3,7 +3,7 @@ package mc.arch.minigames.persistent.housing.game.actions.events
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
-import mc.arch.minigames.persistent.housing.api.action.events.ActionEvent
+import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import org.bukkit.event.player.PlayerJoinEvent
 
 @Service
