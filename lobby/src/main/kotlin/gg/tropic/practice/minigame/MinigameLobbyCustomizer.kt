@@ -15,10 +15,5 @@ interface MinigameLobbyCustomizer
     fun mainMenuProvider(player: Player)
     fun playProvider(player: Player)
 
-    fun leaderboardsProvider(player: Player): Map<Int, Button>
-    fun statisticsMenuProvider(profile: PracticeProfile): Map<Int, Button>
-
-    fun holographicStatsProvider(player: Player): List<String>
-
     fun scoreboard(): MinigameLobbyScoreboardProvider
 }
