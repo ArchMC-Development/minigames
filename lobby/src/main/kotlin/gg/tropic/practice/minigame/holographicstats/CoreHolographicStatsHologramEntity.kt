@@ -1,6 +1,7 @@
 package gg.tropic.practice.minigame.holographicstats
 
 import gg.scala.commons.spatial.Position
+import gg.tropic.practice.minigame.MinigameCompetitiveCustomizer
 import gg.tropic.practice.minigame.MinigameLobby
 import net.evilblock.cubed.entity.hologram.personalized.PersonalizedHologramEntity
 import net.evilblock.cubed.util.CC
@@ -26,7 +27,7 @@ class CoreHolographicStatsHologramEntity(
     override fun getNewLines(player: Player) = listOf(
         "${CC.B_WHITE}PERSONAL STATS",
         "",
-        *MinigameLobby.customizer()
+        *(MinigameLobby.customizer() as MinigameCompetitiveCustomizer)
             .holographicStatsProvider(player)
             .map { text ->
                 if (text.isBlank())

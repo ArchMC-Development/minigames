@@ -3,6 +3,7 @@ package gg.tropic.practice.menu
 import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.practice.kit.Kit
 import gg.tropic.practice.kit.feature.FeatureFlag
+import gg.tropic.practice.minigame.MinigameCompetitiveCustomizer
 import gg.tropic.practice.minigame.MinigameLobby
 import gg.tropic.practice.profile.PracticeProfile
 import gg.tropic.practice.statistics.TrackedKitStatistic
@@ -36,10 +37,10 @@ class StatisticsMenu(
 
     override fun getButtons(player: Player): MutableMap<Int, Button>
     {
-        if (MinigameLobby.isMinigameLobby())
+        if (MinigameLobby.isMinigameLobby() && MinigameLobby.customizer() is MinigameCompetitiveCustomizer)
         {
-            return MinigameLobby
-                .customizer()
+            return (MinigameLobby
+                .customizer() as MinigameCompetitiveCustomizer)
                 .statisticsMenuProvider(profile)
                 .toMutableMap()
         }

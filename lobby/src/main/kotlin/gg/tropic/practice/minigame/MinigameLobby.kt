@@ -598,11 +598,14 @@ object MinigameLobby
                 }
         }
 
-        CoreHolographicStatsHologramEntity(
-            PracticeConfigurationService.local().coreHolographicStatsPosition
-        ).apply {
-            initializeData()
-            EntityHandler.trackEntity(this)
+        if (customizer() is MinigameCompetitiveCustomizer)
+        {
+            CoreHolographicStatsHologramEntity(
+                PracticeConfigurationService.local().coreHolographicStatsPosition
+            ).apply {
+                initializeData()
+                EntityHandler.trackEntity(this)
+            }
         }
 
         PracticeConfigurationService.local().playNPCs
