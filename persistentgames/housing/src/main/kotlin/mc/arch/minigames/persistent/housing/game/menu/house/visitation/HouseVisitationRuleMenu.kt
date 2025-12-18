@@ -37,7 +37,7 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
                     "${CC.GRAY}${visitationRule.description}",
                     if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
                 ).toButton { _, _ ->
-
+                    toggleVisitationStatus(visitationRule, !enabled, house)
                 }
 
             buttons[int+9] = ItemBuilder.of(if (enabled) XMaterial.LIME_DYE else XMaterial.GRAY_DYE)
@@ -46,7 +46,7 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
                     "${CC.GRAY}${visitationRule.description}",
                     if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
                 ).toButton { _, _ ->
-
+                    toggleVisitationStatus(visitationRule, !enabled, house)
                 }
 
             index++
@@ -69,6 +69,8 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
          */
         if (status == VisitationStatus.PRIVATE)
         {
+            house.visitationStatuses[status] = value
+
             if (value)
             {
                 VisitationStatus.entries.forEach {
@@ -83,6 +85,64 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
                     house.visitationStatuses[VisitationStatus.PUBLIC] = true
                 }
             }
+        }
+
+        /**
+         * For public status, we basically just want to
+         * make sure that everyone can join and private
+         * status is turned off.
+         *
+         * On Hypixel, they auto turn-on every single
+         * targeted visitation status, so we do that too
+         */
+        if (status == VisitationStatus.PUBLIC)
+        {
+            house.visitationStatuses[status] = value
+
+            if (value)
+            {
+                VisitationStatus.entries.forEach {
+                    house.visitationStatuses[it] = it != VisitationStatus.PRIVATE
+                }
+            } else
+            {
+                if (VisitationStatus.entries.none { house.visitationStatusApplies(it) })
+                {
+                    house.visitationStatuses[VisitationStatus.PRIVATE] = true
+                }
+            }
+        }
+
+        /**
+         * For these, if it isn't public and isn't private,
+         * it follows super similar rule.
+         *
+         * If it's public, and you disable it, nuke it.
+         */
+        if (status != VisitationStatus.PUBLIC && status != VisitationStatus.PRIVATE)
+        {
+            house.visitationStatuses[status] = value
+
+            if (value)
+            {
+                if (house.visitationStatusApplies(VisitationStatus.PRIVATE))
+                {
+                    house.visitationStatuses[VisitationStatus.PRIVATE] = false
+                }
+            } else
+            {
+                if (house.visitationStatusApplies(VisitationStatus.PUBLIC))
+                {
+                    house.visitationStatuses[VisitationStatus.PUBLIC] = false
+                }
+            }
+        }
+
+        // After every single iteration, if the house has no visitation
+        // statuses on, just make private
+        if (VisitationStatus.entries.none { house.visitationStatusApplies(it) })
+        {
+            house.visitationStatuses[VisitationStatus.PRIVATE] = true
         }
     }
 
