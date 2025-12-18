@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.formatName
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.api.model.VisitationStatus
+import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -51,6 +52,8 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
 
             index++
         }
+
+        buttons[40] = MainHouseMenu.mainMenuButton(house)
 
         return buttons
     }
@@ -144,6 +147,8 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
         {
             house.visitationStatuses[VisitationStatus.PRIVATE] = true
         }
+
+        house.save()
     }
 
     fun icon(visitationStatus: VisitationStatus) = when (visitationStatus)

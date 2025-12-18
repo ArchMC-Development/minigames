@@ -1,5 +1,6 @@
 package mc.arch.minigames.persistent.housing.api.model
 
+import gg.scala.common.Savable
 import gg.scala.commons.annotations.Model
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
@@ -7,6 +8,7 @@ import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
 import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.role.HouseRole
+import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.api.spatial.WorldPosition
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -34,7 +36,7 @@ data class PlayerHouse(
     override val identifier: UUID = UUID.randomUUID(),
     override val displayName: String = name,
     override val description: MutableList<String> = mutableListOf()
-) : IDataStoreObject, HostedWorldAttribute
+) : IDataStoreObject, HostedWorldAttribute, Savable
 {
 
     fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
@@ -61,4 +63,6 @@ data class PlayerHouse(
 
         return getRoleByName(roleString) ?: defaultRole
     }
+
+    override fun save(): CompletableFuture<Void> = PlayerHousingService.
 }

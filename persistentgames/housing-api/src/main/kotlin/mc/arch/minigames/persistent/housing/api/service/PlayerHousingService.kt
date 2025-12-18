@@ -26,6 +26,8 @@ object PlayerHousingService
             )
     }
 
+    fun save(house: PlayerHouse) = controller.save(house, DataStoreStorageType.MONGO)
+
     fun findByName(name : String) = controller.mongo().loadWithFilter(Filters.eq("name", name.lowercase()))
 
     fun findById(uuid: UUID) = controller.load(uuid, DataStoreStorageType.MONGO)

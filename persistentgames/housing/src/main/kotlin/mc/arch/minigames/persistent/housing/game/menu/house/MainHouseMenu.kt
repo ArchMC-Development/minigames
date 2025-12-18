@@ -2,6 +2,7 @@ package mc.arch.minigames.persistent.housing.game.menu.house
 
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -9,7 +10,7 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.entity.Player
 
-class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean): Menu("Viewing ${house.displayName}")
+class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("Viewing ${house.displayName}")
 {
     init
     {
@@ -17,6 +18,16 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean): Menu("Viewi
         {
             placeholder = true
         }
+    }
+
+    companion object
+    {
+        fun mainMenuButton(house: PlayerHouse) =
+            ItemBuilder.of(XMaterial.NETHER_STAR)
+                .name("${CC.GREEN}Main Menu")
+                .toButton { player, _ ->
+                    MainHouseMenu(house, true).openMenu(player!!)
+                }
     }
 
     override fun size(buttons: Map<Int, Button>): Int = if (adminMenu) 45 else 27
@@ -60,7 +71,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean): Menu("Viewi
                     "",
                     "${CC.YELLOW}Click to configure!"
                 ).toButton { _, _ ->
-
+                    HouseSettingsMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
         } else
         {
