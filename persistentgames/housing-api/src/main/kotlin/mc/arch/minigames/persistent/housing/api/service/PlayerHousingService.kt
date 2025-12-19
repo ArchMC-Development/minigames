@@ -6,7 +6,6 @@ import gg.scala.flavor.service.Service
 import gg.scala.store.controller.DataStoreObjectControllerCache
 import gg.scala.store.storage.type.DataStoreStorageType
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
-import mc.arch.minigames.persistent.housing.api.cache.MutableHousingCache
 import java.util.*
 
 @Service
@@ -28,8 +27,15 @@ object PlayerHousingService
 
     fun save(house: PlayerHouse) =
         controller.save(house, DataStoreStorageType.MONGO).thenAccept {
-            MutableHousingCache.cache(house)
+            cache(house)
         }
+
+    fun cache(house: PlayerHouse)
+    {
+        controller.localCache()[house.identifier] = house
+    }
+
+    fun cached(uniqueId: UUID) = controller.localCache()[uniqueId]
 
     fun findByName(name : String) = controller.mongo().loadWithFilter(Filters.eq("name", name.lowercase()))
 

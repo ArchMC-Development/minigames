@@ -6,7 +6,6 @@ import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.instance.BaseHostedWorldInstance
 import mc.arch.minigames.persistent.housing.api.VisitHouseConfiguration
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
-import mc.arch.minigames.persistent.housing.api.cache.MutableHousingCache
 import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
 import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
@@ -36,7 +35,7 @@ class HousingHostedWorldInstance(
     private val holograms: MutableMap<Location, HologramEntity> = mutableMapOf()
     private val npcs: MutableMap<Location, NpcEntity> = mutableMapOf()
 
-    private val playerHouseReference get() = MutableHousingCache.cached(globalId)
+    private val playerHouseReference get() = PlayerHousingService.cached(globalId)
 
     override fun onLoad()
     {
@@ -47,7 +46,7 @@ class HousingHostedWorldInstance(
             //todo: emergency exit here if the house just isn't there and we try load
         } else
         {
-            MutableHousingCache.cache(house)
+            PlayerHousingService.cache(house)
         }
 
         reconfigureWorld(firstSetup = true).join()
@@ -66,8 +65,6 @@ class HousingHostedWorldInstance(
     {
         destroyNPCEntities()
         destroyHologramEntities()
-
-        MutableHousingCache.uncache(globalId)
     } 
 
     private fun destroyHologramEntities()
