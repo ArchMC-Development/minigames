@@ -37,7 +37,9 @@ object PlayerHousingService
 
     fun cached(uniqueId: UUID) = controller.localCache()[uniqueId]
 
-    fun findByName(name : String) = controller.mongo().loadWithFilter(Filters.eq("name", name.lowercase()))
+    fun findByName(name: String) = controller.mongo().loadWithFilter(Filters.eq("name", name.lowercase()))
+
+    fun findAllByOwner(uuid: UUID) = controller.mongo().loadAllWithFilter(Filters.eq("owner", uuid.toString()))
 
     fun findById(uuid: UUID) = controller.load(uuid, DataStoreStorageType.MONGO)
 }
