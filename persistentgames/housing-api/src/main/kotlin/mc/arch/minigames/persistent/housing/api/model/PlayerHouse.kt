@@ -33,6 +33,7 @@ data class PlayerHouse(
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(
         VisitationStatus.PRIVATE to true,
     ),
+    val housingBans: MutableList<UUID> = mutableListOf(),
     val playerRoles: MutableMap<UUID, String> = mutableMapOf(),
     val houseIcon: HousingItemStack? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
