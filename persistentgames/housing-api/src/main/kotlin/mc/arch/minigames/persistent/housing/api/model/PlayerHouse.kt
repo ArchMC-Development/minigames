@@ -4,6 +4,7 @@ import gg.scala.common.Savable
 import gg.scala.commons.annotations.Model
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
+import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
 import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
@@ -27,6 +28,7 @@ data class PlayerHouse(
     var maxPlayers: Int = 20,
     var plotSizeBlocks: Int = 200,
     val tags: MutableList<String> = mutableListOf(),
+    val actionEventMap: MutableMap<String, Task<*>> = mutableMapOf(),
     val roles: MutableMap<String, HouseRole> = HouseRole.defaults(),
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(
         VisitationStatus.PRIVATE to true,
