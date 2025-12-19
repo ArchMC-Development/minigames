@@ -42,7 +42,6 @@ object PreventBlockBreakTask : Task<BlockBreakEvent>(
     override fun apply(playerId: UUID?, event: BlockBreakEvent)
     {
         val player = event.player
-        val housingRole =
 
         event.isCancelled = true
     }
