@@ -54,6 +54,11 @@ data class PlayerHouse(
             return CompletableFuture.completedFuture(true)
         }
 
+        if (visitationStatuses[VisitationStatus.PRIVATE] == true)
+        {
+            return CompletableFuture.completedFuture(playerIsOrAboveAdministrator(uuid))
+        }
+
         return CompletableFuture.completedFuture(uuid == owner)
     }
 
