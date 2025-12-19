@@ -6,6 +6,7 @@ import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
+import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
 import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.role.HouseRole
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
@@ -33,6 +34,7 @@ data class PlayerHouse(
     val playerRoles: MutableMap<UUID, String> = mutableMapOf(),
     val houseIcon: HousingItemStack? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
+    val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
     override val identifier: UUID = UUID.randomUUID(),
     override val displayName: String = name,
     override val description: MutableList<String> = mutableListOf()
@@ -64,5 +66,5 @@ data class PlayerHouse(
         return getRoleByName(roleString) ?: defaultRole
     }
 
-    override fun save(): CompletableFuture<Void> = PlayerHousingService.
+    override fun save(): CompletableFuture<Void> = PlayerHousingService.save(this)
 }

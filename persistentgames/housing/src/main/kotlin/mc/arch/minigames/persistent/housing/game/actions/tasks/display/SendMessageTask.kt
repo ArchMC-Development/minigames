@@ -1,4 +1,4 @@
-package mc.arch.minigames.persistent.housing.game.actions.tasks
+package mc.arch.minigames.persistent.housing.game.actions.tasks.display
 
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
