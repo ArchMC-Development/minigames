@@ -5,6 +5,7 @@ import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
+import mc.arch.minigames.persistent.housing.game.translateCC
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.event.block.BlockBreakEvent
 import java.util.*
@@ -49,7 +50,7 @@ object PreventBlockBreakTask : Task(
         if (option<Boolean>("shouldSendDenial"))
         {
             player.sendMessage(
-                ChatColor.translateAlternateColorCodes('&', option<String>("denialMessage"))
+               option<String>("denialMessage").translateCC()
             )
         }
     }
