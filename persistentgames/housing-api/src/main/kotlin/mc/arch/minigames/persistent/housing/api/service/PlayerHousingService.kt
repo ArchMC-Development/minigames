@@ -25,6 +25,8 @@ object PlayerHousingService
             )
     }
 
+    fun delete(identifier: UUID) = controller.delete(identifier, DataStoreStorageType.MONGO)
+
     fun save(house: PlayerHouse) =
         controller.save(house, DataStoreStorageType.MONGO).thenAccept {
             cache(house)

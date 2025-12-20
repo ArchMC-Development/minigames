@@ -39,6 +39,7 @@ data class PlayerHouse(
     val playerRoles: MutableMap<UUID, String> = mutableMapOf(
         owner to "owner"
     ),
+    //val lastLaunched: Long = System.currentTimeMillis(),
     val houseIcon: HousingItemStack? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
     val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
