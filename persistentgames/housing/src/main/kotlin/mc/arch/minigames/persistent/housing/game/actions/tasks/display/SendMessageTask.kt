@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import java.util.UUID
 
 @Service
-object SendMessageTask : Task<PlayerJoinEvent>(
+object SendMessageTask : Task(
     "sendMessage",
     "Send Message",
     mutableMapOf(
@@ -28,7 +28,7 @@ object SendMessageTask : Task<PlayerJoinEvent>(
         HousingActionBukkitImplementation.registerTask(this)
     }
 
-    override fun apply(playerId: UUID?, event: PlayerJoinEvent)
+    override fun <E> apply(playerId: UUID?, event: E)
     {
         val player = Bukkit.getPlayer(playerId)
             ?: return

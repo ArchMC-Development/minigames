@@ -5,7 +5,7 @@ import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
-import org.bukkit.Bukkit
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.event.block.BlockBreakEvent
 import java.util.*
 
@@ -17,11 +17,11 @@ import java.util.*
  * @website https://solo.to/redis
  */
 @Service
-object PreventBlockBreakTask : Task<BlockBreakEvent>(
+object PreventBlockBreakTask : Task(
     "preventBlockBreak",
     "Prevent Block Breaking",
     mutableMapOf(
-        "shouldSendDential" to TaskOption(
+        "shouldSendDenial" to TaskOption(
             "Send Denial Message?",
             "false"
         ),
@@ -39,10 +39,18 @@ object PreventBlockBreakTask : Task<BlockBreakEvent>(
         HousingActionBukkitImplementation.registerTask(this)
     }
 
-    override fun apply(playerId: UUID?, event: BlockBreakEvent)
+    override fun <E> apply(playerId: UUID?, event: E)
     {
+        val blockBreakEvent = event as BlockBreakEvent
         val player = event.player
 
-        event.isCancelled = true
+        blockBreakEvent.isCancelled = true
+
+        if (option<Boolean>("shouldSendDenial"))
+        {
+            player.sendMessage(
+                ChatColor.translateAlternateColorCodes('&', option<String>("denialMessage"))
+            )
+        }
     }
 }

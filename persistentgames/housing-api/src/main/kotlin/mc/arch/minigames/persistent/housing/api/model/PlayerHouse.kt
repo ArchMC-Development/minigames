@@ -4,6 +4,7 @@ import gg.scala.common.Savable
 import gg.scala.commons.annotations.Model
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
+import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
@@ -12,7 +13,7 @@ import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.role.HouseRole
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.api.spatial.WorldPosition
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -28,7 +29,7 @@ data class PlayerHouse(
     var maxPlayers: Int = 20,
     var plotSizeBlocks: Int = 200,
     val tags: MutableList<String> = mutableListOf(),
-    val actionEventMap: MutableMap<String, Task<*>> = mutableMapOf(),
+    val actionEventMap: MutableMap<String, Task> = mutableMapOf(),
     val roles: MutableMap<String, HouseRole> = HouseRole.defaults(),
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(
         VisitationStatus.PRIVATE to true,
@@ -45,6 +46,9 @@ data class PlayerHouse(
     override val description: MutableList<String> = mutableListOf()
 ) : IDataStoreObject, HostedWorldAttribute, Savable
 {
+    fun getAllActionEventsBy(clazz: Class<*>) = actionEventMap.entries.filter {
+        HousingActionService.getByName(it.key)?.eventClass() == clazz
+    }
 
     fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
 

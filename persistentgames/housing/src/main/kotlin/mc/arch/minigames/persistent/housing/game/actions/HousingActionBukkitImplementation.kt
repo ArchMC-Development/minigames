@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent
 @Service
 object HousingActionBukkitImplementation
 {
-    private var tasks: MutableMap<String, Task<*>> = mutableMapOf()
+    private var tasks: MutableMap<String, Task> = mutableMapOf()
     private val terminable: CompositeTerminable = CompositeTerminable.create()
 
     @Configure
@@ -28,11 +28,14 @@ object HousingActionBukkitImplementation
                     return@handler
                 }
 
-
+                house.getAllActionEventsBy(BlockBreakEvent::class.java)
+                    .forEach {
+                        it.value.apply(event.player.uniqueId, event)
+                    }
             }.bindWith(terminable)
     }
 
-    fun registerTask(task: Task<*>)
+    fun registerTask(task: Task)
     {
         tasks[task.id] = task
     }
