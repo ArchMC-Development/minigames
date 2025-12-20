@@ -12,13 +12,12 @@ import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromIns
 object HouseCommand : ScalaCommand()
 {
     @CommandAlias("house|home")
-    fun onHouse(sender: ScalaPlayer) = sender.bukkit().getPlayerHouseFromInstance().thenAccept { house ->
-        if (house == null)
-        {
-            throw ConditionFailedException(
+    fun onHouse(sender: ScalaPlayer)
+    {
+        val house = sender.bukkit().getPlayerHouseFromInstance()
+            ?: throw ConditionFailedException(
                 "You are not currently visiting a house!"
             )
-        }
 
         MainHouseMenu(house, house.playerIsOrAboveAdministrator(sender.uniqueId))
             .openMenu(sender.bukkit())
