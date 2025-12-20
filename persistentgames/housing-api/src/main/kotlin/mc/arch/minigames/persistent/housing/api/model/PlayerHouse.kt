@@ -23,7 +23,8 @@ import java.util.concurrent.CompletableFuture
 @Model
 data class PlayerHouse(
     val owner: UUID,
-    override val name: String,
+    override val displayName: String,
+    override val name: String = displayName.lowercase(),
     var spawnPoint: WorldPosition? = null,
     var defaultGamemode: HousingGameMode = HousingGameMode.SURVIVAL,
     var maxPlayers: Int = 20,
@@ -42,7 +43,6 @@ data class PlayerHouse(
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
     val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
     override val identifier: UUID = UUID.randomUUID(),
-    override val displayName: String = name,
     override val description: MutableList<String> = mutableListOf()
 ) : IDataStoreObject, HostedWorldAttribute, Savable
 {
