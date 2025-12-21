@@ -96,7 +96,7 @@ object HostedWorldInstanceService
                                     instance.lastDrainBroadcast = System.currentTimeMillis()
                                     instance.bukkitWorld.players.forEach { player ->
                                         player.sendMessage("${CC.B_RED}YOUR WORLD IS REBOOTING")
-                                        player.sendMessage("${CC.RED}You will be automatically disconnected in <1m.")
+                                        player.sendMessage("${CC.RED}You will be automatically disconnected in <1m, but you can join back instantly.")
                                     }
                                 }
                                 return@forEach

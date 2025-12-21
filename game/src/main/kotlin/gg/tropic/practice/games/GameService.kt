@@ -554,7 +554,7 @@ object GameService
         CosmeticLocalConfig.enableCosmeticResources = false
         SpectatingPlayerProvider.spectating = ::isSpectating
 
-//        plugin.registerListener(FireballFeature())
+        plugin.registerListener(FireballFeature())
 
         Events
             .subscribe(EntityDamageByEntityEvent::class.java)
