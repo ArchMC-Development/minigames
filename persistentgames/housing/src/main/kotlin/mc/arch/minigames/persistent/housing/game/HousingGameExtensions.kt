@@ -36,46 +36,4 @@ fun HousingItemStack.toBukkitStack(): ItemStack = ItemStack(Material.valueOf(thi
         itemStack.itemMeta = itemMeta
     }
 
-fun PlayerHouse.processVisitation(player: Player): CompletableFuture<Void>
-{
-    player.sendMessage("${CC.GRAY}Traveling to this realm...")
-
-    return this.playerCanJoin(player.uniqueId).thenCompose {
-        if (!it)
-        {
-            player.sendMessage("${CC.RED}You are now allowed to join this house!")
-            return@thenCompose null
-        }
-
-        HostedWorldRPC.visitWorldRPCService
-            .call(
-                VisitWorldRequest(
-                    visitingPlayers = setOfNotNull(player.uniqueId),
-                    worldGlobalId = this.identifier,
-                    configuration = VisitHouseConfiguration(
-                        houseId = this.identifier,
-                        persistencePolicy = PersistencePolicy.PERSISTENT
-                    ),
-                    ownerPlayerId = player.uniqueId,
-                    providerType = WorldInstanceProviderType.REALM
-                )
-            )
-            .thenAccept { response ->
-                if (response.status == VisitWorldStatus.SUCCESS_REDIRECT)
-                {
-                    player.sendMessage("${CC.GREEN}You are being sent to this home!")
-                    RedisShared.redirect(listOf(player.uniqueId), response.redirectToInstance!!)
-                    return@thenAccept
-                }
-
-                player.sendMessage("${CC.RED}We weren't able to create a house for you. (${response.status})")
-            }
-            .exceptionally { throwable ->
-                throwable.printStackTrace()
-                player.sendMessage("${CC.RED}We weren't able to create a house for you right now. Try again later!")
-                return@exceptionally null
-            }
-    }
-}
-
 fun String.translateCC() = ChatColor.translateAlternateColorCodes('&', this)
