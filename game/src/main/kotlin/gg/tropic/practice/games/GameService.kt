@@ -332,11 +332,14 @@ object GameService
         } else null
 
         // Format team names based on red/blue teams flag
-        val killerName = if (game.flag(FeatureFlag.RedBlueTeams))
-            killer?.teamIdentifier?.toRBTeamSide()
-                ?.format(finalKillerPlayer?.name ?: eliminatedBy?.let { Bukkit.getPlayer(it)?.name } ?: "???")
-                ?: "???"
-        else "${CC.GREEN}${finalKillerPlayer?.name ?: eliminatedBy?.let { Bukkit.getPlayer(it)?.name } ?: "???"}"
+        // Only set killerName if we have a valid killer - don't use "???" fallback
+        val actualKillerName = finalKillerPlayer?.name ?: eliminatedBy?.let { Bukkit.getPlayer(it)?.name }
+        val killerName = if (actualKillerName != null) {
+            if (game.flag(FeatureFlag.RedBlueTeams))
+                killer?.teamIdentifier?.toRBTeamSide()?.format(actualKillerName)
+                    ?: "${CC.GREEN}$actualKillerName"
+            else "${CC.GREEN}$actualKillerName"
+        } else null
 
         val killedName = if (game.flag(FeatureFlag.RedBlueTeams))
             team.teamIdentifier.toRBTeamSide().format(name)

@@ -47,15 +47,21 @@ object DeathMessageStrategy
         {
             EliminationCause.KILLED_BY_PLAYER ->
             {
-                val phrase = if (killedBy is Player)
-                    getMessageBundlePhrase(killedBy) else "slain"
+                // Only show "slain by X" if we have a valid killer name
+                if (killedByDisplayName != null) {
+                    val phrase = if (killedBy is Player)
+                        getMessageBundlePhrase(killedBy) else "slain"
 
-                "${CC.GREEN}$killedDisplayName${CC.GRAY} was $phrase by ${CC.RED}$killedByDisplayName${CC.GRAY}!"
+                    "${CC.GREEN}$killedDisplayName${CC.GRAY} was $phrase by ${CC.RED}$killedByDisplayName${CC.GRAY}!"
+                } else {
+                    // No killer context - show generic death
+                    "${CC.RED}$killedDisplayName${CC.GRAY} died!"
+                }
             }
 
             else -> eliminationCause.formatMessage(
                 killedDisplayName,
-                killedByDisplayName
+                killedByDisplayName  // This is already nullable and handled by formatMessage
             )
         }
     }
