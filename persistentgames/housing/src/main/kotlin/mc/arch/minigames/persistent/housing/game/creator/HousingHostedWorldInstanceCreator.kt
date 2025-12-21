@@ -24,9 +24,9 @@ object HousingHostedWorldInstanceCreator : HostedWorldInstanceCreator<HousingPla
     }
 
     override fun createInstance(request: VisitWorldRequest): CompletableFuture<HostedWorldInstance<HousingPlayerResources>> = SlimeWorldLoadStrategy
-        .createTemporaryWorld(
+        .loadPersistentWorld(
             providerType = type,
-            worldId = request.worldGlobalId
+            persistentWorldId = request.worldGlobalId
         )
         .thenApply { world ->
             if (world == null)
