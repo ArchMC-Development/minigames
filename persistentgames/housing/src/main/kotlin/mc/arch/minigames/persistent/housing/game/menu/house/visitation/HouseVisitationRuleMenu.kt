@@ -9,6 +9,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
@@ -20,44 +21,44 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
 
     override fun size(buttons: Map<Int, Button>): Int = 45
 
-    override fun getButtons(player: Player): Map<Int, Button>
-    {
-        val buttons = mutableMapOf<Int, Button>()
-
-        var index = 0
-        val visitationRules = VisitationStatus.entries
-
-        for (int in 11..15)
+        override fun getButtons(player: Player): Map<Int, Button>
         {
-            val visitationRule = visitationRules.getOrNull(index)
-                ?: VisitationStatus.PUBLIC
-            val enabled = house.visitationStatuses[visitationRule] == true
+            val buttons = mutableMapOf<Int, Button>()
 
-            buttons[int] = ItemBuilder.of(icon(visitationRule))
-                .name("${CC.GREEN}${visitationRule.formatName()}")
-                .addToLore(
-                    "${CC.GRAY}${visitationRule.description}",
-                    if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
-                ).toButton { _, _ ->
-                    toggleVisitationStatus(visitationRule, !enabled, house)
-                }
+            var index = 0
+            val visitationRules = VisitationStatus.entries
 
-            buttons[int+9] = ItemBuilder.of(if (enabled) XMaterial.LIME_DYE else XMaterial.GRAY_DYE)
-                .name(if (enabled) "${CC.GREEN}Enabled" else "${CC.RED}Disabled")
-                .addToLore(
-                    "${CC.GRAY}${visitationRule.description}",
-                    if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
-                ).toButton { _, _ ->
-                    toggleVisitationStatus(visitationRule, !enabled, house)
-                }
+            for (int in 11..15)
+            {
+                val visitationRule = visitationRules.getOrNull(index)
+                    ?: VisitationStatus.PUBLIC
+                val enabled = house.visitationStatuses[visitationRule] == true
 
-            index++
+                buttons[int] = ItemBuilder.of(XMaterial.PLAYER_HEAD)
+                    .name("${CC.GREEN}${visitationRule.formatName()}")
+                    .addToLore(
+                        "${CC.GRAY}${visitationRule.description}",
+                        if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
+                    ).toButton { _, _ ->
+                        toggleVisitationStatus(visitationRule, !enabled, house)
+                    }
+
+                buttons[int+9] = ItemBuilder.of(if (enabled) XMaterial.LIME_DYE else XMaterial.GRAY_DYE)
+                    .name(if (enabled) "${CC.GREEN}Enabled" else "${CC.RED}Disabled")
+                    .addToLore(
+                        "${CC.GRAY}${visitationRule.description}",
+                        if (enabled) "${CC.RED}Click to disable" else "${CC.GREEN}Click to enable"
+                    ).toButton { _, _ ->
+                        toggleVisitationStatus(visitationRule, !enabled, house)
+                    }
+
+                index++
+            }
+
+            buttons[40] = MainHouseMenu.mainMenuButton(house)
+
+            return buttons
         }
-
-        buttons[40] = MainHouseMenu.mainMenuButton(house)
-
-        return buttons
-    }
 
     fun toggleVisitationStatus(status: VisitationStatus, value: Boolean, house: PlayerHouse)
     {
@@ -150,17 +151,5 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
         }
 
         house.save()
-    }
-
-    fun icon(visitationStatus: VisitationStatus) = when (visitationStatus)
-    {
-        VisitationStatus.PUBLIC -> XMaterial.GREEN_DYE
-        VisitationStatus.PARTY -> XMaterial.MAGENTA_DYE
-        VisitationStatus.FRIENDS -> XMaterial.BLUE_DYE
-        VisitationStatus.GUILD -> XMaterial.YELLOW_DYE
-        else ->
-        {
-            XMaterial.RED_DYE
-        }
     }
 }
