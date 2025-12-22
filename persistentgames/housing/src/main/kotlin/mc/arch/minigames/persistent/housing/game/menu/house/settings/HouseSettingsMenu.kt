@@ -56,6 +56,60 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
                     }
                 }
 
+                Button.playNeutral(player)
+                house.save()
+            }
+
+        buttons[11] = ItemBuilder.of(XMaterial.ANVIL)
+            .name("${CC.GREEN}Border: ${CC.AQUA}${house.plotSizeBlocks}x${house.plotSizeBlocks}")
+            .addToLore(
+                "${CC.GRAY}Change the maximum distance",
+                "${CC.GRAY}that players can venture out",
+                "${CC.GRAY}from your realm.",
+                "",
+                "${CC.YELLOW}Distance Caps:",
+                "${CC.GRAY}Default: ${CC.WHITE}300x300",
+                "${CC.PINK}Mythic${CC.GRAY}: ${CC.WHITE}500x500",
+                "${CC.AQUA}Majestic${CC.GRAY}: ${CC.WHITE}750x750",
+                "${CC.D_AQUA}Champion${CC.GRAY}: ${CC.WHITE}1000x1000",
+                "",
+                "${CC.GREEN}Left-Click to cycle forward +10",
+                "${CC.RED}Right-Click to cycle backward +10"
+            ).toButton { _, click ->
+                if (click?.isLeftClick == true)
+                {
+                    house.plotSizeBlocks += 10
+
+                    if (house.plotSizeBlocks >= 300 && !player.hasPermission("housing.plot.500"))
+                    {
+                        house.maxPlayers = 300
+                    }
+
+                    if (house.plotSizeBlocks >= 500 && !player.hasPermission("housing.plot.750"))
+                    {
+                        house.maxPlayers = 500
+                    }
+
+                    if (house.plotSizeBlocks >= 750 && !player.hasPermission("housing.plot.1000"))
+                    {
+                        house.maxPlayers = 750
+                    }
+
+                    if (house.plotSizeBlocks >= 1000)
+                    {
+                        house.maxPlayers = 1000
+                    }
+                } else
+                {
+                    house.plotSizeBlocks -= 10
+
+                    if (house.plotSizeBlocks <= 100)
+                    {
+                        house.plotSizeBlocks = 100
+                    }
+                }
+
+                Button.playNeutral(player)
                 house.save()
             }
 
