@@ -8,6 +8,8 @@ object HousingActionService
 {
     private val events: MutableMap<String, ActionEvent> = mutableMapOf()
 
+    fun getAllEvents(): List<ActionEvent> = events.values.toList()
+
     fun getByName(name: String): ActionEvent? = events[name]
 
     fun registerActionEvent(event: ActionEvent)

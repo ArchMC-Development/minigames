@@ -2,6 +2,7 @@ package mc.arch.minigames.persistent.housing.game.menu.house
 
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import net.evilblock.cubed.menu.Button
@@ -47,7 +48,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view event actions!"
                 ).toButton { _, _ ->
-
+                    EventActionSelectionMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
 
             buttons[3] = ItemBuilder.of(XMaterial.VILLAGER_SPAWN_EGG)
@@ -61,7 +63,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
                 }
 
-            buttons[3] = ItemBuilder.of(XMaterial.OAK_SIGN)
+            buttons[4] = ItemBuilder.of(XMaterial.OAK_SIGN)
                 .name("${CC.GREEN}Hologram Editor")
                 .addToLore(
                     "${CC.GRAY}Want to add custom Holograms to",
