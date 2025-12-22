@@ -6,6 +6,7 @@ import gg.tropic.practice.expectation.GameExpectation
 import gg.tropic.practice.games.GameState
 import gg.tropic.practice.games.manager.GameManager
 import gg.tropic.practice.games.matchmaking.JoinIntoGameRequest
+import gg.tropic.practice.games.matchmaking.JoinIntoGameResult
 import gg.tropic.practice.games.matchmaking.JoinIntoGameStatus
 import gg.tropic.practice.games.matchmaking.MatchmakingMetadata
 import gg.tropic.practice.games.team.GameTeam
@@ -112,10 +113,12 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                     )
                     .join()
             }.getOrElse {
-                JoinIntoGameStatus.FAILED_RPC_FAILURE
+                JoinIntoGameResult(
+                    status = JoinIntoGameStatus.FAILED_RPC_FAILURE
+                )
             }
 
-            if (joinGameResult == JoinIntoGameStatus.SUCCESS)
+            if (joinGameResult.status == JoinIntoGameStatus.SUCCESS)
             {
                 RedisShared.redirect(
                     targetEntry.data.players,
@@ -124,7 +127,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 return listOf(targetEntry.data)
             } else
             {
-                println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult})")
+                println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status})")
             }
         }
 
