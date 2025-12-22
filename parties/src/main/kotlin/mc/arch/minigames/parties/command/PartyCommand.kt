@@ -689,4 +689,32 @@ object PartyCommand : ScalaCommand()
             player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}")
         }
     }
+
+    @Subcommand("private")
+    @Description("Toggle Private Games mode for your party!")
+    fun onPrivate(player: Player): CompletableFuture<Void>
+    {
+        val existing = player.toParty()
+            ?: throw ConditionFailedException("You're not in a party.")
+
+        if (existing.leader.uniqueId != player.uniqueId)
+        {
+            throw ConditionFailedException("Only the party leader can toggle Private Games mode!")
+        }
+
+        val wasEnabled = existing.isEnabled(PartySetting.PRIVATE_GAMES)
+        existing.update(PartySetting.PRIVATE_GAMES, !wasEnabled)
+
+        return existing.saveAndUpdateParty().thenRun {
+            val statusText = if (!wasEnabled) 
+                "${CC.GREEN}enabled" 
+            else 
+                "${CC.RED}disabled"
+            
+            existing.sendMessage(FancyMessage()
+                .withMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}\n")
+                .withMessage("${CC.GREEN}${player.uniqueId.toDisplayName()} ${CC.YELLOW}has $statusText ${CC.LIGHT_PURPLE}Private Games${CC.YELLOW} mode!\n")
+                .withMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}"))
+        }
+    }
 }

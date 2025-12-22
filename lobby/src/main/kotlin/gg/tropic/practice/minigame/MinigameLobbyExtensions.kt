@@ -53,8 +53,35 @@ fun MiniGameModeMetadata.joinGame(player: Player, configuration: MiniGameQueueCo
             player.sendMessage("${CC.RED}This mode is unavailable!")
         }
 
-    QueueService.joinQueue(kit, queueId.queueType, queueId.teamSize, player, configuration)
-    player.sendMessage("${CC.GREEN}Joining a $displayName game...")
+    // Check if player's party has Private Games mode enabled
+    var finalConfiguration = configuration
+    if (lobbyPlayer.isInParty())
+    {
+        val party = lobbyPlayer.partyOf()
+        val privateGamesEnabled = party.delegate.isEnabled(mc.arch.minigames.parties.model.PartySetting.PRIVATE_GAMES)
+        
+        if (privateGamesEnabled)
+        {
+            // Create or modify configuration with private game settings
+            finalConfiguration = configuration?.copy(
+                isPrivateGame = true,
+                privateGameSettings = gg.tropic.practice.privategames.PrivateGameSettings.default()
+            ) ?: MiniGameQueueConfiguration(
+                isPrivateGame = true,
+                privateGameSettings = gg.tropic.practice.privategames.PrivateGameSettings.default()
+            )
+            
+            player.sendMessage("${CC.LIGHT_PURPLE}Starting a Private Game for your party...")
+        }
+    }
+
+    QueueService.joinQueue(kit, queueId.queueType, queueId.teamSize, player, finalConfiguration)
+    
+    val messagePrefix = if (finalConfiguration?.isPrivateGame == true) 
+        "${CC.LIGHT_PURPLE}Creating a private" 
+    else 
+        "${CC.GREEN}Joining a"
+    player.sendMessage("$messagePrefix $displayName game...")
 }
 
 fun ItemBuilder.toConciseJoinButton(mode: String) = toButton { player, type ->

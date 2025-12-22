@@ -304,17 +304,26 @@ class PartyManageMenu(
                     }
                 }
 
+            val privateGamesEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
             this[18] = ItemBuilder
-                .copyOf(
-                    PaginatedMenu.PLACEHOLDER
-                        .getButtonItem(player)
-                )
-                .data(1)
-                .name("${CC.GOLD}Private Games")
+                .of(if (privateGamesEnabled) XMaterial.LIME_DYE else XMaterial.GRAY_DYE)
+                .name("${CC.LIGHT_PURPLE}Private Games")
                 .addToLore(
-                    "${CC.GRAY}Coming soon!"
+                    "${CC.GRAY}Create private game sessions",
+                    "${CC.GRAY}for your party with custom",
+                    "${CC.GRAY}settings and no stat tracking!",
+                    "",
+                    "${CC.WHITE}Status: ${if (privateGamesEnabled) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}",
+                    "",
+                    "${CC.YELLOW}Click to toggle!"
                 )
-                .toButton()
+                .toButton { _, _ ->
+                    val wasEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
+                    party.update(PartySetting.PRIVATE_GAMES, !wasEnabled)
+                    party.saveAndUpdateParty().thenRun {
+                        PartyManageMenu(party, role).openMenu(player)
+                    }
+                }
 
             this[9] = ItemBuilder
                 .copyOf(

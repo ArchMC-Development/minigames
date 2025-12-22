@@ -357,7 +357,7 @@ object GameService
         // Handle killer effects and statistics
         if (finalKillerPlayer is Player && !game.robot())
         {
-            if (game.expectationModel.queueType != null)
+            if (!game.expectationModel.isPrivateGame && game.expectationModel.queueType != null)
             {
                 StatisticService
                     .update(finalKillerPlayer.uniqueId) {
@@ -407,7 +407,7 @@ object GameService
         }
 
         // Handle victim death statistics
-        if (!game.robot() && game.expectationModel.queueType != null)
+        if (!game.robot() && !game.expectationModel.isPrivateGame && game.expectationModel.queueType != null)
         {
             StatisticService
                 .update(uniqueId) {

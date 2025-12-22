@@ -346,7 +346,7 @@ open class GameImpl(
 
             val opponents = getAllOpponents(winner)
             val allOpponentPlayers = opponents.flatMap(GameTeam::players)
-            if (!robot() && expectationModel.queueType != null)
+            if (!robot() && !expectationModel.isPrivateGame && expectationModel.queueType != null)
             {
                 val trackedKitStatisticsUpdates = allOpponentPlayers.map {
                     StatisticService.update(it) {
