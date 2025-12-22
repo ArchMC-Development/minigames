@@ -1,6 +1,7 @@
 package gg.tropic.practice.privategames
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -29,7 +30,7 @@ import java.time.Duration
 object PrivateGamesHotbarService
 {
     @Inject
-    lateinit var plugin: JavaPlugin
+    lateinit var plugin: ExtendedScalaPlugin
 
     private val settingsItem = ItemBuilder
         .of(XMaterial.COMPARATOR)
@@ -56,7 +57,7 @@ object PrivateGamesHotbarService
                 {
                     event.player.inventory.setItem(2, settingsItem)
                     event.player.updateInventory()
-                    
+
                     event.player.sendMessage("${CC.LIGHT_PURPLE}This is a Private Game! Right-click the Comparator to configure settings.")
                 }
             }
@@ -65,8 +66,8 @@ object PrivateGamesHotbarService
         // Handle settings item click
         Events
             .subscribe(PlayerInteractEvent::class.java)
-            .filter { 
-                it.hasItem() && 
+            .filter {
+                it.hasItem() &&
                 it.item.isSimilar(settingsItem) &&
                 (it.action == Action.RIGHT_CLICK_AIR || it.action == Action.RIGHT_CLICK_BLOCK)
             }
