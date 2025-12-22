@@ -37,19 +37,28 @@ class VisitWorldRequestHandler(
 
             if (existingWorldMatchingSpec != null)
             {
-                val response = HostedWorldRPC.visitWorldAddPlayerRPCService.callSync(AddPlayerRequest(
-                    globalWorldId = existingWorldMatchingSpec.globalId,
-                    server = existingWorldMatchingSpec.server,
-                    visitingPlayers = request.visitingPlayers
-                ))
+                val response = runCatching {
+                    HostedWorldRPC.visitWorldAddPlayerRPCService
+                        .call(
+                            AddPlayerRequest(
+                                globalWorldId = existingWorldMatchingSpec.globalId,
+                                server = existingWorldMatchingSpec.server,
+                                visitingPlayers = request.visitingPlayers
+                            )
+                        )
+                        .join()
+                        ?.status
+                }.getOrElse {
+                    AddPlayerStatus.FAILURE_WORLD_NOT_LOADED
+                }
 
-                if (response?.status == AddPlayerStatus.SUCCESS)
+                if (response == AddPlayerStatus.SUCCESS)
                 {
                     return@withGlobalLock VisitWorldResponse(
                         status = VisitWorldStatus.SUCCESS_REDIRECT,
                         redirectToInstance = existingWorldMatchingSpec.server // Assuming this field exists
                     )
-                } else if (response?.status == AddPlayerStatus.FAILURE_WORLD_DRAINING)
+                } else if (response == AddPlayerStatus.FAILURE_WORLD_DRAINING)
                 {
                     return@withGlobalLock VisitWorldResponse(
                         status = VisitWorldStatus.FAILED_UNAVAILABLE_INSTANCE_DRAINING,

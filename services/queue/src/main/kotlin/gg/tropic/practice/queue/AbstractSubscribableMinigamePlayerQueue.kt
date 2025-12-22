@@ -98,14 +98,19 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         if (existingGameRequiringPlayers != null)
         {
-            val joinGameResult = MiniGameRPC.joinIntoGameService
-                .callSync(
-                    JoinIntoGameRequest(
-                        server = existingGameRequiringPlayers.server,
-                        players = targetEntry.data.players.toSet(),
-                        game = existingGameRequiringPlayers
+            val joinGameResult = runCatching {
+                MiniGameRPC.joinIntoGameService
+                    .call(
+                        JoinIntoGameRequest(
+                            server = existingGameRequiringPlayers.server,
+                            players = targetEntry.data.players.toSet(),
+                            game = existingGameRequiringPlayers
+                        )
                     )
-                )
+                    .join()
+            }.getOrElse {
+                JoinIntoGameStatus.FAILED_RPC_FAILURE
+            }
 
             if (joinGameResult?.status == JoinIntoGameStatus.SUCCESS)
             {
