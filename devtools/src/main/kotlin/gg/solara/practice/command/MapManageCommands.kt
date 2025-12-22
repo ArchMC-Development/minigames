@@ -14,13 +14,18 @@ import gg.solara.practice.map.MapManageServices
 import gg.tropic.practice.map.MapService
 import gg.scala.commons.spatial.Bounds
 import gg.scala.commons.spatial.toPosition
+import gg.scala.flavor.inject.Inject
+import gg.solara.practice.PracticeDevTools
+import gg.tropic.practice.map.MapContainer
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.utilities.MapMetadataScanUtilities
+import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.InputPrompt
 import org.bukkit.Bukkit
 import org.bukkit.Sound
+import java.io.File
 
 /**
  * @author GrowlyX
@@ -31,6 +36,9 @@ import org.bukkit.Sound
 @CommandPermission("op")
 object MapManageCommands : ScalaCommand()
 {
+    @Inject
+    lateinit var plugin: PracticeDevTools
+
     @Default
     @HelpCommand
     fun onHelp(help: CommandHelp)
@@ -49,10 +57,35 @@ object MapManageCommands : ScalaCommand()
     @Subcommand("manipulate")
     fun onManipulate(player: ScalaPlayer)
     {
+        data class X(
+            val uid: String,
+            val maps: MutableMap<String, Map>? = mutableMapOf()
+        )
+
+        data class Container(
+            val items: List<X>
+        )
+
+        val things = Serializers.gson.fromJson(
+            File(plugin.dataFolder, "Scala.DataSync.json").readText(),
+            Container::class.java
+        )
+
+        val item = things.component1().firstOrNull { it.uid == "mi-practice-maps" }
+            ?: throw ConditionFailedException("couldn't find map container")
+        item.component2()
+            ?: throw ConditionFailedException("coudn't find maps")
+
         MapService.editAndSave {
-            maps.values.forEach { map ->
-                map.associatedKitGroups += "mw_main"
-                map.associatedKitGroups -= "__default__"
+            maps.forEach { (key, map) ->
+                val component = item.component2()!![key]
+                    ?: return@forEach run {
+                        player.sendMessage("${CC.RED}failed $key")
+                    }
+
+                map.associatedKitGroups.clear()
+                map.associatedKitGroups += component.associatedKitGroups
+                player.sendMessage("${CC.GREEN}succeeded $key")
             }
         }
     }
