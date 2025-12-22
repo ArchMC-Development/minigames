@@ -49,7 +49,10 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         val preferredRegion = if (targetEntry.data.preferredQueueRegion == Region.Both)
             Region.NA else targetEntry.data.preferredQueueRegion
 
-        val existingGameRequiringPlayers = GameManager.allGames()
+        // Private games always create new instances - skip joining existing games
+        val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
+        
+        val existingGameRequiringPlayers = if (isPrivateGame) null else GameManager.allGames()
             .filter {
                 var conditions = it.queueId == id &&
                     (it.state == GameState.Waiting || it.state == GameState.Starting)
@@ -164,7 +167,9 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 region = Region.NA,
                 bracket = targetEntry.data.miniGameQueueConfiguration?.bracket
             ),
-            miniGameConfiguration = constructConfigurationForInitiatorEntry(targetEntry.data)
+            miniGameConfiguration = constructConfigurationForInitiatorEntry(targetEntry.data),
+            isPrivateGame = isPrivateGame,
+            privateGameSettings = targetEntry.data.miniGameQueueConfiguration?.privateGameSettings
         )
 
         GameQueueManager

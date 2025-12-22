@@ -253,6 +253,18 @@ object NetworkPartyService : PartyService
         )
     }
 
+    fun warpPartyTo(party: Party, server: String)
+    {
+        AwareMessage.of(
+            packet = "warp",
+            aware = sync,
+            "uniqueId" to party.uniqueId,
+            "server" to server,
+        ).publish(
+            context = AwareThreadContext.ASYNC
+        )
+    }
+
     override fun delete(party: Party)
     {
         ScalaCommonsGlobals.redis()

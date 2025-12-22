@@ -5,6 +5,7 @@ import gg.tropic.practice.games.matchmaking.MatchmakingMetadata
 import gg.tropic.practice.queue.QueueType
 import gg.tropic.practice.games.team.GameTeam
 import gg.tropic.practice.minigame.MiniGameConfiguration
+import gg.tropic.practice.privategames.PrivateGameSettings
 import gg.tropic.practice.provider.MiniProviderVersion
 import java.util.*
 
@@ -26,5 +27,12 @@ data class GameExpectation(
     val configuration: PvPConfiguration? = null,
     val matchmakingMetadataAPIV2: MatchmakingMetadata? = null,
     val miniGameConfiguration: MiniGameConfiguration? = null,
-    val requiredMiniVersion: MiniProviderVersion = MiniProviderVersion.LEGACY
+    val requiredMiniVersion: MiniProviderVersion = MiniProviderVersion.LEGACY,
+    /**
+     * Private games are party-exclusive games with no stat tracking
+     * and optional game-specific settings.
+     */
+    val isPrivateGame: Boolean = false,
+    val privateGameSettings: PrivateGameSettings? = null
 )
+

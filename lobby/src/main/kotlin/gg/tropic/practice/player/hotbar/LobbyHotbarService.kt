@@ -510,10 +510,34 @@ object LobbyHotbarService
                         return@scope ItemStack(Material.AIR)
                     }
 
-                    return@scope ItemBuilder
-                        .of(XMaterial.LIME_DYE)
-                        .name("${CC.B_GREEN}Party Play ${CC.GRAY}(Right Click)")
-                        .build()
+                    val lobbyPlayer = LobbyPlayerService.find(player)
+                        ?: return@scope ItemStack(Material.AIR)
+                    
+                    if (!lobbyPlayer.isInParty())
+                    {
+                        return@scope ItemStack(Material.AIR)
+                    }
+
+                    val party = lobbyPlayer.partyOf()
+                    val privateGamesEnabled = party.delegate.isEnabled(mc.arch.minigames.parties.model.PartySetting.PRIVATE_GAMES)
+
+                    return@scope if (privateGamesEnabled)
+                    {
+                        ItemBuilder
+                            .of(XMaterial.NETHER_STAR)
+                            .name("${CC.LIGHT_PURPLE}Private Games ${CC.GRAY}(Right Click)")
+                            .addToLore(
+                                "${CC.GRAY}Click to select a minigame",
+                                "${CC.GRAY}for your private party game!"
+                            )
+                            .build()
+                    } else
+                    {
+                        ItemBuilder
+                            .of(XMaterial.LIME_DYE)
+                            .name("${CC.B_GREEN}Party Play ${CC.GRAY}(Right Click)")
+                            .build()
+                    }
                 }
 
                 it.onClick = scope@{ player ->
@@ -522,7 +546,24 @@ object LobbyHotbarService
                         return@scope
                     }
 
-                    PartyPlayGameSelectMenu().openMenu(player)
+                    val lobbyPlayer = LobbyPlayerService.find(player)
+                        ?: return@scope
+                    
+                    if (!lobbyPlayer.isInParty())
+                    {
+                        return@scope
+                    }
+
+                    val party = lobbyPlayer.partyOf()
+                    val privateGamesEnabled = party.delegate.isEnabled(mc.arch.minigames.parties.model.PartySetting.PRIVATE_GAMES)
+
+                    if (privateGamesEnabled)
+                    {
+                        gg.tropic.practice.menu.party.PrivateGamesMinigameSelectorMenu().openMenu(player)
+                    } else
+                    {
+                        PartyPlayGameSelectMenu().openMenu(player)
+                    }
                 }
             }
         )
