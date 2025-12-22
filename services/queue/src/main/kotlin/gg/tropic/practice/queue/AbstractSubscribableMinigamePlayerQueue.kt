@@ -51,7 +51,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         // Private games always create new instances - skip joining existing games
         val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
-        
+
         val existingGameRequiringPlayers = if (isPrivateGame) null else GameManager.allGames()
             .filter {
                 var conditions = it.queueId == id &&
@@ -115,7 +115,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 JoinIntoGameStatus.FAILED_RPC_FAILURE
             }
 
-            if (joinGameResult?.status == JoinIntoGameStatus.SUCCESS)
+            if (joinGameResult == JoinIntoGameStatus.SUCCESS)
             {
                 RedisShared.redirect(
                     targetEntry.data.players,
@@ -124,7 +124,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 return listOf(targetEntry.data)
             } else
             {
-                println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult?.status})")
+                println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult})")
             }
         }
 
