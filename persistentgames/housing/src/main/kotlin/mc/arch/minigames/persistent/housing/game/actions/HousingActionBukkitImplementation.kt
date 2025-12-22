@@ -21,16 +21,13 @@ object HousingActionBukkitImplementation
             .handler { event ->
                 val player = event.player
                 val house = player.getPlayerHouseFromInstance()
-
-                if (house == null)
-                {
-                    event.isCancelled = true
-                    return@handler
-                }
+                    ?: return@handler
 
                 house.getAllActionEventsBy(BlockBreakEvent::class.java)
                     .forEach {
-                        it.value.apply(event.player.uniqueId, event)
+                        it.value.forEach { action ->
+                            action.apply(event.player.uniqueId, event)
+                        }
                     }
             }.bindWith(terminable)
     }

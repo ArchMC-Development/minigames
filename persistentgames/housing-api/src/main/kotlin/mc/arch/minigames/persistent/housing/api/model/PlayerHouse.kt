@@ -30,7 +30,7 @@ data class PlayerHouse(
     var maxPlayers: Int = 20,
     var plotSizeBlocks: Int = 200,
     val tags: MutableList<String> = mutableListOf(),
-    val actionEventMap: MutableMap<String, Task> = mutableMapOf(),
+    val actionEventMap: MutableMap<String, MutableList<Task>> = mutableMapOf(),
     val roles: MutableMap<String, HouseRole> = HouseRole.defaults(),
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(
         VisitationStatus.PRIVATE to true,

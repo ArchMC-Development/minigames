@@ -12,6 +12,10 @@ val bundles = mutableMapOf(
     ),
     "blockBreakEvent" to ActionDisplayBundle(
         "Block Break Event",
+        XMaterial.DIRT
+    ),
+    "blockPlaceEvent" to ActionDisplayBundle(
+        "Block Place Event",
         XMaterial.GRASS_BLOCK
     )
 )
