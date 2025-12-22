@@ -38,6 +38,40 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
         if (adminMenu)
         {
+            buttons[2] = ItemBuilder.of(XMaterial.REPEATER)
+                .name("${CC.GREEN}Event Actions")
+                .addToLore(
+                    "${CC.GRAY}Want to trigger an action",
+                    "${CC.GRAY}when someone joins or breaks a block?",
+                    "${CC.GRAY}Check out our custom event action system.",
+                    "",
+                    "${CC.YELLOW}Click to view event actions!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[3] = ItemBuilder.of(XMaterial.VILLAGER_SPAWN_EGG)
+                .name("${CC.GREEN}NPC Editor")
+                .addToLore(
+                    "${CC.GRAY}Want to add custom NPCs to",
+                    "${CC.GRAY}your realm? Edit them here!",
+                    "",
+                    "${CC.YELLOW}Click to view NPCs!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[3] = ItemBuilder.of(XMaterial.OAK_SIGN)
+                .name("${CC.GREEN}Hologram Editor")
+                .addToLore(
+                    "${CC.GRAY}Want to add custom Holograms to",
+                    "${CC.GRAY}your realm? Edit them here!",
+                    "",
+                    "${CC.YELLOW}Click to view Holograms!"
+                ).toButton { _, _ ->
+
+                }
+
             buttons[27] = ItemBuilder.of(XMaterial.JUNGLE_DOOR)
                 .name("${CC.GREEN}Travel to someone else's realm")
                 .addToLore(

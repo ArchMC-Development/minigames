@@ -82,22 +82,22 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
 
                     if (house.plotSizeBlocks >= 300 && !player.hasPermission("housing.plot.500"))
                     {
-                        house.maxPlayers = 300
+                        house.plotSizeBlocks = 300
                     }
 
                     if (house.plotSizeBlocks >= 500 && !player.hasPermission("housing.plot.750"))
                     {
-                        house.maxPlayers = 500
+                        house.plotSizeBlocks = 500
                     }
 
                     if (house.plotSizeBlocks >= 750 && !player.hasPermission("housing.plot.1000"))
                     {
-                        house.maxPlayers = 750
+                        house.plotSizeBlocks = 750
                     }
 
                     if (house.plotSizeBlocks >= 1000)
                     {
-                        house.maxPlayers = 1000
+                        house.plotSizeBlocks = 1000
                     }
                 } else
                 {
