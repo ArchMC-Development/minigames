@@ -8,6 +8,8 @@ import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
+import mc.arch.minigames.persistent.housing.api.content.HousingTime
+import mc.arch.minigames.persistent.housing.api.content.HousingWeather
 import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
 import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.role.HouseRole
@@ -41,6 +43,8 @@ data class PlayerHouse(
     ),
     val lastLaunched: Long = System.currentTimeMillis(),
     val houseIcon: HousingItemStack? = null,
+    var housingTime: HousingTime? = null,
+    var housingWeather: HousingWeather? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
     val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
     override val identifier: UUID = UUID.randomUUID(),

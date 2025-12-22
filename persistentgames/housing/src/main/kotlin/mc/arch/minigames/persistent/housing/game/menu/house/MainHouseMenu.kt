@@ -1,6 +1,8 @@
 package mc.arch.minigames.persistent.housing.game.menu.house
 
 import com.cryptomorin.xseries.XMaterial
+import mc.arch.minigames.persistent.housing.api.content.HousingTime
+import mc.arch.minigames.persistent.housing.api.content.HousingWeather
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
@@ -70,6 +72,54 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "${CC.GRAY}your realm? Edit them here!",
                     "",
                     "${CC.YELLOW}Click to view Holograms!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[5] = ItemBuilder.of(XMaterial.FILLED_MAP)
+                .name("${CC.GREEN}Groups and Permissions")
+                .addToLore(
+                    "${CC.GRAY}Want to add custom groups",
+                    "${CC.GRAY}to your realm? Edit them here!",
+                    "",
+                    "${CC.YELLOW}Click to view groups!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[6] = ItemBuilder.of(XMaterial.COMMAND_BLOCK)
+                .name("${CC.GREEN}Player Management")
+                .addToLore(
+                    "${CC.GRAY}Want to ban players or give",
+                    "${CC.GRAY}players roles? Do it here!",
+                    "",
+                    "${CC.YELLOW}Click to view player management panel!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[11] = ItemBuilder.of(XMaterial.DEAD_BUSH)
+                .name("${CC.GREEN}Weather")
+                .addToLore(
+                    "${CC.GRAY}Update the weather of",
+                    "${CC.GRAY}your realm!",
+                    "",
+                    "${CC.WHITE}Currently ${(house.housingWeather ?: HousingWeather.CLEAR).displayName}",
+                    "",
+                    "${CC.YELLOW}Click to edit cycle options!"
+                ).toButton { _, _ ->
+
+                }
+
+            buttons[12] = ItemBuilder.of(XMaterial.CLOCK)
+                .name("${CC.GREEN}Time")
+                .addToLore(
+                    "${CC.GRAY}Update the time of",
+                    "${CC.GRAY}your realm!",
+                    "",
+                    "${CC.WHITE}Currently ${(house.housingTime ?: HousingTime.DAY).displayName}",
+                    "",
+                    "${CC.YELLOW}Click to edit cycle options!"
                 ).toButton { _, _ ->
 
                 }
