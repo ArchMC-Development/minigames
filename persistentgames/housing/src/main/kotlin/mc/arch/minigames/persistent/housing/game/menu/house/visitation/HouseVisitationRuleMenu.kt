@@ -29,7 +29,8 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
 
         for (int in 11..15)
         {
-            val visitationRule = visitationRules[index]
+            val visitationRule = visitationRules.getOrNull(index)
+                ?: VisitationStatus.PUBLIC
             val enabled = house.visitationStatuses[visitationRule] == true
 
             buttons[int] = ItemBuilder.of(icon(visitationRule))

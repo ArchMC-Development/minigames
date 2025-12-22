@@ -4,6 +4,7 @@ import gg.scala.lemon.util.SplitUtil
 import gg.tropic.practice.map.MapReplicationService
 import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.versioned.Versioned
+import mc.arch.minigames.versioned.generics.SlimeWorldGeneric
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import org.bukkit.World
 import java.util.UUID
@@ -17,7 +18,8 @@ object SlimeWorldLoadStrategy
 {
     fun loadPersistentWorld(
         providerType: WorldInstanceProviderType,
-        persistentWorldId: UUID
+        persistentWorldId: UUID,
+        defaultCreator: (String) -> SlimeWorldGeneric<*>
     ): CompletableFuture<LoadedSlimeWorld?>
     {
         val instanceWorldId = "hostedworld_instance_${providerType.name.lowercase()}_${
@@ -26,9 +28,13 @@ object SlimeWorldLoadStrategy
             SplitUtil.splitUuid(persistentWorldId)
         }"
 
-        val slimeWorld = Versioned.toProvider()
-            .getSlimeProvider()
-            .loadPersistentHostedWorld(persistentWorldId.toString())
+        val slimeWorld = runCatching {
+            Versioned.toProvider()
+                .getSlimeProvider()
+                .loadPersistentHostedWorld(persistentWorldId.toString())
+        }.getOrElse {
+            defaultCreator.invoke(persistentWorldId.toString())
+        }
 
         return MapReplicationService
             .runInWorldLoadSync {

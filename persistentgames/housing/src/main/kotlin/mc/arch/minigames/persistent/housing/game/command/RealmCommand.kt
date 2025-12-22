@@ -9,14 +9,14 @@ import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
 
 @AutoRegister
-object HouseCommand : ScalaCommand()
+object RealmCommand : ScalaCommand()
 {
-    @CommandAlias("house|home")
+    @CommandAlias("realm")
     fun onHouse(sender: ScalaPlayer)
     {
         val house = sender.bukkit().getPlayerHouseFromInstance()
             ?: throw ConditionFailedException(
-                "You are not currently visiting a house!"
+                "You are not currently visiting a realm!"
             )
 
         MainHouseMenu(house, house.playerIsOrAboveAdministrator(sender.uniqueId))

@@ -8,6 +8,7 @@ import gg.tropic.practice.ugc.creator.HostedWorldInstanceCreator
 import gg.tropic.practice.ugc.creator.HostedWorldInstanceCreatorRegistry
 import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.strategies.SlimeWorldLoadStrategy
+import gg.tropic.practice.versioned.Versioned
 import mc.arch.minigames.persistent.housing.game.instance.HousingHostedWorldInstance
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import java.util.concurrent.CompletableFuture
@@ -26,7 +27,8 @@ object HousingHostedWorldInstanceCreator : HostedWorldInstanceCreator<HousingPla
     override fun createInstance(request: VisitWorldRequest): CompletableFuture<HostedWorldInstance<HousingPlayerResources>> = SlimeWorldLoadStrategy
         .loadPersistentWorld(
             providerType = type,
-            persistentWorldId = request.worldGlobalId
+            persistentWorldId = request.worldGlobalId,
+            defaultCreator = { id -> Versioned.toProvider().getSlimeProvider().createEmptyHostedWorld(id) }
         )
         .thenApply { world ->
             if (world == null)

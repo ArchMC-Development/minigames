@@ -39,12 +39,12 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
         if (adminMenu)
         {
             buttons[27] = ItemBuilder.of(XMaterial.JUNGLE_DOOR)
-                .name("${CC.GREEN}Travel to someone else's house")
+                .name("${CC.GREEN}Travel to someone else's realm")
                 .addToLore(
                     "${CC.GRAY}Want to see what others are up to?",
-                    "${CC.GRAY}Come explore all open houses.",
+                    "${CC.GRAY}Come explore all open realms.",
                     "",
-                    "${CC.YELLOW}Click to view houses you can join!"
+                    "${CC.YELLOW}Click to view realms you can join!"
                 ).toButton { _, _ ->
 
                 }
@@ -54,7 +54,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                 .name("${CC.GREEN}Visiting Rules")
                 .addToLore(
                     "${CC.GRAY}Allows you to select who can",
-                    "${CC.GRAY}and cannot visit your home.",
+                    "${CC.GRAY}and cannot visit your realm.",
                     "",
                     "${CC.YELLOW}Click to configure!"
                 ).toButton { _, _ ->
@@ -63,11 +63,11 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                 }
 
             buttons[39] = ItemBuilder.of(XMaterial.COMPARATOR)
-                .name("${CC.GREEN}House Settings")
+                .name("${CC.GREEN}Realm Settings")
                 .addToLore(
                     "${CC.GRAY}Allows you to change and",
                     "${CC.GRAY}view specific settings about",
-                    "${CC.GRAY}your house.",
+                    "${CC.GRAY}your realm.",
                     "",
                     "${CC.YELLOW}Click to configure!"
                 ).toButton { _, _ ->
