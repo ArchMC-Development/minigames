@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.formatName
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.api.model.VisitationStatus
+import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -112,6 +113,8 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
                 Button.playNeutral(player)
                 house.save()
             }
+
+        buttons[32] = MainHouseMenu.mainMenuButton(house)
 
         return buttons
     }

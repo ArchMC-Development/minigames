@@ -1,6 +1,5 @@
 package mc.arch.minigames.persistent.housing.game.menu.house.events
 
-import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
