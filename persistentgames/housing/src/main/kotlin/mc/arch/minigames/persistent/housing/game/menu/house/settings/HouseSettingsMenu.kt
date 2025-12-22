@@ -114,7 +114,7 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
                 house.save()
             }
 
-        buttons[32] = MainHouseMenu.mainMenuButton(house)
+        buttons[31] = MainHouseMenu.mainMenuButton(house)
 
         return buttons
     }
