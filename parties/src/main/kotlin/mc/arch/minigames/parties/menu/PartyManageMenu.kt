@@ -304,27 +304,6 @@ class PartyManageMenu(
                     }
                 }
 
-            val privateGamesEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
-            this[18] = ItemBuilder
-                .of(if (privateGamesEnabled) XMaterial.LIME_DYE else XMaterial.GRAY_DYE)
-                .name("${CC.LIGHT_PURPLE}Private Games")
-                .addToLore(
-                    "${CC.GRAY}Create private game sessions",
-                    "${CC.GRAY}for your party with custom",
-                    "${CC.GRAY}settings and no stat tracking!",
-                    "",
-                    "${CC.WHITE}Status: ${if (privateGamesEnabled) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}",
-                    "",
-                    "${CC.YELLOW}Click to toggle!"
-                )
-                .toButton { _, _ ->
-                    val wasEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
-                    party.update(PartySetting.PRIVATE_GAMES, !wasEnabled)
-                    party.saveAndUpdateParty().thenRun {
-                        PartyManageMenu(party, role).openMenu(player)
-                    }
-                }
-
             this[9] = ItemBuilder
                 .copyOf(
                     PaginatedMenu.PLACEHOLDER
@@ -345,8 +324,6 @@ class PartyManageMenu(
 
             if (role == PartyRole.LEADER)
             {
-                val redDye = ColorUtil.toDyeData(ChatColor.RED)
-
                 listOf(7, 16, 25).forEach {
                     this[it] = PaginatedMenu.PLACEHOLDER
                 }
@@ -366,6 +343,27 @@ class PartyManageMenu(
 
                         player.closeInventory()
                         player.sendMessage("${CC.GREEN}You've warped party members to your server!")
+                    }
+
+                val privateGamesEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
+                this[8] = ItemBuilder
+                    .of(if (privateGamesEnabled) XMaterial.PINK_DYE else XMaterial.GRAY_DYE)
+                    .name("${CC.LIGHT_PURPLE}Private Games")
+                    .addToLore(
+                        "${CC.GRAY}Create private game sessions",
+                        "${CC.GRAY}for your party with custom",
+                        "${CC.GRAY}settings and no stat tracking!",
+                        "",
+                        "${CC.WHITE}Status: ${if (privateGamesEnabled) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}",
+                        "",
+                        "${CC.YELLOW}Click to toggle!"
+                    )
+                    .toButton { _, _ ->
+                        val wasEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
+                        party.update(PartySetting.PRIVATE_GAMES, !wasEnabled)
+                        party.saveAndUpdateParty().thenRun {
+                            PartyManageMenu(party, role).openMenu(player)
+                        }
                     }
 
                 this[8 + 18] = ItemBuilder(XMaterial.RED_DYE)
