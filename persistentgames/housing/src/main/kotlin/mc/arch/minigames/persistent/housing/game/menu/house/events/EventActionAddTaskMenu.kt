@@ -3,13 +3,22 @@ package mc.arch.minigames.persistent.housing.game.menu.house.events
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
+import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.entity.Player
 
-class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : PaginatedMenu()
+/**
+ * Class created on 12/23/2025
+
+ * @author Max C.
+ * @project arch-minigames
+ * @website https://solo.to/redis
+ */
+class EventActionAddTaskMenu(val house: PlayerHouse, val event: ActionEvent) : PaginatedMenu()
 {
     init
     {
@@ -33,22 +42,19 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
             )
             .toButton { _, _ ->
                 Button.playNeutral(player)
-                EventActionSelectionMenu(house).openMenu(player)
-            },
-        41 to ItemBuilder.of(XMaterial.COMPARATOR)
-            .name("${CC.GOLD}Add Task")
-            .addToLore(
-                "${CC.GRAY}Add a task that triggers when",
-                "${CC.GRAY}this event happens.",
-                "",
-                "${CC.GREEN}Click to add task!"
-            ).toButton { _, _ ->
-                EventActionAddTaskMenu(house, event).openMenu(player)
-            }
-    )
+                EventActionTasksMenu(house, event).openMenu(player)
+            })
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> = mutableMapOf<Int, Button>().also { buttons ->
-        val tasks = house.actionEventMap[event.id()]
-            ?: mutableListOf()
+        HousingActionBukkitImplementation.getAllTasks()
+            .filter { it.appliesToEvent(event) }.forEach { task ->
+                val displayAttribute = task.getDisplayBundle()
+                buttons[buttons.size] = ItemBuilder.of(displayAttribute.icon)
+                    .name("${CC.GREEN}${displayAttribute.displayName}")
+                    .addToLore("${CC.YELLOW}Click to select this task!")
+                    .toButton { _, _ ->
+
+                    }
+            }
     }
 }

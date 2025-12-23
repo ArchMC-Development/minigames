@@ -37,7 +37,8 @@ class EventActionSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
                 .addToLore(
                     "${CC.YELLOW}Click to select this event!"
                 ).toButton { _, _ ->
-
+                    Button.playNeutral(player)
+                    EventActionTasksMenu(house, it).openMenu(player)
                 }
         }
     }
