@@ -52,13 +52,12 @@ object PrivateGamesHotbarService
             .filter { it.game.expectationModel.isPrivateGame }
             .filter { it.game.state == GameState.Waiting || it.game.state == GameState.Starting }
             .handler { event ->
-                // Add settings item to slot 2 for party leader
                 if (event.game.expectationModel.players.firstOrNull() == event.player.uniqueId)
                 {
-                    event.player.inventory.setItem(2, settingsItem)
+                    event.player.inventory.setItem(4, settingsItem)
                     event.player.updateInventory()
 
-                    event.player.sendMessage("${CC.LIGHT_PURPLE}This is a Private Game! Right-click the Comparator to configure settings.")
+                    event.player.sendMessage("${CC.PINK}This is a Private Game! ${CC.GRAY}Right-click the comparator to configure settings.")
                 }
             }
             .bindWith(plugin)
@@ -75,7 +74,7 @@ object PrivateGamesHotbarService
                 val game = gg.tropic.practice.games.GameService.byPlayer(event.player)
                     ?: return@handler
 
-                if (!game.expectationModel.isPrivateGame)
+                if (!game.expectationModel.isPrivateGame || !(game.state(GameState.Waiting) || game.state(GameState.Starting)))
                 {
                     return@handler
                 }

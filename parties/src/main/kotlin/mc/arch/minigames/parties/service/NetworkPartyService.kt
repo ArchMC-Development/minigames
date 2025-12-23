@@ -17,6 +17,9 @@ import mc.arch.minigames.parties.PartiesPlugin
 import mc.arch.minigames.parties.model.Party
 import mc.arch.minigames.parties.model.PartyMember
 import mc.arch.minigames.parties.model.PartyRole
+import mc.arch.minigames.parties.service.event.PartyCreateEvent
+import mc.arch.minigames.parties.service.event.PartyDisbandEvent
+import mc.arch.minigames.parties.service.event.PartyUpdateEvent
 import mc.arch.minigames.parties.toDisplayName
 import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.services.CommonsServiceExecutor
@@ -136,13 +139,16 @@ object NetworkPartyService : PartyService
 
             partyLock.write {
                 parties[uniqueId] = loadedParty
+                PartyUpdateEvent(loadedParty).callEvent()
             }
         }
 
         sync.listen("delete") {
             val uniqueId = retrieve<UUID>("uniqueId")
             partyLock.write {
-                parties.remove(uniqueId)
+                parties.remove(uniqueId)?.apply {
+                    PartyDisbandEvent(this).callEvent()
+                }
             }
         }
 
@@ -212,6 +218,9 @@ object NetworkPartyService : PartyService
 
         partyLock.write {
             parties[newParty.uniqueId] = newParty
+            Bukkit.getPlayer(leader)?.apply {
+                PartyCreateEvent(newParty, this).callEvent()
+            }
         }
 
         updateParty(newParty)

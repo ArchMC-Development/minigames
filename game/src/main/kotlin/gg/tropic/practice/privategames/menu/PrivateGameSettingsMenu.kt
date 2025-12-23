@@ -96,7 +96,7 @@ class PrivateGameSettingsMenu(
             }
 
             lines.add("")
-            lines.add("${CC.WHITE}Current: ${CC.AQUA}${formatValue(setting.value)}")
+            lines.add("${CC.GRAY}Current: ${CC.AQUA}${formatValue(setting.value)}")
             lines.add("")
 
             when (setting) {

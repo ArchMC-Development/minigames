@@ -27,11 +27,14 @@ import gg.tropic.practice.menu.party.PartyPlayGameSelectMenu
 import gg.tropic.practice.minigame.MinigameLobby
 import gg.tropic.practice.player.LobbyPlayerService
 import gg.tropic.practice.player.PlayerState
+import gg.tropic.practice.player.player
 import gg.tropic.practice.profile.PracticeProfileService
 import gg.tropic.practice.queue.QueueService
 import gg.tropic.practice.queue.QueueType
 import gg.tropic.practice.statistics.TrackedKitStatistic
 import gg.tropic.practice.statistics.statisticIdFrom
+import mc.arch.minigames.parties.service.event.PartyCreateEvent
+import mc.arch.minigames.parties.service.event.PartyUpdateEvent
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.composite.CompositeTerminable
@@ -134,6 +137,32 @@ object LobbyHotbarService
             .handler {
                 wasGameParticipant.remove(it.player.uniqueId)
                 loginTasks.remove(it.player.uniqueId)
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PartyCreateEvent::class.java)
+            .handler { event ->
+                val lobbyPlayer = LobbyPlayerService.find(event.player)
+                    ?: return@handler
+
+                synchronized(lobbyPlayer.stateUpdateLock) {
+                    lobbyPlayer.state = PlayerState.InPartyAsLeader
+                }
+            }
+            .bindWith(plugin)
+
+        Events
+            .subscribe(PartyUpdateEvent::class.java)
+            .handler { event ->
+                event.party.includedMembersOnline().forEach { member ->
+                    val lobbyPlayer = LobbyPlayerService.find(member)
+                        ?: return@handler
+
+                    lobbyPlayer.player?.apply {
+                        get(lobbyPlayer.state).applyToPlayer(this)
+                    }
+                }
             }
             .bindWith(plugin)
 
@@ -361,14 +390,6 @@ object LobbyHotbarService
                 it.onClick = scope@{ player ->
                     player.performCommand("party create")
                     Button.playNeutral(player)
-
-                    val lobbyPlayer = LobbyPlayerService.find(player)
-                        ?: return@scope
-
-                    synchronized(lobbyPlayer.stateUpdateLock) {
-                        lobbyPlayer.state = PlayerState.InPartyAsLeader
-                        lobbyPlayer.maintainStateTimeout = System.currentTimeMillis() + 1000L
-                    }
                 }
             }
         )
@@ -512,7 +533,7 @@ object LobbyHotbarService
 
                     val lobbyPlayer = LobbyPlayerService.find(player)
                         ?: return@scope ItemStack(Material.AIR)
-                    
+
                     if (!lobbyPlayer.isInParty())
                     {
                         return@scope ItemStack(Material.AIR)
@@ -524,12 +545,8 @@ object LobbyHotbarService
                     return@scope if (privateGamesEnabled)
                     {
                         ItemBuilder
-                            .of(XMaterial.NETHER_STAR)
+                            .of(XMaterial.PINK_DYE)
                             .name("${CC.LIGHT_PURPLE}Private Games ${CC.GRAY}(Right Click)")
-                            .addToLore(
-                                "${CC.GRAY}Click to select a minigame",
-                                "${CC.GRAY}for your private party game!"
-                            )
                             .build()
                     } else
                     {
@@ -548,7 +565,7 @@ object LobbyHotbarService
 
                     val lobbyPlayer = LobbyPlayerService.find(player)
                         ?: return@scope
-                    
+
                     if (!lobbyPlayer.isInParty())
                     {
                         return@scope

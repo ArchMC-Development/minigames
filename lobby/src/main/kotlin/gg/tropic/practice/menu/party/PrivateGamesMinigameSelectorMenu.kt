@@ -37,16 +37,16 @@ class PrivateGamesMinigameSelectorMenu : Menu("Private Games - Select Mode")
 
         // Get all registered minigame types
         val minigameTypes = listOf(
-            MinigameTypeInfo("bedwars", "BedWars", XMaterial.RED_BED, "bedwars-lobby"),
-            MinigameTypeInfo("skywars", "SkyWars", XMaterial.FEATHER, "skywars-lobby"),
-            MinigameTypeInfo("miniwalls", "Mini Walls", XMaterial.IRON_SWORD, "miniwalls-lobby"),
-            MinigameTypeInfo("events", "Events", XMaterial.GOLDEN_APPLE, "events-lobby")
+            MinigameTypeInfo("bedwars", "BedWars", XMaterial.RED_BED, "bwlobby"),
+            MinigameTypeInfo("skywars", "SkyWars", XMaterial.FEATHER, "swlobby"),
+            MinigameTypeInfo("miniwalls", "Mini Walls", XMaterial.IRON_SWORD, "mwlobby"),
+            MinigameTypeInfo("events", "Events", XMaterial.GOLDEN_APPLE, "eventhall")
         )
 
         minigameTypes.forEachIndexed { index, info ->
             val lobbyServers = ServerContainer
                 .getServersInGroupCasted<GameServer>(info.lobbyGroup)
-            
+
             val isAvailable = lobbyServers.isNotEmpty()
             val playerCount = lobbyServers.sumOf { it.getPlayersCount() ?: 0 }
 
@@ -57,7 +57,7 @@ class PrivateGamesMinigameSelectorMenu : Menu("Private Games - Select Mode")
                     "${CC.GRAY}Play ${info.displayName} with",
                     "${CC.GRAY}your party in a private match!",
                     "",
-                    "${CC.WHITE}Players in Lobby: ${CC.AQUA}$playerCount",
+                    "${CC.GRAY}In Lobby: ${CC.AQUA}$playerCount",
                     ""
                 )
                 .apply {
