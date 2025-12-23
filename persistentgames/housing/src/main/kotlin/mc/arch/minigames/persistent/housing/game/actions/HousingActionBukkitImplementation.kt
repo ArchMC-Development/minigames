@@ -32,6 +32,8 @@ object HousingActionBukkitImplementation
             }.bindWith(terminable)
     }
 
+    fun getAllTasks() = tasks.values.toList()
+
     fun registerTask(task: Task)
     {
         tasks[task.id] = task

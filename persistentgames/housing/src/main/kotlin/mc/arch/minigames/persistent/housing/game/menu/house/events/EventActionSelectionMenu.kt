@@ -3,6 +3,7 @@ package mc.arch.minigames.persistent.housing.game.menu.house.events
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
+import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
@@ -16,6 +17,10 @@ class EventActionSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
     {
         placeholdBorders = true
     }
+
+    override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
+        31 to MainHouseMenu.mainMenuButton(house)
+    )
 
     override fun size(buttons: Map<Int, Button>) = 45
     override fun getMaxItemsPerPage(player: Player) = 21
