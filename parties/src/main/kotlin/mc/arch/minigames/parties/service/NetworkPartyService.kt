@@ -158,11 +158,6 @@ object NetworkPartyService : PartyService
                 ?: return@listen
 
             val server = retrieve<String>("server")
-            if (server == ServerSync.local.id)
-            {
-                return@listen
-            }
-
             for (uuid in party.members.keys)
             {
                 val bukkitPlayer = Bukkit
