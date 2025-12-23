@@ -59,7 +59,7 @@ fun MiniGameModeMetadata.joinGame(player: Player, configuration: MiniGameQueueCo
     {
         val party = lobbyPlayer.partyOf()
         val privateGamesEnabled = party.delegate.isEnabled(mc.arch.minigames.parties.model.PartySetting.PRIVATE_GAMES)
-        
+
         if (privateGamesEnabled)
         {
             // Create or modify configuration with private game settings
@@ -70,16 +70,16 @@ fun MiniGameModeMetadata.joinGame(player: Player, configuration: MiniGameQueueCo
                 isPrivateGame = true,
                 privateGameSettings = gg.tropic.practice.privategames.PrivateGameSettings.default()
             )
-            
-            player.sendMessage("${CC.LIGHT_PURPLE}Starting a Private Game for your party...")
+
+            player.sendMessage("${CC.GRAY}Starting a Private Game for your party...")
         }
     }
 
     QueueService.joinQueue(kit, queueId.queueType, queueId.teamSize, player, finalConfiguration)
-    
-    val messagePrefix = if (finalConfiguration?.isPrivateGame == true) 
-        "${CC.LIGHT_PURPLE}Creating a private" 
-    else 
+
+    val messagePrefix = if (finalConfiguration?.isPrivateGame == true)
+        "${CC.LIGHT_PURPLE}Creating a private"
+    else
         "${CC.GREEN}Joining a"
     player.sendMessage("$messagePrefix $displayName game...")
 }
