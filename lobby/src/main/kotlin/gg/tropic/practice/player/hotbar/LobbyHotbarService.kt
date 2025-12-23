@@ -33,6 +33,8 @@ import gg.tropic.practice.queue.QueueService
 import gg.tropic.practice.queue.QueueType
 import gg.tropic.practice.statistics.TrackedKitStatistic
 import gg.tropic.practice.statistics.statisticIdFrom
+import mc.arch.minigames.parties.model.PartySetting
+import mc.arch.minigames.parties.service.NetworkPartyService
 import mc.arch.minigames.parties.service.event.PartyCreateEvent
 import mc.arch.minigames.parties.service.event.PartyUpdateEvent
 import me.lucko.helper.Events
@@ -531,16 +533,9 @@ object LobbyHotbarService
                         return@scope ItemStack(Material.AIR)
                     }
 
-                    val lobbyPlayer = LobbyPlayerService.find(player)
+                    val party = NetworkPartyService.findParty(player.uniqueId)
                         ?: return@scope ItemStack(Material.AIR)
-
-                    if (!lobbyPlayer.isInParty())
-                    {
-                        return@scope ItemStack(Material.AIR)
-                    }
-
-                    val party = lobbyPlayer.partyOf()
-                    val privateGamesEnabled = party.delegate.isEnabled(mc.arch.minigames.parties.model.PartySetting.PRIVATE_GAMES)
+                    val privateGamesEnabled = party.isEnabled(PartySetting.PRIVATE_GAMES)
 
                     return@scope if (privateGamesEnabled)
                     {
