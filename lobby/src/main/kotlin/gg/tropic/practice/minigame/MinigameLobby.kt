@@ -183,6 +183,10 @@ object MinigameLobby
             configurePlayNPCs()
         }
 
+        // for some reason this wasn't always
+        // running, so do it again! (issue with provider?)
+        configureLobbyNPCs()
+
         plugin.commandManager.registerCommand(QuestsCommand)
         plugin.unregisterCommands(
             StatResetTokenCommand,
@@ -577,6 +581,7 @@ object MinigameLobby
 
         PracticeConfigurationService.local().minigameLobbyNPCs
             .forEach { playNPC ->
+                println("Spawning play npc: ${playNPC.gamemodeName}")
                 MinigameLobbyNPCEntity(playNPC).configure()
             }
     }
