@@ -19,7 +19,7 @@ class EventActionSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
-        31 to MainHouseMenu.mainMenuButton(house)
+        40 to MainHouseMenu.mainMenuButton(house)
     )
 
     override fun size(buttons: Map<Int, Button>) = 45

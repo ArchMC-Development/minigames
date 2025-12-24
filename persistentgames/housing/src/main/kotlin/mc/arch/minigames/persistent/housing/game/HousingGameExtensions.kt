@@ -1,5 +1,6 @@
 package mc.arch.minigames.persistent.housing.game
 
+import gg.tropic.practice.metadata.SystemMetadataService
 import gg.tropic.practice.persistence.RedisShared
 import gg.tropic.practice.ugc.HostedWorldRPC
 import gg.tropic.practice.ugc.PersistencePolicy
@@ -37,3 +38,5 @@ fun HousingItemStack.toBukkitStack(): ItemStack = ItemStack(Material.valueOf(thi
     }
 
 fun String.translateCC() = ChatColor.translateAlternateColorCodes('&', this)
+
+fun PlayerHouse.getReference() = SystemMetadataService.allHostedWorldInstances().firstOrNull { it.globalId == this.identifier }

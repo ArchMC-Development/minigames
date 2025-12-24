@@ -20,7 +20,7 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
     override fun getMaxItemsPerPage(player: Player) = 21
     override fun getAllPagesButtonSlots() = (10..16).toList() + (19..25).toList() + (28..34).toList()
 
-    override fun getPrePaginatedTitle(player: Player): String = "Viewing Event Tasks"
+    override fun getPrePaginatedTitle(player: Player): String = "Viewing Tasks"
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mapOf(
         39 to ItemBuilder.of(XMaterial.ARROW)

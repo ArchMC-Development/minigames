@@ -32,7 +32,7 @@ class EventActionAddTaskMenu(val house: PlayerHouse, val event: ActionEvent) : P
     override fun getPrePaginatedTitle(player: Player): String = "Viewing Event Tasks"
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mapOf(
-        39 to ItemBuilder.of(XMaterial.ARROW)
+        40 to ItemBuilder.of(XMaterial.ARROW)
             .name("${CC.GREEN}Go Back")
             .addToLore(
                 "${CC.GRAY}Go back to the main action",
@@ -53,7 +53,14 @@ class EventActionAddTaskMenu(val house: PlayerHouse, val event: ActionEvent) : P
                     .name("${CC.GREEN}${displayAttribute.displayName}")
                     .addToLore("${CC.YELLOW}Click to select this task!")
                     .toButton { _, _ ->
+                        if (task.options.isEmpty())
+                        {
+                            house.addTaskToAction(event, task)
+                            player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have successfully added this task to your house")
+                        } else
+                        {
 
+                        }
                     }
             }
     }

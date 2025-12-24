@@ -1,28 +1,26 @@
-package mc.arch.minigames.persistent.housing.game.actions.tasks.display
+package mc.arch.minigames.persistent.housing.game.actions.tasks.attribute
 
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
-import mc.arch.minigames.persistent.housing.api.action.util.HousingActionPrimitive
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
 import mc.arch.minigames.persistent.housing.game.translateCC
 import org.bukkit.Bukkit
-import org.bukkit.event.player.PlayerJoinEvent
 import java.util.UUID
 
+/**
+ * Class created on 12/23/2025
+
+ * @author Max C.
+ * @project arch-minigames
+ * @website https://solo.to/redis
+ */
 @Service
-object SendMessageTask : Task(
-    "sendMessage",
-    "Send Message",
-    mutableMapOf(
-        "message" to
-            TaskOption(
-                "Message",
-                "&aThis is a default message!",
-                HousingActionPrimitive.STRING
-            )
-    )
+object FullHealTask : Task(
+    "fullHeal",
+    "Full Heal",
+    mutableMapOf()
 )
 {
     @Configure
@@ -36,6 +34,6 @@ object SendMessageTask : Task(
         val player = Bukkit.getPlayer(playerId)
             ?: return
 
-        player.sendMessage(option<String>("message").translateCC())
+        player.health = 20.0
     }
 }

@@ -4,6 +4,7 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
+import mc.arch.minigames.persistent.housing.api.action.util.HousingActionPrimitive
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
 import mc.arch.minigames.persistent.housing.game.translateCC
 import net.md_5.bungee.api.ChatColor
@@ -24,14 +25,17 @@ object PreventBlockBreakTask : Task(
     mutableMapOf(
         "shouldSendDenial" to TaskOption(
             "Send Denial Message?",
-            "false"
+            "false",
+            HousingActionPrimitive.BOOLEAN
         ),
         "denialMessage" to
             TaskOption(
                 "Dential Message",
-                "&cYou cannot do this here!"
+                "&cYou cannot do this here!",
+                HousingActionPrimitive.STRING
             )
-    )
+    ),
+    scopes = listOf("blockBreakEvent")
 )
 {
     @Configure

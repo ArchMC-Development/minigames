@@ -6,20 +6,22 @@ import mc.arch.minigames.persistent.housing.api.action.option.TaskOption
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.action.util.HousingActionPrimitive
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
+import mc.arch.minigames.persistent.housing.game.getReference
+import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
 import mc.arch.minigames.persistent.housing.game.translateCC
 import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.UUID
 
 @Service
-object SendMessageTask : Task(
-    "sendMessage",
-    "Send Message",
+object BroadcastMessageTask : Task(
+    "broadcastMessage",
+    "Broadcast Message",
     mutableMapOf(
         "message" to
             TaskOption(
                 "Message",
-                "&aThis is a default message!",
+                "This is a default message!",
                 HousingActionPrimitive.STRING
             )
     )
@@ -35,7 +37,14 @@ object SendMessageTask : Task(
     {
         val player = Bukkit.getPlayer(playerId)
             ?: return
+        val house = player.getPlayerHouseFromInstance()
+            ?: return
+        val reference = house.getReference()
+            ?: return
 
-        player.sendMessage(option<String>("message").translateCC())
+        reference.onlinePlayers.mapNotNull { Bukkit.getPlayer(it) }
+            .forEach {
+                it.sendMessage(option<String>("message").translateCC())
+            }
     }
 }

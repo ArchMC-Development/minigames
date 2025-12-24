@@ -11,6 +11,22 @@ val bundles = mutableMapOf(
         "Player Join Event",
         XMaterial.PLAYER_HEAD
     ),
+    "playerQuitEvent" to ActionDisplayBundle(
+        "Player Quit Event",
+        XMaterial.SKELETON_SKULL
+    ),
+    "playerDeathEvent" to ActionDisplayBundle(
+        "Player Death Event",
+        XMaterial.DIAMOND_SWORD
+    ),
+    "playerDamageEvent" to ActionDisplayBundle(
+        "Player Damage Event",
+        XMaterial.LAVA_BUCKET
+    ),
+    "playerMoveEvent" to ActionDisplayBundle(
+        "Player Move Event",
+        XMaterial.IRON_BOOTS
+    ),
     "blockBreakEvent" to ActionDisplayBundle(
         "Block Break Event",
         XMaterial.DIRT
@@ -25,6 +41,14 @@ val taskBundles = mutableMapOf(
     "sendMessage" to ActionDisplayBundle(
         "Send Message",
         XMaterial.PAPER
+    ),
+    "broadcastMessage" to ActionDisplayBundle(
+        "Send Message",
+        XMaterial.OAK_SIGN
+    ),
+    "fullHeal" to ActionDisplayBundle(
+        "Full Heal",
+        XMaterial.GOLDEN_APPLE
     ),
     "preventBlockPlace" to ActionDisplayBundle(
         "Prevent Block Place",

@@ -5,6 +5,7 @@ import gg.scala.commons.annotations.Model
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
+import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
 import mc.arch.minigames.persistent.housing.api.content.HousingItemStack
@@ -53,6 +54,15 @@ data class PlayerHouse(
 {
     fun getAllActionEventsBy(clazz: Class<*>) = actionEventMap.entries.filter {
         HousingActionService.getByName(it.key)?.eventClass() == clazz
+    }
+
+    fun addTaskToAction(actionEvent: ActionEvent, task: Task)
+    {
+        val currentTasks = actionEventMap[actionEvent.id()]
+            ?: mutableListOf()
+
+        currentTasks += task
+        save()
     }
 
     fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
