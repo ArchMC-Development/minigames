@@ -7,9 +7,20 @@ package mc.arch.minigames.persistent.housing.api.action.util
  * @project arch-minigames
  * @website https://solo.to/redis
  */
-enum class HousingActionPrimitive
+enum class HousingActionPrimitive(
+    val mutator: (String) -> String?,
+    val errorMessage: String,
+)
 {
-    BOOLEAN,
-    INTEGER,
-    STRING,
+    BOOLEAN({ input ->
+        input.toBoolean().toString()
+    }, "Please enter either True or False for this option!"),
+
+    INTEGER({ input ->
+        input.toIntOrNull()?.toString()
+    }, "Please enter a valid Number for this option!"),
+
+    STRING({ input ->
+        input
+    }, "Please enter a valid String for this option!"),
 }

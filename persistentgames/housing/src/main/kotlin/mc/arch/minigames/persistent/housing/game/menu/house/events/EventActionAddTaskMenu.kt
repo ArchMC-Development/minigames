@@ -5,6 +5,7 @@ import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.actions.HousingActionBukkitImplementation
 import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
+import mc.arch.minigames.persistent.housing.game.menu.house.events.option.EventActionOptionsEditMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
@@ -59,7 +60,7 @@ class EventActionAddTaskMenu(val house: PlayerHouse, val event: ActionEvent) : P
                             player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have successfully added this task to your house")
                         } else
                         {
-
+                            EventActionOptionsEditMenu(house, event, task).openMenu(player)
                         }
                     }
             }

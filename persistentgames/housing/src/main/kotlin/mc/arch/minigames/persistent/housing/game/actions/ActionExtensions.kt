@@ -43,7 +43,7 @@ val taskBundles = mutableMapOf(
         XMaterial.PAPER
     ),
     "broadcastMessage" to ActionDisplayBundle(
-        "Send Message",
+        "Broadcast Message",
         XMaterial.OAK_SIGN
     ),
     "fullHeal" to ActionDisplayBundle(

@@ -55,7 +55,7 @@ class HouseVisitationRuleMenu(val house: PlayerHouse): Menu("Visitation Rules")
                 index++
             }
 
-            buttons[31] = MainHouseMenu.mainMenuButton(house)
+            buttons[40] = MainHouseMenu.mainMenuButton(house)
 
             return buttons
         }
