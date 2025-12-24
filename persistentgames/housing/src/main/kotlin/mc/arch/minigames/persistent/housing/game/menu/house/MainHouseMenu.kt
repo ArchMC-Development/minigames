@@ -111,7 +111,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
                 }
 
-            buttons[6] = ItemBuilder.of(XMaterial.CAULDRON)
+            buttons[8] = ItemBuilder.of(XMaterial.CAULDRON)
                 .name("${CC.GREEN}Clear Inventory")
                 .addToLore(
                     "${CC.GRAY}Got a lot of items? Get rid of",
