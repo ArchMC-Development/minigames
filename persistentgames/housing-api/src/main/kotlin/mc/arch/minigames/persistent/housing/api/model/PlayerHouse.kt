@@ -62,6 +62,7 @@ data class PlayerHouse(
             ?: mutableListOf()
 
         currentTasks += task
+        actionEventMap[actionEvent.id()] = currentTasks
         save()
     }
 
