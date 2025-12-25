@@ -3,9 +3,11 @@ package mc.arch.minigames.persistent.housing.game.menu.house.events
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.entity.Player
 
@@ -50,5 +52,35 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
     override fun getAllPagesButtons(player: Player): Map<Int, Button> = mutableMapOf<Int, Button>().also { buttons ->
         val tasks = house.actionEventMap[event.id()]
             ?: mutableListOf()
+
+        tasks.forEach { task ->
+            val displayBundle = task.getDisplayBundle()
+
+            buttons[buttons.size] = ItemBuilder.of(displayBundle.icon)
+                .name("${CC.GREEN}${displayBundle.displayName}")
+                .addToLore(
+                    "${CC.YELLOW}Options:"
+                ).also { button ->
+                    task.options.forEach {
+                        button.addToLore(
+                            "${CC.GRAY}${Constants.DOT_SYMBOL} ${CC.WHITE}${it.value.name}",
+                            "${CC.GRAY}    - ${it.value.data}"
+                        )
+                    }
+                    button.addToLore(
+                        "",
+                        "${CC.RED}Right-Click to delete!",
+                        "${CC.GREEN}Left-Click to edit!"
+                    )
+                }.toButton { _, click ->
+                    if (click?.isRightClick == true)
+                    {
+
+                    } else
+                    {
+
+                    }
+                }
+        }
     }
 }

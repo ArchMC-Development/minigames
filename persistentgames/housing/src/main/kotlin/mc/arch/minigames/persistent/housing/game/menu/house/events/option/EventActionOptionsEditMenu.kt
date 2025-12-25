@@ -6,6 +6,7 @@ import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionAddTaskMenu
+import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionTasksMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
@@ -34,7 +35,18 @@ class EventActionOptionsEditMenu(val house: PlayerHouse, val event: ActionEvent,
     override fun getPrePaginatedTitle(player: Player): String = "Viewing Options"
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mapOf(
-        40 to ItemBuilder.of(XMaterial.ARROW)
+        4 to ItemBuilder.of(XMaterial.EMERALD)
+            .name("${CC.GREEN}Commit Changes")
+            .addToLore(
+                "${CC.YELLOW}Click to commit changes to your realm!"
+            )
+            .toButton { _, _ ->
+                house.addTaskToAction(event, task)
+                player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have added this task to your realm!")
+
+                EventActionTasksMenu(house, event).openMenu(player)
+            },
+        22 to ItemBuilder.of(XMaterial.ARROW)
             .name("${CC.GREEN}Go Back")
             .addToLore(
                 "${CC.GRAY}Go back to the main task",
@@ -70,7 +82,7 @@ class EventActionOptionsEditMenu(val house: PlayerHouse, val event: ActionEvent,
                         task.options[it.key] = it.value
 
                         house.save()
-                        player.sendMessage("${CC.B_GREEN}SUCCESS! You have updated this option")
+                        player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have updated this option")
 
                         EventActionOptionsEditMenu(house, event, task).openMenu(player)
                     }.start(player)
