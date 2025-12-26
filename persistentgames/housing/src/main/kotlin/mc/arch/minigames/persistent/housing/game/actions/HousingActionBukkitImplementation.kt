@@ -7,6 +7,7 @@ import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromIns
 import me.lucko.helper.Events
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.player.PlayerMoveEvent
 
 @Service
 object HousingActionBukkitImplementation
@@ -24,6 +25,20 @@ object HousingActionBukkitImplementation
                     ?: return@handler
 
                 house.getAllActionEventsBy(BlockBreakEvent::class.java)
+                    .forEach {
+                        it.value.forEach { action ->
+                            action.apply(event.player.uniqueId, event)
+                        }
+                    }
+            }.bindWith(terminable)
+
+        Events.subscribe(PlayerMoveEvent::class.java)
+            .handler { event ->
+                val player = event.player
+                val house = player.getPlayerHouseFromInstance()
+                    ?: return@handler
+
+                house.getAllActionEventsBy(PlayerMoveEvent::class.java)
                     .forEach {
                         it.value.forEach { action ->
                             action.apply(event.player.uniqueId, event)

@@ -11,6 +11,9 @@ import net.evilblock.cubed.util.CC
  */
 enum class HousingTime(val displayName: String)
 {
-    NIGHT("${CC.D_PURPLE}Night"),
-    DAY("${CC.YELLOW}Day")
+    MORNING("${CC.GOLD}Morning"),
+    NOON("${CC.YELLOW}Noon"),
+    AFTERNOON("${CC.GREEN}Afternoon"),
+    EVENING("${CC.PINK}Evening"),
+    MIDNIGHT("${CC.D_PURPLE}Midnight")
 }

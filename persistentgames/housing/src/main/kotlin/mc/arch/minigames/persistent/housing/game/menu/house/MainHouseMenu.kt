@@ -5,6 +5,7 @@ import mc.arch.minigames.persistent.housing.api.content.HousingTime
 import mc.arch.minigames.persistent.housing.api.content.HousingWeather
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
+import mc.arch.minigames.persistent.housing.game.menu.house.npc.NPCEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import net.evilblock.cubed.menu.Button
@@ -75,7 +76,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view NPCs!"
                 ).toButton { _, _ ->
-
+                    NPCEditorMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
 
             buttons[4] = ItemBuilder.of(XMaterial.OAK_SIGN)
@@ -133,7 +135,14 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to edit cycle options!"
                 ).toButton { _, _ ->
+                    val currentIndex = HousingWeather.entries.indexOf(house.housingWeather ?: HousingWeather.CLEAR)
+                    val next = HousingWeather.entries.getOrElse(currentIndex) { HousingWeather.CLEAR }
 
+                    house.housingWeather = next
+                    house.save()
+
+                    Button.playNeutral(player)
+                    player.sendMessage("${CC.YELLOW}Your weather has been updated to: ${next.displayName}")
                 }
 
             buttons[12] = ItemBuilder.of(XMaterial.CLOCK)
@@ -142,11 +151,18 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "${CC.GRAY}Update the time of",
                     "${CC.GRAY}your realm!",
                     "",
-                    "${CC.WHITE}Currently ${(house.housingTime ?: HousingTime.DAY).displayName}",
+                    "${CC.WHITE}Currently ${(house.housingTime ?: HousingTime.NOON).displayName}",
                     "",
                     "${CC.YELLOW}Click to edit cycle options!"
                 ).toButton { _, _ ->
+                    val currentIndex = HousingTime.entries.indexOf(house.housingTime ?: HousingTime.NOON)
+                    val next = HousingTime.entries.getOrElse(currentIndex) { HousingTime.NOON }
 
+                    house.housingTime = next
+                    house.save()
+
+                    Button.playNeutral(player)
+                    player.sendMessage("${CC.YELLOW}Your time has been updated to: ${next.displayName}")
                 }
 
             buttons[27] = ItemBuilder.of(XMaterial.SPRUCE_DOOR)
