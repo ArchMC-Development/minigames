@@ -5,14 +5,17 @@ import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import net.evilblock.cubed.serializers.Serializers
 import java.util.UUID
 
-abstract class Task(
+open class Task(
     val id: String,
     val displayName: String,
     val options: MutableMap<String, TaskOption>,
     val scopes: List<String> = listOf()
 )
 {
-    abstract fun <E> apply(playerId: UUID?, event: E)
+    open fun <E> apply(playerId: UUID?, event: E)
+    {
+        throw NotImplementedError()
+    }
 
     fun appliesToEvent(event: ActionEvent) = scopes.isEmpty() || scopes.contains(event.id())
 
