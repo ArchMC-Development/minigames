@@ -1,11 +1,14 @@
 package mc.arch.minigames.persistent.housing.game.menu.house.npc
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
+import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
 import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionTasksMenu
+import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
@@ -22,6 +25,20 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
+        4 to ItemBuilder.of(XMaterial.ARROW)
+            .name("${CC.GREEN}Create NPC")
+            .addToLore("${CC.YELLOW}Click to create a new NPC!")
+            .toButton { _, _ ->
+                CallbackInputPrompt("${CC.GREEN}Please type in the name you want this NPC to have:") { input ->
+                    val npc = HousingNPC(input, player.location.toWorldPosition())
+
+                    house.houseNPCMap[npc.name] = npc
+                    house.save()
+
+                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created an npc!")
+                    NPCEditorMenu(house).openMenu(player)
+                }.start(player)
+            },
         31 to MainHouseMenu.mainMenuButton(house)
     )
 
@@ -56,7 +73,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                         "${CC.GREEN}Left-Click to edit NPC",
                         "${CC.RED}Right-CLick to delete NPC"
                     )
-                }.toButton { _, _ ->
+                }.toButton { _, click ->
 
                 }
         }

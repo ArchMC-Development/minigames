@@ -31,7 +31,7 @@ object PreventBlockPlaceTask : Task(
         ),
         "denialMessage" to
             TaskOption(
-                "Dential Message",
+                "Denial Message",
                 "&cYou cannot do this here!",
                 HousingActionPrimitive.STRING
             )

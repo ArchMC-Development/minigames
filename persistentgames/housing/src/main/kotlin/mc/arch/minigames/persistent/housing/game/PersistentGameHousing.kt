@@ -13,7 +13,8 @@ import gg.scala.commons.core.plugin.PluginWebsite
     version = "%remote%/%branch%/%id%"
 )
 @PluginAuthorComposite(
-    PluginAuthor("GrowlyX")
+    PluginAuthor("GrowlyX"),
+    PluginAuthor("98ping"),
 )
 @PluginWebsite("https://arch.mc")
 @PluginDependencyComposite(

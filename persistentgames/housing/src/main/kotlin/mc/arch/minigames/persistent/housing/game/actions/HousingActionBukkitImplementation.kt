@@ -25,8 +25,8 @@ object HousingActionBukkitImplementation
                     ?: return@handler
 
                 house.getAllActionEventsBy(BlockBreakEvent::class.java)
-                    .forEach {
-                        it.value.forEach { action ->
+                    .forEach { entry ->
+                        entry.value.map { it.asRegistered() }.forEach { action ->
                             action.apply(event.player.uniqueId, event)
                         }
                     }
@@ -39,8 +39,8 @@ object HousingActionBukkitImplementation
                     ?: return@handler
 
                 house.getAllActionEventsBy(PlayerMoveEvent::class.java)
-                    .forEach {
-                        it.value.forEach { action ->
+                    .forEach { entry ->
+                        entry.value.map { it.asRegistered() }.forEach { action ->
                             action.apply(event.player.uniqueId, event)
                         }
                     }

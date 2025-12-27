@@ -60,5 +60,7 @@ val taskBundles = mutableMapOf(
     )
 )
 
+fun Task.asRegistered(): Task = HousingActionBukkitImplementation.getAllTasks().first { it.id == this.id }
+
 fun Task.getDisplayBundle(): ActionDisplayBundle = taskBundles[this.id]!!
 fun ActionEvent.getDisplayBundle(): ActionDisplayBundle = bundles[this.id()]!!

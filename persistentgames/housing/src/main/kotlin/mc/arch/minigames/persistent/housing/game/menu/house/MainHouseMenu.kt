@@ -22,6 +22,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
         {
             placeholder = true
         }
+
+        updateAfterClick = true
     }
 
     companion object
