@@ -136,7 +136,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "${CC.YELLOW}Click to edit cycle options!"
                 ).toButton { _, _ ->
                     val currentIndex = HousingWeather.entries.indexOf(house.housingWeather ?: HousingWeather.CLEAR)
-                    val next = HousingWeather.entries.getOrElse(currentIndex) { HousingWeather.CLEAR }
+                    val next = HousingWeather.entries.getOrElse(currentIndex + 1) { HousingWeather.CLEAR }
 
                     house.housingWeather = next
                     house.save()
@@ -156,7 +156,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "${CC.YELLOW}Click to edit cycle options!"
                 ).toButton { _, _ ->
                     val currentIndex = HousingTime.entries.indexOf(house.housingTime ?: HousingTime.NOON)
-                    val next = HousingTime.entries.getOrElse(currentIndex) { HousingTime.NOON }
+                    val next = HousingTime.entries.getOrElse(currentIndex + 1) { HousingTime.NOON }
 
                     house.housingTime = next
                     house.save()

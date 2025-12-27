@@ -16,6 +16,6 @@ abstract class Task(
 
     fun appliesToEvent(event: ActionEvent) = scopes.isEmpty() || scopes.contains(event.id())
 
-    inline fun <reified V> option(id: String): V =
-        Serializers.gson.fromJson(options[id]?.data ?: "Unknown", V::class.java)
+    fun <V> option(id: String): V =
+        (options[id]?.data ?: "Unknown") as V
 }
