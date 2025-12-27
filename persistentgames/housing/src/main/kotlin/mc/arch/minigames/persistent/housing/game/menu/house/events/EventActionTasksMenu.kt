@@ -59,14 +59,22 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
             buttons[buttons.size] = ItemBuilder.of(displayBundle.icon)
                 .name("${CC.GREEN}${displayBundle.displayName}")
                 .addToLore(
+                    "",
                     "${CC.YELLOW}Options:"
                 ).also { button ->
-                    task.options.forEach {
-                        button.addToLore(
-                            "${CC.GRAY}${Constants.DOT_SYMBOL} ${CC.WHITE}${it.value.name}",
-                            "${CC.GRAY}    - ${it.value.data}"
-                        )
+                    if (task.options.isNotEmpty())
+                    {
+                        task.options.forEach {
+                            button.addToLore(
+                                "${CC.GRAY}${Constants.DOT_SYMBOL} ${CC.WHITE}${it.value.name}",
+                                "${CC.GRAY}    - ${it.value.data}"
+                            )
+                        }
+                    } else
+                    {
+                        button.addToLore("${CC.RED}None Apply!")
                     }
+                    
                     button.addToLore(
                         "",
                         "${CC.RED}Right-Click to delete!",
