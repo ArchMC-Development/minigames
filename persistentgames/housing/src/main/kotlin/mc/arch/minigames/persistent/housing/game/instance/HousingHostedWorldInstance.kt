@@ -8,6 +8,7 @@ import mc.arch.minigames.persistent.housing.api.VisitHouseConfiguration
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
 import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
+import mc.arch.minigames.persistent.housing.game.getReference
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
@@ -97,7 +98,16 @@ class HousingHostedWorldInstance(
     }
 
     override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
-    override fun generateScoreboardLines(player: Player) = listOf<String>()
+    override fun generateScoreboardLines(player: Player) = listOf(
+        "${CC.YELLOW}Realm Name:",
+        "${CC.WHITE}${playerHouseReference?.displayName ?: "${CC.RED}Unavailable"}",
+        "",
+        "${CC.YELLOW}Guests:",
+        "${CC.WHITE}${playerHouseReference?.getReference()?.onlinePlayers?.size ?: 0} out of ${playerHouseReference?.maxPlayers ?: 100}",
+        "",
+        "${CC.YELLOW}Your Role:",
+        "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.displayName ?: "${CC.GRAY}Guest"}",
+    )
 
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
         .supplyAsync {
