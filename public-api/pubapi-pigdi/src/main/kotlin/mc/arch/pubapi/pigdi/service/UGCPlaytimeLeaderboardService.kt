@@ -7,7 +7,6 @@ import mc.arch.pubapi.pigdi.model.UGCGamemode
 import mc.arch.pubapi.pigdi.repository.LifestealProfileRepository
 import mc.arch.pubapi.pigdi.repository.SurvivalProfileRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.atomic.AtomicReference
@@ -24,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 class UGCPlaytimeLeaderboardService(
     private val lifestealProfileRepository: LifestealProfileRepository,
     private val survivalProfileRepository: SurvivalProfileRepository,
-    private val redisTemplate: StringRedisTemplate
+    private val uuidCacheService: UuidCacheService
 )
 {
     private val logger = LoggerFactory.getLogger(UGCPlaytimeLeaderboardService::class.java)
@@ -109,7 +108,7 @@ class UGCPlaytimeLeaderboardService(
                 PlaytimeLeaderboardEntry(
                     position = 0, // Set after sorting
                     uuid = profile.identifier,
-                    username = resolveUuidToUsername(profile.identifier),
+                    username = uuidCacheService.resolveUuidToUsername(profile.identifier),
                     playtimeSeconds = profile.getPlaytimeSeconds()
                 )
             }
@@ -131,7 +130,7 @@ class UGCPlaytimeLeaderboardService(
                 PlaytimeLeaderboardEntry(
                     position = 0, // Set after sorting
                     uuid = profile.identifier,
-                    username = resolveUuidToUsername(profile.identifier),
+                    username = uuidCacheService.resolveUuidToUsername(profile.identifier),
                     playtimeSeconds = profile.getPlaytimeSeconds()
                 )
             }
@@ -142,9 +141,5 @@ class UGCPlaytimeLeaderboardService(
         spartanLeaderboard.set(leaderboard)
         logger.info("Refreshed Spartan playtime leaderboard: ${leaderboard.size} players loaded")
     }
-
-    private fun resolveUuidToUsername(uuid: String): String?
-    {
-        return redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:UUID", uuid)
-    }
 }
+

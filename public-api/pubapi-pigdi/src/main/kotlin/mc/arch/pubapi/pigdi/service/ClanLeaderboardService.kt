@@ -6,7 +6,6 @@ import mc.arch.pubapi.pigdi.dto.ClanLeaderboardPage
 import mc.arch.pubapi.pigdi.entity.ClanDocument
 import mc.arch.pubapi.pigdi.repository.ClanRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.atomic.AtomicReference
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference
 @Service
 class ClanLeaderboardService(
     private val clanRepository: ClanRepository,
-    private val redisTemplate: StringRedisTemplate
+    private val uuidCacheService: UuidCacheService
 )
 {
     private val logger = LoggerFactory.getLogger(ClanLeaderboardService::class.java)
@@ -98,7 +97,7 @@ class ClanLeaderboardService(
 
     private fun buildLeaderboardEntry(clan: ClanDocument): ClanLeaderboardEntry
     {
-        val leaderUsername = resolveUuidToUsername(clan.leader)
+        val leaderUsername = uuidCacheService.resolveUuidToUsername(clan.leader)
 
         return ClanLeaderboardEntry(
             position = 0, // Will be set after sorting
@@ -111,10 +110,5 @@ class ClanLeaderboardService(
             memberCount = clan.members.size
         )
     }
-
-    private fun resolveUuidToUsername(uuid: String): String?
-    {
-        // Look up in Redis UUID cache (hash: DataStore:UuidCache:UUID)
-        return redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:UUID", uuid)
-    }
 }
+

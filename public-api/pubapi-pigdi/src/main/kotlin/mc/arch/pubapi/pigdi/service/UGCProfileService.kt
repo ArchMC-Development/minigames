@@ -4,7 +4,6 @@ import mc.arch.pubapi.pigdi.dto.ItemFilterResponse
 import mc.arch.pubapi.pigdi.dto.LifestealProfileResponse
 import mc.arch.pubapi.pigdi.repository.LifestealProfileRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -17,7 +16,7 @@ import java.util.*
 @Service
 class UGCProfileService(
     private val lifestealProfileRepository: LifestealProfileRepository,
-    private val redisTemplate: StringRedisTemplate
+    private val uuidCacheService: UuidCacheService
 )
 {
     private val logger = LoggerFactory.getLogger(UGCProfileService::class.java)
@@ -30,7 +29,7 @@ class UGCProfileService(
         val profile = lifestealProfileRepository.findByIdentifier(uuid.toString())
             ?: return null
 
-        val username = resolveUuidToUsername(uuid.toString())
+        val username = uuidCacheService.resolveUuidToUsername(uuid)
 
         return LifestealProfileResponse(
             uuid = profile.identifier,
@@ -59,20 +58,8 @@ class UGCProfileService(
      */
     fun getLifestealProfileByUsername(username: String): LifestealProfileResponse?
     {
-        val uuid = resolveUsername(username) ?: return null
+        val uuid = uuidCacheService.resolveUsernameToUuid(username) ?: return null
         return getLifestealProfile(uuid)
     }
-
-    private fun resolveUsername(username: String): UUID?
-    {
-        val uuid = redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:Username", username)
-        return uuid?.let {
-            try { UUID.fromString(it) } catch (e: Exception) { null }
-        }
-    }
-
-    private fun resolveUuidToUsername(uuid: String): String?
-    {
-        return redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:UUID", uuid)
-    }
 }
+

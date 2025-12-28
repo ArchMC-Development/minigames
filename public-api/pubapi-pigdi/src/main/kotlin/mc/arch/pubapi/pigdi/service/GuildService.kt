@@ -6,7 +6,6 @@ import mc.arch.pubapi.pigdi.dto.GuildResponse
 import mc.arch.pubapi.pigdi.entity.GuildDocument
 import mc.arch.pubapi.pigdi.repository.GuildRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.*
@@ -21,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference
 @Service
 class GuildService(
     private val guildRepository: GuildRepository,
-    private val redisTemplate: StringRedisTemplate
+    private val uuidCacheService: UuidCacheService
 )
 {
     private val logger = LoggerFactory.getLogger(GuildService::class.java)
@@ -98,7 +97,7 @@ class GuildService(
      */
     fun getGuildByPlayerUsername(username: String): GuildResponse?
     {
-        val uuid = resolveUsername(username) ?: return null
+        val uuid = uuidCacheService.resolveUsernameToUuid(username) ?: return null
         return getGuildByPlayerUuid(uuid)
     }
 
@@ -155,7 +154,7 @@ class GuildService(
         val creatorResponse = guild.creator?.let { creator ->
             GuildMemberResponse(
                 uuid = creator.uniqueId,
-                username = resolveUuidToUsername(creator.uniqueId),
+                username = uuidCacheService.resolveUuidToUsername(creator.uniqueId),
                 joinedOn = creator.joinedOn,
                 role = creator.role ?: "Leader"
             )
@@ -164,7 +163,7 @@ class GuildService(
         val memberResponses = guild.members?.map { (uuid, member) ->
             GuildMemberResponse(
                 uuid = uuid,
-                username = resolveUuidToUsername(uuid),
+                username = uuidCacheService.resolveUuidToUsername(uuid),
                 joinedOn = member.joinedOn,
                 role = member.role ?: "Member"
             )
@@ -181,17 +180,5 @@ class GuildService(
             allInvite = guild.allInvite
         )
     }
-
-    private fun resolveUsername(username: String): UUID?
-    {
-        val uuid = redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:Username", username)
-        return uuid?.let {
-            try { UUID.fromString(it) } catch (e: Exception) { null }
-        }
-    }
-
-    private fun resolveUuidToUsername(uuid: String): String?
-    {
-        return redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:UUID", uuid)
-    }
 }
+

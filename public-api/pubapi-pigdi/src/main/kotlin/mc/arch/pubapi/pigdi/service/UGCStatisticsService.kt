@@ -20,7 +20,8 @@ import java.util.*
  */
 @Service
 class UGCStatisticsService(
-    private val redisTemplate: StringRedisTemplate
+    private val redisTemplate: StringRedisTemplate,
+    private val uuidCacheService: UuidCacheService
 )
 {
     private val logger = LoggerFactory.getLogger(UGCStatisticsService::class.java)
@@ -96,7 +97,7 @@ class UGCStatisticsService(
      */
     fun getPlayerStatisticsByUsername(gamemode: UGCGamemode, username: String): UGCPlayerStatistics?
     {
-        val uuid = resolveUsername(username) ?: return null
+        val uuid = uuidCacheService.resolveUsernameToUuid(username) ?: return null
         return getPlayerStatistics(gamemode, uuid)
     }
 
@@ -146,7 +147,7 @@ class UGCStatisticsService(
             UGCLeaderboardEntry(
                 position = position,
                 uuid = uuid,
-                username = resolveUuidToUsername(UUID.fromString(uuid)) ?: uuid,
+                username = uuidCacheService.resolveUuidToUsername(uuid) ?: uuid,
                 value = score
             )
         }?.filterNotNull() ?: emptyList()
@@ -164,7 +165,7 @@ class UGCStatisticsService(
 
     private fun fetchPlayerStatistics(gamemode: UGCGamemode, uuid: UUID): UGCPlayerStatistics?
     {
-        val username = resolveUuidToUsername(uuid) ?: return null
+        val username = uuidCacheService.resolveUuidToUsername(uuid) ?: return null
 
         val statisticValues = mutableMapOf<String, UGCStatisticValue>()
 
@@ -198,18 +199,4 @@ class UGCStatisticsService(
         return "${gamemode.redisPrefix}:statistics:$statType"
     }
 
-    private fun resolveUsername(username: String): UUID?
-    {
-        // Look up in Redis UUID cache (hash: DataStore:UuidCache:Username)
-        val uuid = redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:Username", username)
-        return uuid?.let {
-            try { UUID.fromString(it) } catch (e: Exception) { null }
-        }
-    }
-
-    private fun resolveUuidToUsername(uuid: UUID): String?
-    {
-        // Look up in Redis UUID cache (hash: DataStore:UuidCache:UUID)
-        return redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:UUID", uuid.toString())
-    }
 }
