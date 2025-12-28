@@ -171,7 +171,8 @@ class AkersStaffLookupMenu(
     {
         val activeKeys = profile.getActiveKeys()
         val totalDaily = activeKeys.sumOf { AkersMetricsService.getDailyRequests(it.token) }
-        val totalWeekly = activeKeys.sumOf { AkersMetricsService.getTotalRequests(it.token, 7) }
+        val totalWeekly = activeKeys.sumOf { AkersMetricsService.getWeeklyRequests(it.token) }
+        val total = activeKeys.sumOf { AkersMetricsService.getTotalRequests(it.token) }
 
         return ItemBuilder
             .of(XMaterial.TRIPWIRE_HOOK)
@@ -182,7 +183,8 @@ class AkersStaffLookupMenu(
                 "${CC.GRAY}Revoked Keys: ${CC.WHITE}${profile.apiKeys.count { it.revoked }}",
                 "",
                 "${CC.GRAY}Total Requests Today: ${CC.WHITE}$totalDaily",
-                "${CC.GRAY}Total Requests (7d): ${CC.WHITE}$totalWeekly"
+                "${CC.GRAY}Total Requests This Week: ${CC.WHITE}$totalWeekly",
+                "${CC.GRAY}Total Requests (Total): ${CC.WHITE}$total"
             )
             .toButton()
     }
@@ -190,6 +192,8 @@ class AkersStaffLookupMenu(
     private fun buildKeyButton(key: AkersApiKey, viewer: Player): Button
     {
         val dailyRequests = AkersMetricsService.getDailyRequests(key.token)
+        val weeklyRequests = AkersMetricsService.getWeeklyRequests(key.token)
+        val requests = AkersMetricsService.getTotalRequests(key.token)
 
         return ItemBuilder
             .of(XMaterial.PAPER)
@@ -198,7 +202,10 @@ class AkersStaffLookupMenu(
                 "",
                 "${CC.GRAY}Token: ${CC.WHITE}${key.token.take(15)}...",
                 "${CC.GRAY}Created: ${CC.WHITE}${formatTime(key.createdAt)}",
+                "",
                 "${CC.GRAY}Requests Today: ${CC.WHITE}$dailyRequests",
+                "${CC.GRAY}Requests This Week: ${CC.WHITE}$weeklyRequests",
+                "${CC.GRAY}Requests Total: ${CC.WHITE}$requests",
                 "",
                 "${CC.RED}Right-Click to revoke"
             )

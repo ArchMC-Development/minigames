@@ -37,7 +37,8 @@ class AkersKeyDetailMenu(
         val buttons = mutableMapOf<Int, Button>()
 
         val dailyRequests = AkersMetricsService.getDailyRequests(key.token)
-        val weeklyRequests = AkersMetricsService.getTotalRequests(key.token, 7)
+        val requests = AkersMetricsService.getTotalRequests(key.token)
+        val weeklyRequests = AkersMetricsService.getWeeklyRequests(key.token)
 
         // Key info (center)
         buttons[13] = ItemBuilder
@@ -63,9 +64,10 @@ class AkersKeyDetailMenu(
             .addToLore(
                 "",
                 "${CC.GRAY}Requests Today: ${CC.WHITE}$dailyRequests",
-                "${CC.GRAY}Requests (7 days): ${CC.WHITE}$weeklyRequests",
+                "${CC.GRAY}Requests This Week: ${CC.WHITE}$weeklyRequests",
+                "${CC.GRAY}Requests Total: ${CC.WHITE}$requests",
                 "",
-                "${CC.GRAY}Rate Limit: ${CC.WHITE}100/min"
+                "${CC.GRAY}Rate Limit: ${CC.WHITE}100 req/min"
             )
             .toButton()
 

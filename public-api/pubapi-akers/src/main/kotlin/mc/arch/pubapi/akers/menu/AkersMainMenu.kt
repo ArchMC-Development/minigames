@@ -133,7 +133,8 @@ class AkersMainMenu(
     private fun buildKeyButton(key: AkersApiKey, index: Int): Button
     {
         val dailyRequests = AkersMetricsService.getDailyRequests(key.token)
-        val weeklyRequests = AkersMetricsService.getTotalRequests(key.token, 7)
+        val requests = AkersMetricsService.getTotalRequests(key.token)
+        val weeklyRequests = AkersMetricsService.getWeeklyRequests(key.token)
 
         return ItemBuilder
             .of(XMaterial.TRIPWIRE_HOOK)
@@ -149,7 +150,8 @@ class AkersMainMenu(
                     "${CC.GRAY}Last Used: ${CC.WHITE}Never",
                 "",
                 "${CC.GRAY}Requests Today: ${CC.WHITE}$dailyRequests",
-                "${CC.GRAY}Requests (7 days): ${CC.WHITE}$weeklyRequests",
+                "${CC.GRAY}Requests This Week: ${CC.WHITE}$weeklyRequests",
+                "${CC.GRAY}Requests Total: ${CC.WHITE}$requests",
                 "",
                 "${CC.YELLOW}Left-Click to view details",
                 "${CC.RED}Right-Click to delete"
@@ -259,7 +261,8 @@ class AkersMainMenu(
     {
         val activeKeys = profile.getActiveKeys()
         val totalDaily = activeKeys.sumOf { AkersMetricsService.getDailyRequests(it.token) }
-        val totalWeekly = activeKeys.sumOf { AkersMetricsService.getTotalRequests(it.token, 7) }
+        val totalWeekly = activeKeys.sumOf { AkersMetricsService.getWeeklyRequests(it.token) }
+        val total = activeKeys.sumOf { AkersMetricsService.getTotalRequests(it.token) }
 
         return ItemBuilder
             .of(XMaterial.PAPER)
@@ -269,9 +272,10 @@ class AkersMainMenu(
                 "${CC.GRAY}Total API Keys: ${CC.WHITE}${activeKeys.size}/${AkersProfile.MAX_API_KEYS}",
                 "",
                 "${CC.GRAY}Requests Today: ${CC.WHITE}$totalDaily",
-                "${CC.GRAY}Requests (7 days): ${CC.WHITE}$totalWeekly",
+                "${CC.GRAY}Requests This Week: ${CC.WHITE}$totalWeekly",
+                "${CC.GRAY}Requests Total: ${CC.WHITE}$total",
                 "",
-                "${CC.GRAY}Rate Limit: ${CC.WHITE}100/min per key"
+                "${CC.GRAY}Rate Limit: ${CC.WHITE}100 req/min (per key)"
             )
             .toButton()
     }

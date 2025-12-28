@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
  */
 object AkersMetricsService
 {
-    private const val REQUESTS_PREFIX = "pigdi:metrics:requests:"
+    private const val REQUESTS_PREFIX = "pigdi:metrics:"
 
     private fun redis() = ScalaCommons.bundle().globals().redis().sync()
 
@@ -21,25 +21,31 @@ object AkersMetricsService
     fun getDailyRequests(apiKeyToken: String): Long
     {
         val today = java.time.LocalDate.now().toString()
-        val key = "$REQUESTS_PREFIX$apiKeyToken:$today"
+        val key = "${REQUESTS_PREFIX}daily:$apiKeyToken:$today"
         return redis().get(key)?.toLongOrNull() ?: 0L
+    }
+
+    fun getWeeklyRequests(apiKeyToken: String): Long
+    {
+        var total = 0L
+        val startDate = java.time.LocalDate.now().minusDays(6.toLong())
+
+        for (i in 0 until 7)
+        {
+            val date = startDate.plusDays(i.toLong()).toString()
+            val key = "${REQUESTS_PREFIX}daily:$apiKeyToken:$date"
+            total += redis().get(key)?.toLongOrNull() ?: 0L
+        }
+
+        return total
     }
 
     /**
      * Get total requests for an API key over the last N days.
      */
-    fun getTotalRequests(apiKeyToken: String, days: Int = 7): Long
+    fun getTotalRequests(apiKeyToken: String): Long
     {
-        var total = 0L
-        val startDate = java.time.LocalDate.now().minusDays((days - 1).toLong())
-
-        for (i in 0 until days)
-        {
-            val date = startDate.plusDays(i.toLong()).toString()
-            val key = "$REQUESTS_PREFIX$apiKeyToken:$date"
-            total += redis().get(key)?.toLongOrNull() ?: 0L
-        }
-
-        return total
+        val key = "${REQUESTS_PREFIX}total:$apiKeyToken"
+        return redis().get(key)?.toLongOrNull() ?: 0L
     }
 }
