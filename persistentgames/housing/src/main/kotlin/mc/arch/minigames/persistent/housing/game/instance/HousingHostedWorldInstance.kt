@@ -10,6 +10,7 @@ import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
 import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
 import mc.arch.minigames.persistent.housing.game.getReference
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
+import mc.arch.minigames.persistent.housing.game.translateCC
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.entity.hologram.HologramEntity
@@ -106,7 +107,7 @@ class HousingHostedWorldInstance(
         "${CC.WHITE}${playerHouseReference?.getReference()?.onlinePlayers?.size ?: 0} out of ${playerHouseReference?.maxPlayers ?: 100}",
         "",
         "${CC.YELLOW}Your Role:",
-        "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.displayName ?: "${CC.GRAY}Guest"}",
+        "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"}",
     )
 
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
