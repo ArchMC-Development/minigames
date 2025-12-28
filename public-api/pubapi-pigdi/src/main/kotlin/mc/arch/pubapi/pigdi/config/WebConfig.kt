@@ -6,6 +6,8 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
  * Web configuration for filters and security.
@@ -17,7 +19,7 @@ import org.springframework.core.Ordered
 class WebConfig(
     private val apiKeyAuthFilter: ApiKeyAuthFilter,
     private val rateLimitFilter: RateLimitFilter
-)
+) : WebMvcConfigurer
 {
     @Bean
     fun apiKeyAuthFilterRegistration(): FilterRegistrationBean<ApiKeyAuthFilter>
@@ -37,5 +39,18 @@ class WebConfig(
         registration.addUrlPatterns("/v1/*")
         registration.order = Ordered.HIGHEST_PRECEDENCE + 1
         return registration
+    }
+
+    override fun addResourceHandlers(registry: ResourceHandlerRegistry)
+    {
+        registry.addResourceHandler(
+            "/favicon.ico",
+            "/favicon-16x16.png",
+            "/favicon-32x32.png",
+            "/apple-touch-icon.png",
+            "/android-chrome-192x192.png",
+            "/android-chrome-512x512.png",
+            "/site.webmanifest"
+        ).addResourceLocations("classpath:/")
     }
 }
