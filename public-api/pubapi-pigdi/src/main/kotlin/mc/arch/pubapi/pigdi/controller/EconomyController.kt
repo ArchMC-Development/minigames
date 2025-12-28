@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import mc.arch.pubapi.pigdi.dto.BalTopMapResponse
 import mc.arch.pubapi.pigdi.dto.BalTopResponse
 import mc.arch.pubapi.pigdi.dto.EconomyProfileResponse
 import mc.arch.pubapi.pigdi.dto.ErrorResponse
@@ -30,24 +31,19 @@ class EconomyController(
 {
     @GetMapping("/baltop")
     @Operation(
-        summary = "Get balance top leaderboard",
-        description = "Returns the top players by coin balance"
+        summary = "Get balance top leaderboard for all currencies",
+        description = "Returns the top players by balance for all currency types (survival-coins, bedwars-experience, etc.)"
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "BalTop leaderboard",
-                content = [Content(schema = Schema(implementation = BalTopResponse::class))]
+                description = "BalTop leaderboard map keyed by currency type",
+                content = [Content(schema = Schema(implementation = BalTopMapResponse::class))]
             ),
             ApiResponse(
                 responseCode = "401",
                 description = "Invalid or missing API key",
-                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "BalTop data not available",
                 content = [Content(schema = Schema(implementation = ErrorResponse::class))]
             ),
             ApiResponse(
@@ -57,13 +53,50 @@ class EconomyController(
             )
         ]
     )
-    fun getBalTop(): ResponseEntity<Any>
+    fun getBalTop(): ResponseEntity<Map<String, BalTopResponse>>
     {
-        val balTop = economyService.getBalTop()
+        return ResponseEntity.ok(economyService.getBalTop())
+    }
+
+    @GetMapping("/baltop/{currency}")
+    @Operation(
+        summary = "Get balance top leaderboard for a specific currency",
+        description = "Returns the top players by balance for a specific currency type (e.g., survival-coins, bedwars-experience)"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "BalTop leaderboard for the specified currency",
+                content = [Content(schema = Schema(implementation = BalTopResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Invalid or missing API key",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Currency not found",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "429",
+                description = "Rate limit exceeded",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            )
+        ]
+    )
+    fun getBalTopByCurrency(
+        @Parameter(description = "Currency type (e.g., survival-coins, bedwars-experience)")
+        @PathVariable currency: String
+    ): ResponseEntity<Any>
+    {
+        val balTop = economyService.getBalTopByCurrency(currency)
             ?: return ResponseEntity.status(404).body(
                 ErrorResponse(
-                    error = "DATA_NOT_AVAILABLE",
-                    message = "BalTop data is currently not available"
+                    error = "CURRENCY_NOT_FOUND",
+                    message = "No baltop data found for currency '$currency'"
                 )
             )
 

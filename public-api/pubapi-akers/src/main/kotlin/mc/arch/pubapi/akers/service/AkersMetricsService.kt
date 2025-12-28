@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
  */
 object AkersMetricsService
 {
-    private const val REQUESTS_PREFIX = "akers:metrics:requests:"
+    private const val REQUESTS_PREFIX = "pigdi:metrics:requests:"
 
     private fun redis() = ScalaCommons.bundle().globals().redis().sync()
 

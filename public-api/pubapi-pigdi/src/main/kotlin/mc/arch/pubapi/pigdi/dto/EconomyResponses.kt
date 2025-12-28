@@ -1,7 +1,13 @@
 package mc.arch.pubapi.pigdi.dto
 
 /**
- * Response for BalTop endpoint.
+ * Response for BalTop endpoint (map of currency to leaderboard).
+ * This is a schema helper for Swagger documentation.
+ */
+typealias BalTopMapResponse = Map<String, BalTopResponse>
+
+/**
+ * Response for BalTop endpoint for a single currency.
  */
 data class BalTopResponse(
     val entries: List<BalTopEntry>,
