@@ -37,15 +37,62 @@ class EconomyService(
 
     /**
      * Get the balance top leaderboard from Redis.
+     * Note: economy:global:top is a Redis hash table where:
+     * - Fields are currency types (e.g., "survival-coins", "bedwars-experience")
+     * - Values are JSON arrays of player objects with _id and balance
      */
-    fun getBalTop(): BalTopResponse?
+    fun getBalTop(): Map<String, BalTopResponse>
     {
         return try
         {
-            val rawData = redisTemplate.opsForValue().get(BALTOP_REDIS_KEY)
-            if (rawData == null)
+            val hashEntries = redisTemplate.opsForHash<String, String>().entries(BALTOP_REDIS_KEY)
+            if (hashEntries.isEmpty())
             {
                 logger.warn("BalTop data not found in Redis at key: $BALTOP_REDIS_KEY")
+                return emptyMap()
+            }
+
+            hashEntries.mapValues { (currency, rawData) ->
+                val jsonObject = gson.fromJson(rawData, JsonObject::class.java)
+                val playersArray = jsonObject.getAsJsonArray("players")
+
+                val entries = playersArray.mapIndexed { index, element ->
+                    val player = element.asJsonObject
+                    val uuid = player.get("_id").asString
+                    val balance = player.get("balance").asLong
+
+                    BalTopEntry(
+                        position = index + 1,
+                        uuid = uuid,
+                        username = resolveUuidToUsername(uuid) ?: uuid,
+                        balance = balance
+                    )
+                }
+
+                BalTopResponse(
+                    entries = entries,
+                    count = entries.size
+                )
+            }
+        }
+        catch (e: Exception)
+        {
+            logger.error("Failed to parse BalTop data from Redis", e)
+            emptyMap()
+        }
+    }
+
+    /**
+     * Get the balance top leaderboard for a specific currency from Redis.
+     */
+    fun getBalTopByCurrency(currency: String): BalTopResponse?
+    {
+        return try
+        {
+            val rawData = redisTemplate.opsForHash<String, String>().get(BALTOP_REDIS_KEY, currency)
+            if (rawData == null)
+            {
+                logger.warn("BalTop data not found for currency: $currency")
                 return null
             }
 
@@ -72,7 +119,7 @@ class EconomyService(
         }
         catch (e: Exception)
         {
-            logger.error("Failed to parse BalTop data from Redis", e)
+            logger.error("Failed to parse BalTop data for currency: $currency", e)
             null
         }
     }

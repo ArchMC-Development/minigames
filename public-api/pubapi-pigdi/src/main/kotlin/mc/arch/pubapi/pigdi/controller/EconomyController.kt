@@ -59,15 +59,7 @@ class EconomyController(
     )
     fun getBalTop(): ResponseEntity<Any>
     {
-        val balTop = economyService.getBalTop()
-            ?: return ResponseEntity.status(404).body(
-                ErrorResponse(
-                    error = "DATA_NOT_AVAILABLE",
-                    message = "BalTop data is currently not available"
-                )
-            )
-
-        return ResponseEntity.ok(balTop)
+        return ResponseEntity.ok(economyService.getBalTop())
     }
 
     @GetMapping("/player/uuid/{uuid}")

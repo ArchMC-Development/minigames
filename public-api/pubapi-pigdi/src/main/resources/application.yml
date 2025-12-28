@@ -25,17 +25,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus,metrics
+        include: ""
   endpoint:
     health:
-      show-details: always
+      show-details: never
   metrics:
     tags:
       application: pigdi
   prometheus:
     metrics:
       export:
-        enabled: true
+        enabled: false
 
 # Discord OAuth
 discord:
@@ -60,3 +60,12 @@ logging:
     mc.arch.pubapi: DEBUG
     org.springframework.web: INFO
     org.springframework.data.mongodb: DEBUG
+
+# Sentry Error Monitoring
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:production}
+  send-default-pii: true
+  debug: ${SENTRY_DEBUG:false}
+  traces-sample-rate: 0.1
+  exception-resolver-order: -2147483647

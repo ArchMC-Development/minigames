@@ -25,6 +25,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
+    // Sentry (Spring Boot 3 / Jakarta)
+    implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.22.0")
+    implementation("io.sentry:sentry-logback:7.22.0")
+
     // OpenAPI / Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
