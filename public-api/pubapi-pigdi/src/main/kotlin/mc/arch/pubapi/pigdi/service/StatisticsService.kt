@@ -397,7 +397,7 @@ class StatisticsService(
     private fun resolveUsername(username: String): UUID?
     {
         // Look up in Redis UUID cache (hash: DataStore:UuidCache:Username)
-        val uuid = redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:Username", username)
+        val uuid = redisTemplate.opsForHash<String, String>().get("DataStore:UuidCache:Username", username.lowercase())
         return uuid?.let {
             try { UUID.fromString(it) } catch (e: Exception) { null }
         }

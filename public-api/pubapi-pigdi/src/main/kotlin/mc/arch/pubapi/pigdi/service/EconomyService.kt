@@ -29,7 +29,7 @@ class EconomyService(
 
     companion object
     {
-        const val BALTOP_REDIS_KEY = "DataStore:BalTop"
+        const val BALTOP_REDIS_KEY = "economy:global:top"
         const val UUID_CACHE_KEY = "DataStore:UuidCache:UUID"
         const val USERNAME_CACHE_KEY = "DataStore:UuidCache:Username"
         const val ECONOMY_COLLECTION = "EconomyProfile"
@@ -169,7 +169,7 @@ class EconomyService(
     {
         return try
         {
-            val uuid = redisTemplate.opsForHash<String, String>().get(USERNAME_CACHE_KEY, username)
+            val uuid = redisTemplate.opsForHash<String, String>().get(USERNAME_CACHE_KEY, username.lowercase())
             uuid?.let { UUID.fromString(it) }
         }
         catch (e: Exception)
