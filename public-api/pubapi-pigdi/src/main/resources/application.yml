@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: pigdi
+
+  # MongoDB Configuration
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://archmc-cluster-mongodb.databases.svc.cluster.local:27017/?authSource=admin}
+      database: ${MONGODB_DATABASE:Scala}
+
+    # Redis Configuration
+    redis:
+      host: ${REDIS_HOST:archmc-cluster-redis-master.databases.svc.cluster.local}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+# Server Configuration
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+# Actuator / Prometheus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: pigdi
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Discord OAuth
+discord:
+  client-id: ${DISCORD_CLIENT_ID:}
+  client-secret: ${DISCORD_CLIENT_SECRET:}
+  redirect-uri: ${DISCORD_REDIRECT_URI:https://api.arch.mc/auth/discord/callback}
+
+# OpenAPI / Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+
+# Logging
+logging:
+  level:
+    root: INFO
+    mc.arch.pubapi: DEBUG
+    org.springframework.web: INFO
+    org.springframework.data.mongodb: DEBUG

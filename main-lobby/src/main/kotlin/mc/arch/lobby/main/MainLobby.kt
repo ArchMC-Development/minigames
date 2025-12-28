@@ -21,4 +21,5 @@ import org.bukkit.Bukkit
     PluginDependency("Lemon"),
     PluginDependency("Minigames"),
 )
+@ServiceablePackage("mc.arch.pubapi.akers")
 class MainLobby : ExtendedScalaPlugin()
