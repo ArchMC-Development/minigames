@@ -174,3 +174,110 @@ data class ClanLeaderboardPage(
     @Schema(description = "Clan leaderboard entries for this page")
     val entries: List<ClanLeaderboardEntry>
 )
+
+// ==================== Playtime Leaderboard DTOs ====================
+
+/**
+ * Individual playtime leaderboard entry.
+ */
+@Schema(description = "A single entry in the playtime leaderboard")
+data class PlaytimeLeaderboardEntry(
+    @Schema(description = "Position on the leaderboard (1-indexed)")
+    val position: Int,
+
+    @Schema(description = "Player's Minecraft UUID")
+    val uuid: String,
+
+    @Schema(description = "Player's Minecraft username (if available)")
+    val username: String?,
+
+    @Schema(description = "Total playtime in seconds")
+    val playtimeSeconds: Long
+)
+
+/**
+ * Paginated playtime leaderboard response.
+ */
+@Schema(description = "Paginated playtime leaderboard for a UGC gamemode")
+data class PlaytimeLeaderboardPage(
+    @Schema(description = "The gamemode for this leaderboard")
+    val gamemode: String,
+
+    @Schema(description = "Display name of the gamemode")
+    val gamemodeDisplayName: String,
+
+    @Schema(description = "Current page number (0-indexed)")
+    val page: Int,
+
+    @Schema(description = "Number of entries per page")
+    val size: Int,
+
+    @Schema(description = "Total number of pages")
+    val totalPages: Int,
+
+    @Schema(description = "Total number of players in the leaderboard")
+    val totalPlayers: Int,
+
+    @Schema(description = "Leaderboard entries for this page")
+    val entries: List<PlaytimeLeaderboardEntry>
+)
+
+// ==================== Lifesteal Profile DTOs ====================
+
+/**
+ * Item filter configuration (sanitized - no actual block/potion lists).
+ */
+@Schema(description = "Player's item filter configuration")
+data class ItemFilterResponse(
+    @Schema(description = "Whether the item filter is enabled")
+    val enabled: Boolean,
+
+    @Schema(description = "Filter type (Blacklist or Whitelist)")
+    val type: String,
+
+    @Schema(description = "Number of excluded blocks")
+    val excludedBlockCount: Int,
+
+    @Schema(description = "Number of excluded potions")
+    val excludedPotionCount: Int
+)
+
+/**
+ * Lifesteal player profile (sanitized - no locations or sensitive data).
+ */
+@Schema(description = "Lifesteal (Trojan) player profile with public statistics")
+data class LifestealProfileResponse(
+    @Schema(description = "Player's Minecraft UUID")
+    val uuid: String,
+
+    @Schema(description = "Player's Minecraft username (if available)")
+    val username: String?,
+
+    @Schema(description = "Current hearts (half-hearts, e.g., 17 = 8.5 hearts)")
+    val hearts: Int?,
+
+    @Schema(description = "Total playtime in seconds")
+    val totalPlaytimeSeconds: Long,
+
+    @Schema(description = "Number of rename tokens owned")
+    val renameTokens: Int,
+
+    @Schema(description = "Number of homes set")
+    val homeCount: Int,
+
+    @Schema(description = "Number of public homes")
+    val publicHomeCount: Int,
+
+    @Schema(description = "Item filter configuration")
+    val itemFilter: ItemFilterResponse?,
+
+    @Schema(description = "List of ignored tutorial tips")
+    val ignoredTips: List<String>,
+
+    @Schema(description = "Whether V1 homes have been migrated")
+    val hasMigratedV1Homes: Boolean?,
+
+    @Schema(description = "Whether V2 homes have been migrated")
+    val hasMigratedV2Homes: Boolean?
+)
+

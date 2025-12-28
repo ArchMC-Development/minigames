@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import mc.arch.pubapi.pigdi.dto.*
 import mc.arch.pubapi.pigdi.model.UGCGamemode
 import mc.arch.pubapi.pigdi.service.ClanLeaderboardService
+import mc.arch.pubapi.pigdi.service.UGCPlaytimeLeaderboardService
+import mc.arch.pubapi.pigdi.service.UGCProfileService
 import mc.arch.pubapi.pigdi.service.UGCStatisticsService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -39,7 +41,9 @@ import java.util.*
 )
 class UGCController(
     private val ugcStatisticsService: UGCStatisticsService,
-    private val clanLeaderboardService: ClanLeaderboardService
+    private val clanLeaderboardService: ClanLeaderboardService,
+    private val playtimeLeaderboardService: UGCPlaytimeLeaderboardService,
+    private val profileService: UGCProfileService
 )
 {
     @GetMapping("/{gamemode}/statistics")
@@ -455,4 +459,189 @@ class UGCController(
 
         return ResponseEntity.ok(leaderboard)
     }
+
+    // ==================== Playtime Leaderboard ====================
+
+    @GetMapping("/{gamemode}/leaderboard/playtime")
+    @Operation(
+        summary = "Get playtime leaderboard for a gamemode",
+        description = """
+            Returns a paginated leaderboard of the top 1000 players by total playtime in a UGC gamemode.
+            
+            **Gamemodes:**
+            - `trojan` - Lifesteal gamemode
+            - `spartan` - Survival gamemode
+            
+            The leaderboard is cached and refreshed every minute.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Playtime leaderboard page"),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid gamemode or parameters",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Invalid or missing API key",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "429",
+                description = "Rate limit exceeded",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            )
+        ]
+    )
+    fun getPlaytimeLeaderboard(
+        @Parameter(
+            description = "UGC gamemode (trojan = Lifesteal, spartan = Survival)",
+            schema = Schema(allowableValues = ["trojan", "spartan"])
+        )
+        @PathVariable gamemode: String,
+        @Parameter(description = "Page number (0-indexed)")
+        @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "Results per page (max 100)")
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<Any>
+    {
+        val ugcGamemode = UGCGamemode.fromApiName(gamemode)
+            ?: return ResponseEntity.badRequest().body(
+                ErrorResponse(
+                    error = "INVALID_GAMEMODE",
+                    message = "Invalid gamemode '$gamemode'. Valid values: trojan (Lifesteal), spartan (Survival)"
+                )
+            )
+
+        if (page < 0)
+        {
+            return ResponseEntity.badRequest().body(
+                ErrorResponse(
+                    error = "INVALID_PAGE",
+                    message = "Page number must be >= 0"
+                )
+            )
+        }
+
+        val clampedSize = size.coerceIn(1, 100)
+        val leaderboard = playtimeLeaderboardService.getLeaderboard(ugcGamemode, page, clampedSize)
+
+        return ResponseEntity.ok(leaderboard)
+    }
+
+    // ==================== Lifesteal Profile ====================
+
+    @GetMapping("/trojan/players/uuid/{uuid}/profile")
+    @Operation(
+        summary = "Get Lifesteal profile by UUID",
+        description = """
+            Returns a player's Lifesteal (trojan) profile with public statistics.
+            
+            **Note:** All location data (homes, death locations, etc.) is stripped for privacy.
+            Only aggregate counts and non-sensitive configuration are exposed.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Lifesteal player profile"),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid UUID format",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Invalid or missing API key",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Profile not found",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "429",
+                description = "Rate limit exceeded",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            )
+        ]
+    )
+    fun getLifestealProfileByUuid(
+        @Parameter(description = "Minecraft UUID")
+        @PathVariable uuid: String
+    ): ResponseEntity<Any>
+    {
+        val parsedUuid = try
+        {
+            UUID.fromString(uuid)
+        }
+        catch (e: Exception)
+        {
+            return ResponseEntity.badRequest().body(
+                ErrorResponse(
+                    error = "INVALID_UUID",
+                    message = "Invalid UUID format: '$uuid'"
+                )
+            )
+        }
+
+        val profile = profileService.getLifestealProfile(parsedUuid)
+            ?: return ResponseEntity.status(404).body(
+                ErrorResponse(
+                    error = "PROFILE_NOT_FOUND",
+                    message = "No Lifesteal profile found for player '$uuid'"
+                )
+            )
+
+        return ResponseEntity.ok(profile)
+    }
+
+    @GetMapping("/trojan/players/username/{username}/profile")
+    @Operation(
+        summary = "Get Lifesteal profile by username",
+        description = """
+            Returns a player's Lifesteal (trojan) profile with public statistics.
+            
+            **Note:** All location data (homes, death locations, etc.) is stripped for privacy.
+            Only aggregate counts and non-sensitive configuration are exposed.
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Lifesteal player profile"),
+            ApiResponse(
+                responseCode = "401",
+                description = "Invalid or missing API key",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Profile not found",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "429",
+                description = "Rate limit exceeded",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            )
+        ]
+    )
+    fun getLifestealProfileByUsername(
+        @Parameter(description = "Minecraft username")
+        @PathVariable username: String
+    ): ResponseEntity<Any>
+    {
+        val profile = profileService.getLifestealProfileByUsername(username)
+            ?: return ResponseEntity.status(404).body(
+                ErrorResponse(
+                    error = "PROFILE_NOT_FOUND",
+                    message = "No Lifesteal profile found for player '$username'"
+                )
+            )
+
+        return ResponseEntity.ok(profile)
+    }
 }
+
