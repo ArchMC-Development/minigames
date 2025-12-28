@@ -5,7 +5,9 @@ import mc.arch.minigames.persistent.housing.api.content.HousingTime
 import mc.arch.minigames.persistent.housing.api.content.HousingWeather
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
+import mc.arch.minigames.persistent.housing.game.menu.house.hologram.HologramEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.npc.NPCEditorMenu
+import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import net.evilblock.cubed.menu.Button
@@ -90,7 +92,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view Holograms!"
                 ).toButton { _, _ ->
-
+                    HologramEditorMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
 
             buttons[5] = ItemBuilder.of(XMaterial.FILLED_MAP)
@@ -101,7 +104,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view groups!"
                 ).toButton { _, _ ->
-
+                    RoleEditorMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
 
             buttons[6] = ItemBuilder.of(XMaterial.COMMAND_BLOCK)

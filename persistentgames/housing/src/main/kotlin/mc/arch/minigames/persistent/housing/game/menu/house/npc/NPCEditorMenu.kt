@@ -22,6 +22,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
     init
     {
         placeholdBorders = true
+        updateAfterClick = true
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
@@ -32,7 +33,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                 CallbackInputPrompt("${CC.GREEN}Please type in the name you want this NPC to have:") { input ->
                     val npc = HousingNPC(input, player.location.toWorldPosition())
 
-                    house.houseNPCMap[npc.name] = npc
+                    house.houseNPCMap[npc.id] = npc
                     house.save()
 
                     player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created an npc!")
@@ -74,7 +75,14 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                         "${CC.RED}Right-CLick to delete NPC"
                     )
                 }.toButton { _, click ->
+                    if (click!!.isLeftClick) {
+                        NPCSpecificsEditorMenu(house, npc).openMenu(player)
+                    } else if (click.isRightClick) {
+                        house.houseNPCMap.remove(npc.id)
+                        house.save()
 
+                        player.sendMessage("${CC.RED}Deleted NPC!")
+                    }
                 }
         }
     }

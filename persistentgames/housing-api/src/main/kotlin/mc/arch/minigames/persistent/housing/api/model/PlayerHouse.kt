@@ -66,6 +66,16 @@ data class PlayerHouse(
         save()
     }
 
+    fun removeTaskFromAction(task: Task, actionEvent: ActionEvent)
+    {
+        val currentTasks = actionEventMap[actionEvent.id()]
+            ?: mutableListOf()
+
+        currentTasks -= task
+        actionEventMap[actionEvent.id()] = currentTasks
+        save()
+    }
+
     fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
 
     fun playerCanJoin(uuid: UUID): CompletableFuture<Boolean> {

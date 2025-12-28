@@ -16,6 +16,7 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
     init
     {
         placeholdBorders = true
+        updateAfterClick = true
     }
 
     override fun size(buttons: Map<Int, Button>) = 45
@@ -83,7 +84,8 @@ class EventActionTasksMenu(val house: PlayerHouse, val event: ActionEvent) : Pag
                 }.toButton { _, click ->
                     if (click?.isRightClick == true)
                     {
-
+                        house.removeTaskFromAction(task, event)
+                        player.sendMessage("${CC.RED}Deleted task!")
                     } else
                     {
 

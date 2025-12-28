@@ -5,7 +5,7 @@ import mc.arch.minigames.persistent.housing.api.spatial.WorldPosition
 
 data class HousingHologram(
     val name: String,
-    val location: WorldPosition,
+    var location: WorldPosition,
     val id: String = name.lowercase(),
     val lines: MutableList<String> = mutableListOf(name),
     val floatingItem: HousingItemStack? = null
