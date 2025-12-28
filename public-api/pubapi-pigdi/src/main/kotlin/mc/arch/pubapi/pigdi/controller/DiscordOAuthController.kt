@@ -256,203 +256,116 @@ class DiscordOAuthController(
             <!DOCTYPE html>
             <html lang="en">
             <head>
-                <title>Discord Linked - Arch MC</title>
+                <title>Discord Linked - ArchMC</title>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta name="description" content="Discord account linking for Arch MC API">
+                <script src="https://cdn.tailwindcss.com"></script>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                <style>
-                    * { box-sizing: border-box; margin: 0; padding: 0; }
-                    body {
-                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        background: linear-gradient(180deg, #0d0d12 0%, #1a1a24 100%);
-                        min-height: 100vh;
-                        color: #fff;
+                <script>
+                    tailwind.config = {
+                        theme: {
+                            extend: {
+                                colors: {
+                                    'arch-dark': '#0a0a0f',
+                                    'arch-card': '#111116',
+                                    'arch-red': '#ef4444',
+                                },
+                                animation: {
+                                    'fade-in': 'fadeIn 0.4s ease-out',
+                                    'fade-in-up': 'fadeInUp 0.5s ease-out',
+                                    'scale-in': 'scaleIn 0.4s ease-out',
+                                    'spin-slow': 'spin 2s linear infinite',
+                                    'check-draw': 'checkDraw 0.6s ease-out 0.2s forwards',
+                                    'pop-in': 'popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                                },
+                                keyframes: {
+                                    fadeIn: {
+                                        '0%': { opacity: '0' },
+                                        '100%': { opacity: '1' },
+                                    },
+                                    fadeInUp: {
+                                        '0%': { opacity: '0', transform: 'translateY(16px)' },
+                                        '100%': { opacity: '1', transform: 'translateY(0)' },
+                                    },
+                                    scaleIn: {
+                                        '0%': { opacity: '0', transform: 'scale(0.95)' },
+                                        '100%': { opacity: '1', transform: 'scale(1)' },
+                                    },
+                                    spin: {
+                                        '0%': { transform: 'rotate(0deg)' },
+                                        '100%': { transform: 'rotate(360deg)' },
+                                    },
+                                    checkDraw: {
+                                        '0%': { opacity: '0', transform: 'scale(0)' },
+                                        '50%': { opacity: '1', transform: 'scale(1.1)' },
+                                        '100%': { opacity: '1', transform: 'scale(1)' },
+                                    },
+                                    popIn: {
+                                        '0%': { opacity: '0', transform: 'scale(0.8)' },
+                                        '100%': { opacity: '1', transform: 'scale(1)' },
+                                    },
+                                },
+                            },
+                        },
                     }
-                    
-                    /* Navbar */
-                    .navbar {
-                        background: rgba(15, 15, 20, 0.95);
-                        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-                        padding: 0 24px;
-                        height: 60px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        backdrop-filter: blur(20px);
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        z-index: 1000;
-                    }
-                    .navbar-brand {
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        text-decoration: none;
-                    }
-                    .navbar-brand .primary-text {
-                        color: #8b5cf6;
-                        font-weight: 700;
-                        font-size: 22px;
-                    }
-                    .navbar-brand .secondary-text {
-                        color: #a0a0b0;
-                        font-weight: 500;
-                        font-size: 16px;
-                    }
-                    .navbar-links {
-                        display: flex;
-                        gap: 32px;
-                    }
-                    .navbar-links a {
-                        color: #a0a0b0;
-                        text-decoration: none;
-                        font-size: 14px;
-                        font-weight: 500;
-                        transition: color 0.2s;
-                    }
-                    .navbar-links a:hover { color: #fff; }
-                    
-                    /* Main Content */
-                    .main-wrapper {
-                        padding-top: 60px;
-                        min-height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .container {
-                        max-width: 480px;
-                        width: 100%;
-                        padding: 20px;
-                    }
-                    .card {
-                        background: rgba(26, 26, 36, 0.8);
-                        border: 1px solid rgba(255, 255, 255, 0.06);
-                        border-radius: 16px;
-                        padding: 48px 40px;
-                        text-align: center;
-                        backdrop-filter: blur(20px);
-                    }
-                    .success-icon {
-                        width: 80px;
-                        height: 80px;
-                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin: 0 auto 24px;
-                        font-size: 36px;
-                        color: #fff;
-                        animation: pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-                    }
-                    @keyframes pop {
-                        0% { transform: scale(0); }
-                        100% { transform: scale(1); }
-                    }
-                    h1 {
-                        color: #10b981;
-                        font-size: 26px;
-                        font-weight: 700;
-                        margin-bottom: 8px;
-                    }
-                    .discord-user {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                        background: rgba(88, 101, 242, 0.15);
-                        border: 1px solid rgba(88, 101, 242, 0.3);
-                        color: #5865F2;
-                        padding: 8px 16px;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        font-size: 15px;
-                        margin: 16px 0 24px;
-                    }
-                    .discord-user i { font-size: 18px; }
-                    p {
-                        color: #71717a;
-                        font-size: 15px;
-                        line-height: 1.6;
-                    }
-                    .info-box {
-                        margin-top: 28px;
-                        padding: 16px 20px;
-                        background: rgba(139, 92, 246, 0.08);
-                        border: 1px solid rgba(139, 92, 246, 0.15);
-                        border-radius: 10px;
-                    }
-                    .info-box p {
-                        color: #a78bfa;
-                        margin: 0;
-                        font-size: 14px;
-                    }
-                    .info-box i {
-                        margin-right: 8px;
-                    }
-                    
-                    /* Footer */
-                    .footer {
-                        position: fixed;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        background: rgba(15, 15, 20, 0.9);
-                        border-top: 1px solid rgba(255, 255, 255, 0.06);
-                        padding: 16px 24px;
-                        text-align: center;
-                        backdrop-filter: blur(20px);
-                    }
-                    .footer p {
-                        color: #52525b;
-                        font-size: 13px;
-                    }
-                    
-                    @media (max-width: 640px) {
-                        .navbar-links { display: none; }
-                        .card { padding: 32px 24px; }
-                    }
-                </style>
+                </script>
             </head>
-            <body>
-                <nav class="navbar">
-                    <a class="navbar-brand" href="https://arch.mc">
-                        <span class="primary-text">Arch</span>
-                        <span class="secondary-text">Network</span>
-                    </a>
-                    <div class="navbar-links">
-                        <a href="https://arch.mc"><i class="fa fa-home"></i> Home</a>
-                        <a href="https://store.arch.mc"><i class="fa fa-shopping-cart"></i> Store</a>
-                        <a href="https://discord.gg/archmc"><i class="fab fa-discord"></i> Discord</a>
+            <body class="bg-arch-dark text-neutral-100 min-h-screen font-sans antialiased">
+                <div class="min-h-screen flex flex-col items-center justify-center px-8 py-32 md:py-32">
+                    <div class="mb-16 animate-fade-in-up">
+                        <img src="https://i.imgur.com/u11GbgT.png" alt="Arch MC" class="h-20 w-auto">
                     </div>
-                </nav>
-                
-                <div class="main-wrapper">
-                    <div class="container">
-                        <div class="card">
-                            <div class="success-icon">
+                    
+                    <div class="w-full max-w-[520px] bg-arch-card rounded-lg p-12 md:p-8 text-center animate-scale-in">
+                        <div class="relative w-20 h-20 mx-auto mb-8">
+                            <div id="loading-spinner" class="absolute inset-0 w-20 h-20 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin-slow"></div>
+                            <div id="success-check" class="absolute inset-0 w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-4xl text-white opacity-0">
                                 <i class="fa fa-check"></i>
                             </div>
-                            <h1>Discord Linked!</h1>
-                            <div class="discord-user">
-                                <i class="fab fa-discord"></i>
-                                $discordUsername
-                            </div>
-                            <p>Your Discord account has been successfully linked to your Minecraft account.</p>
-                            <div class="info-box">
-                                <p><i class="fa fa-gamepad"></i>You can now close this window and return to Minecraft to create your API keys!</p>
-                            </div>
                         </div>
+                        <h1 id="success-title" class="text-3xl md:text-2xl font-semibold text-neutral-100 mb-4 tracking-tight leading-tight opacity-0">Account Linked</h1>
+                        <div id="username-display" class="inline-block px-4 py-2 bg-arch-red/12 border border-arch-red/24 rounded-lg text-arch-red text-sm md:text-base font-medium mb-8 opacity-0">
+                            $discordUsername
+                        </div>
+                        <p id="success-message" class="text-zinc-400 text-base leading-relaxed mb-0 opacity-0">Your Discord account has been successfully linked to your Minecraft account. You can close this window and return to the game.</p>
                     </div>
-                </div>
-                
-                <div class="footer">
-                    <p>Copyright © Arch Network 2024-2025</p>
+                    
+                    <script>
+                        setTimeout(() => {
+                            const spinner = document.getElementById('loading-spinner');
+                            const check = document.getElementById('success-check');
+                            const title = document.getElementById('success-title');
+                            const username = document.getElementById('username-display');
+                            const message = document.getElementById('success-message');
+                            
+                            spinner.style.opacity = '0';
+                            spinner.style.transition = 'opacity 0.3s ease-out';
+                            
+                            setTimeout(() => {
+                                spinner.style.display = 'none';
+                                check.style.opacity = '1';
+                                check.classList.add('animate-pop-in');
+                                
+                                setTimeout(() => {
+                                    title.style.opacity = '1';
+                                    title.style.transition = 'opacity 0.4s ease-out';
+                                    setTimeout(() => {
+                                        username.style.opacity = '1';
+                                        username.style.transition = 'opacity 0.4s ease-out';
+                                        setTimeout(() => {
+                                            message.style.opacity = '1';
+                                            message.style.transition = 'opacity 0.4s ease-out';
+                                        }, 100);
+                                    }, 100);
+                                }, 300);
+                            }, 300);
+                        }, 1500);
+                    </script>
+                    
+                    <div class="mt-16 text-center animate-fade-in-up" style="animation-delay: 0.2s;">
+                        <p class="text-zinc-600 text-xs">© 2025 Rule Your Own Game, Inc.</p>
+                    </div>
                 </div>
             </body>
             </html>
@@ -465,185 +378,72 @@ class DiscordOAuthController(
             <!DOCTYPE html>
             <html lang="en">
             <head>
-                <title>Error - Arch MC</title>
+                <title>Error - ArchMC</title>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta name="description" content="Discord account linking for Arch MC API">
+                <script src="https://cdn.tailwindcss.com"></script>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                <style>
-                    * { box-sizing: border-box; margin: 0; padding: 0; }
-                    body {
-                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                        background: linear-gradient(180deg, #0d0d12 0%, #1a1a24 100%);
-                        min-height: 100vh;
-                        color: #fff;
+                <script>
+                    tailwind.config = {
+                        theme: {
+                            extend: {
+                                colors: {
+                                    'arch-dark': '#0a0a0f',
+                                    'arch-card': '#111116',
+                                    'arch-red': '#ef4444',
+                                },
+                                animation: {
+                                    'fade-in': 'fadeIn 0.4s ease-out',
+                                    'fade-in-up': 'fadeInUp 0.5s ease-out',
+                                    'scale-in': 'scaleIn 0.4s ease-out',
+                                    'shake': 'shake 0.5s ease-out',
+                                },
+                                keyframes: {
+                                    fadeIn: {
+                                        '0%': { opacity: '0' },
+                                        '100%': { opacity: '1' },
+                                    },
+                                    fadeInUp: {
+                                        '0%': { opacity: '0', transform: 'translateY(16px)' },
+                                        '100%': { opacity: '1', transform: 'translateY(0)' },
+                                    },
+                                    scaleIn: {
+                                        '0%': { opacity: '0', transform: 'scale(0.95)' },
+                                        '100%': { opacity: '1', transform: 'scale(1)' },
+                                    },
+                                    shake: {
+                                        '0%, 100%': { transform: 'translateX(0)' },
+                                        '25%': { transform: 'translateX(-4px)' },
+                                        '75%': { transform: 'translateX(4px)' },
+                                    },
+                                },
+                            },
+                        },
                     }
-                    
-                    /* Navbar */
-                    .navbar {
-                        background: rgba(15, 15, 20, 0.95);
-                        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-                        padding: 0 24px;
-                        height: 60px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        backdrop-filter: blur(20px);
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        z-index: 1000;
-                    }
-                    .navbar-brand {
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        text-decoration: none;
-                    }
-                    .navbar-brand .primary-text {
-                        color: #8b5cf6;
-                        font-weight: 700;
-                        font-size: 22px;
-                    }
-                    .navbar-brand .secondary-text {
-                        color: #a0a0b0;
-                        font-weight: 500;
-                        font-size: 16px;
-                    }
-                    .navbar-links {
-                        display: flex;
-                        gap: 32px;
-                    }
-                    .navbar-links a {
-                        color: #a0a0b0;
-                        text-decoration: none;
-                        font-size: 14px;
-                        font-weight: 500;
-                        transition: color 0.2s;
-                    }
-                    .navbar-links a:hover { color: #fff; }
-                    
-                    /* Main Content */
-                    .main-wrapper {
-                        padding-top: 60px;
-                        min-height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .container {
-                        max-width: 480px;
-                        width: 100%;
-                        padding: 20px;
-                    }
-                    .card {
-                        background: rgba(26, 26, 36, 0.8);
-                        border: 1px solid rgba(255, 255, 255, 0.06);
-                        border-radius: 16px;
-                        padding: 48px 40px;
-                        text-align: center;
-                        backdrop-filter: blur(20px);
-                    }
-                    .error-icon {
-                        width: 80px;
-                        height: 80px;
-                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin: 0 auto 24px;
-                        font-size: 36px;
-                        color: #fff;
-                        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
-                    }
-                    h1 {
-                        color: #ef4444;
-                        font-size: 24px;
-                        font-weight: 700;
-                        margin-bottom: 16px;
-                    }
-                    p {
-                        color: #71717a;
-                        font-size: 15px;
-                        line-height: 1.6;
-                    }
-                    .retry-btn {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                        margin-top: 28px;
-                        padding: 12px 24px;
-                        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                        color: #fff;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        font-size: 14px;
-                        transition: transform 0.2s, box-shadow 0.2s;
-                        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-                    }
-                    .retry-btn:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
-                    }
-                    
-                    /* Footer */
-                    .footer {
-                        position: fixed;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        background: rgba(15, 15, 20, 0.9);
-                        border-top: 1px solid rgba(255, 255, 255, 0.06);
-                        padding: 16px 24px;
-                        text-align: center;
-                        backdrop-filter: blur(20px);
-                    }
-                    .footer p {
-                        color: #52525b;
-                        font-size: 13px;
-                    }
-                    
-                    @media (max-width: 640px) {
-                        .navbar-links { display: none; }
-                        .card { padding: 32px 24px; }
-                    }
-                </style>
+                </script>
             </head>
-            <body>
-                <nav class="navbar">
-                    <a class="navbar-brand" href="https://arch.mc">
-                        <span class="primary-text">Arch</span>
-                        <span class="secondary-text">Network</span>
-                    </a>
-                    <div class="navbar-links">
-                        <a href="https://arch.mc"><i class="fa fa-home"></i> Home</a>
-                        <a href="https://store.arch.mc"><i class="fa fa-shopping-cart"></i> Store</a>
-                        <a href="https://discord.gg/archmc"><i class="fab fa-discord"></i> Discord</a>
+            <body class="bg-arch-dark text-neutral-100 min-h-screen font-sans antialiased">
+                <div class="min-h-screen flex flex-col items-center justify-center px-8 py-32 md:py-32">
+                    <div class="mb-16 animate-fade-in-up">
+                        <img src="https://i.imgur.com/u11GbgT.png" alt="Arch MC" class="h-20 w-auto">
                     </div>
-                </nav>
-                
-                <div class="main-wrapper">
-                    <div class="container">
-                        <div class="card">
-                            <div class="error-icon">
-                                <i class="fa fa-times"></i>
-                            </div>
-                            <h1>$title</h1>
-                            <p>$message</p>
-                            <a href="javascript:history.back()" class="retry-btn">
-                                <i class="fa fa-arrow-left"></i>
-                                Go Back
-                            </a>
+                    
+                    <div class="w-full max-w-[520px] bg-arch-card rounded-lg p-12 md:p-8 text-center animate-scale-in">
+                        <div class="w-18 h-18 bg-arch-red rounded-lg flex items-center justify-center mx-auto mb-8 text-4xl text-white animate-shake">
+                            <i class="fa fa-times"></i>
                         </div>
+                        <h1 class="text-3xl md:text-2xl font-semibold text-arch-red mb-6 tracking-tight leading-tight">$title</h1>
+                        <p class="text-zinc-400 text-base leading-relaxed mb-8">$message</p>
+                        <a href="javascript:history.back()" class="inline-flex items-center gap-2 px-6 py-3 bg-arch-red text-white rounded-lg font-medium hover:bg-red-600 transition-colors duration-200">
+                            <i class="fa fa-arrow-left"></i>
+                            Go back
+                        </a>
                     </div>
-                </div>
-                
-                <div class="footer">
-                    <p>Copyright © Arch Network 2024-2025</p>
+                    
+                    <div class="mt-16 text-center animate-fade-in-up" style="animation-delay: 0.2s;">
+                        <p class="text-zinc-600 text-xs">© 2025 Rule Your Own Game, Inc.</p>
+                    </div>
                 </div>
             </body>
             </html>
