@@ -19,6 +19,10 @@ val bundles = mutableMapOf(
         "Player Death Event",
         XMaterial.DIAMOND_SWORD
     ),
+    "playerDamageByPlayerEvent" to ActionDisplayBundle(
+        "Player Damage By Player Event",
+        XMaterial.GOLDEN_SWORD
+    ),
     "playerDamageEvent" to ActionDisplayBundle(
         "Player Damage Event",
         XMaterial.LAVA_BUCKET
@@ -34,6 +38,58 @@ val bundles = mutableMapOf(
     "blockPlaceEvent" to ActionDisplayBundle(
         "Block Place Event",
         XMaterial.GRASS_BLOCK
+    ),
+    "playerInteractEvent" to ActionDisplayBundle(
+        "Player Interact Event",
+        XMaterial.STICK
+    ),
+    "playerInteractEntityEvent" to ActionDisplayBundle(
+        "Player Interact Entity Event",
+        XMaterial.VILLAGER_SPAWN_EGG
+    ),
+    "playerRespawnEvent" to ActionDisplayBundle(
+        "Player Respawn Event",
+        XMaterial.TOTEM_OF_UNDYING
+    ),
+    "playerTeleportEvent" to ActionDisplayBundle(
+        "Player Teleport Event",
+        XMaterial.ENDER_PEARL
+    ),
+    "playerDropItemEvent" to ActionDisplayBundle(
+        "Player Drop Item Event",
+        XMaterial.DROPPER
+    ),
+    "playerPickupItemEvent" to ActionDisplayBundle(
+        "Player Pickup Item Event",
+        XMaterial.HOPPER
+    ),
+    "playerChatEvent" to ActionDisplayBundle(
+        "Player Chat Event",
+        XMaterial.WRITABLE_BOOK
+    ),
+    "playerCommandEvent" to ActionDisplayBundle(
+        "Player Command Event",
+        XMaterial.COMMAND_BLOCK
+    ),
+    "playerSneakEvent" to ActionDisplayBundle(
+        "Player Sneak Event",
+        XMaterial.LEATHER_BOOTS
+    ),
+    "playerSprintEvent" to ActionDisplayBundle(
+        "Player Sprint Event",
+        XMaterial.GOLDEN_BOOTS
+    ),
+    "playerFishEvent" to ActionDisplayBundle(
+        "Player Fish Event",
+        XMaterial.FISHING_ROD
+    ),
+    "playerProjectileEvent" to ActionDisplayBundle(
+        "Player Projectile Launch Event",
+        XMaterial.BOW
+    ),
+    "playerFoodChangeEvent" to ActionDisplayBundle(
+        "Player Food Change Event",
+        XMaterial.COOKED_BEEF
     )
 )
 
