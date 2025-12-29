@@ -49,7 +49,7 @@ val bundles = mutableMapOf(
     ),
     "playerRespawnEvent" to ActionDisplayBundle(
         "Player Respawn Event",
-        XMaterial.TOTEM_OF_UNDYING
+        XMaterial.BEACON
     ),
     "playerTeleportEvent" to ActionDisplayBundle(
         "Player Teleport Event",
@@ -65,7 +65,7 @@ val bundles = mutableMapOf(
     ),
     "playerChatEvent" to ActionDisplayBundle(
         "Player Chat Event",
-        XMaterial.WRITABLE_BOOK
+        XMaterial.PAPER
     ),
     "playerCommandEvent" to ActionDisplayBundle(
         "Player Command Event",
