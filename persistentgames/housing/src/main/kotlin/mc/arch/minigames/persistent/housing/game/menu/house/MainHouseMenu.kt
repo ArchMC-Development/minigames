@@ -10,6 +10,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.npc.NPCEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
+import mc.arch.minigames.persistent.housing.game.prevention.HousingItemService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -56,7 +57,11 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view advanced tools!"
                 ).toButton { _, _ ->
+                    player.inventory.addItem(HousingItemService.powerToolsItem)
+                    Button.playSuccess(player)
 
+                    player.closeInventory()
+                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You now have a wand! Check the item lore to see commands.")
                 }
 
             buttons[2] = ItemBuilder.of(XMaterial.REPEATER)
