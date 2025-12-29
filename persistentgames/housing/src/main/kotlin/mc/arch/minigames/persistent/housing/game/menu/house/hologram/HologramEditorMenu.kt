@@ -22,7 +22,7 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
-        4 to ItemBuilder.of(XMaterial.ARROW)
+        4 to ItemBuilder.of(XMaterial.EMERALD)
             .name("${CC.GREEN}Create Hologram")
             .addToLore("${CC.YELLOW}Click to create a new Hologram!")
             .toButton { _, _ ->
@@ -58,7 +58,7 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     } else
                     {
                         hologram.lines.forEach {
-                            button.addToLore("${CC.GRAY}- ${it.translateCC()}")
+                            button.addToLore("${CC.GRAY}- ${CC.WHITE}${it.translateCC()}")
                         }
                     }
 
