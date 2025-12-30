@@ -9,6 +9,7 @@ import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
 import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
 import mc.arch.minigames.persistent.housing.game.getReference
+import mc.arch.minigames.persistent.housing.game.prevention.HousingItemService
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import mc.arch.minigames.persistent.housing.game.translateCC
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
@@ -89,24 +90,28 @@ class HousingHostedWorldInstance(
 
     private fun spawnEntities(player: Player)
     {
-        npcs.values.forEach {
-            it.spawn(player)
-        }
+        Tasks.sync {
+            npcs.values.forEach {
+                println("Spawning NPC #${it.id} for ${player.name}")
+                it.spawn(player)
+            }
 
-        holograms.values.forEach {
-            it.spawn(player)
+            holograms.values.forEach {
+                println("Spawning Hologram #${it.id} for ${player.name}")
+                it.spawn(player)
+            }
         }
     }
 
     override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
     override fun generateScoreboardLines(player: Player) = listOf(
-        "${CC.YELLOW}Realm Name:",
+        "${CC.RED}Realm Name:",
         "${CC.WHITE}${playerHouseReference?.displayName ?: "${CC.RED}Unavailable"}",
         "",
-        "${CC.YELLOW}Guests:",
+        "${CC.RED}Guests:",
         "${CC.WHITE}${playerHouseReference?.getReference()?.onlinePlayers?.size ?: 0} out of ${playerHouseReference?.maxPlayers ?: 100}",
         "",
-        "${CC.YELLOW}Your Role:",
+        "${CC.RED}Your Role:",
         "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"}",
     )
 
@@ -140,10 +145,11 @@ class HousingHostedWorldInstance(
 
     override fun onLogin(player: Player)
     {
-        player.updateInventory()
-
         Tasks.delayed(10L) {
             spawnEntities(player)
+
+            player.inventory.setItem(8, HousingItemService.realmItem)
+            player.updateInventory()
         }
     }
 

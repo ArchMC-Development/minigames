@@ -7,6 +7,7 @@ import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.hologram.HologramEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.npc.NPCEditorMenu
+import mc.arch.minigames.persistent.housing.game.menu.house.player.PlayerManagementMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
@@ -121,7 +122,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to view player management panel!"
                 ).toButton { _, _ ->
-
+                    PlayerManagementMenu(house).openMenu(player)
+                    Button.playNeutral(player)
                 }
 
             buttons[8] = ItemBuilder.of(XMaterial.CAULDRON)

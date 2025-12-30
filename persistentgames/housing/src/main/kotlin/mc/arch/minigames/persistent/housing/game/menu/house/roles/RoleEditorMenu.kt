@@ -26,7 +26,7 @@ class RoleEditorMenu(val house: PlayerHouse) : PaginatedMenu()
     override fun getPrePaginatedTitle(player: Player): String = "Viewing All Roles"
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
-        4 to ItemBuilder.of(XMaterial.ARROW)
+        4 to ItemBuilder.of(XMaterial.EMERALD)
             .name("${CC.GREEN}Create Role")
             .addToLore("${CC.YELLOW}Click to create a new Role!")
             .toButton { _, _ ->
