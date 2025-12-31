@@ -105,13 +105,13 @@ class HousingHostedWorldInstance(
 
     override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
     override fun generateScoreboardLines(player: Player) = listOf(
-        "${CC.RED}Realm Name:",
+        "${CC.D_RED}Realm Name:",
         "${CC.WHITE}${playerHouseReference?.displayName ?: "${CC.RED}Unavailable"}",
         "",
-        "${CC.RED}Guests:",
+        "${CC.D_RED}Guests:",
         "${CC.WHITE}${playerHouseReference?.getReference()?.onlinePlayers?.size ?: 0} out of ${playerHouseReference?.maxPlayers ?: 100}",
         "",
-        "${CC.RED}Your Role:",
+        "${CC.D_RED}Your Role:",
         "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"}",
     )
 

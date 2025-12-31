@@ -79,7 +79,7 @@ object HousingItemService
 
         Events.subscribe(PlayerInteractEvent::class.java)
             .filter { it.action == Action.RIGHT_CLICK_AIR || it.action == Action.RIGHT_CLICK_BLOCK }
-            .filter { it.item.isSimilar(realmItem) }
+            .filter { it.item != null && it.item.isSimilar(realmItem) }
             .handler { event ->
                 val house = event.player.getPlayerHouseFromInstance()
                     ?: return@handler
