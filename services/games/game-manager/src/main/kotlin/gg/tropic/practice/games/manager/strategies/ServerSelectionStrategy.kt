@@ -36,6 +36,12 @@ object ServerSelectionStrategy
                     return@filter false
                 }
 
+                // if provider is minigame and server is housing, don't select
+                if (requiredType == MiniProviderType.MINIGAME && it.groups.contains("housing"))
+                {
+                    return@filter false
+                }
+
                 val serverInstance = instances[it.id]
 
                 !it.isDraining() &&
