@@ -96,6 +96,8 @@ object LegacySlimeProvider : SlimeProvider
         val legacy = generic as LegacySlimeWorld
         val serialized = (legacy.worldInstance as CraftSlimeWorld).serialize()
 
+        Bukkit.getLogger().info("Saving world content of ${generic.worldInstance.name}")
+
         LegacyGridFSContentProvider.saveWorld(
             generic.worldInstance.name, serialized, true
         )

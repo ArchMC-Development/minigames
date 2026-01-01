@@ -19,6 +19,7 @@ fun HousingNPC.toCubedNPC(world: World): NpcEntity = NpcEntity(this.aboveHeadTex
         }
 
         npc.messages = this.messagesToSend
+        npc.persistent = false
     }
 
 fun HousingHologram.toCubedHologram(world: World): HologramEntity =
@@ -35,4 +36,6 @@ fun HousingHologram.toCubedHologram(world: World): HologramEntity =
                     )
                 )
             }
+
+            hologram.persistent = false
         }

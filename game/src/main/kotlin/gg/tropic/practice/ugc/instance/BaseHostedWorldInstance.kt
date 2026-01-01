@@ -5,6 +5,7 @@ import gg.tropic.practice.games.GameService
 import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import gg.tropic.practice.ugc.*
 import gg.tropic.practice.ugc.resources.HostedWorldInstancePlayerResources
+import gg.tropic.practice.versioned.Versioned
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import org.bukkit.World
@@ -66,6 +67,13 @@ abstract class BaseHostedWorldInstance<R : HostedWorldInstancePlayerResources>(
         player = player,
         world = bukkitWorld
     )
+
+    fun saveWorld() =
+        Versioned
+            .toProvider()
+            .getSlimeProvider()
+            .saveWorld(loadedWorld.generic)
+
 
     override fun onlinePlayers() = bukkitWorld.players.toSet()
     override fun close()
