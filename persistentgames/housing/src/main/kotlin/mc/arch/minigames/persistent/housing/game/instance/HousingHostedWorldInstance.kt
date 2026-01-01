@@ -1,6 +1,7 @@
 package mc.arch.minigames.persistent.housing.game.instance
 
 import gg.scala.lemon.handler.PlayerHandler
+import gg.tropic.practice.schematics.SchematicUtil
 import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.instance.BaseHostedWorldInstance
@@ -11,6 +12,7 @@ import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
 import mc.arch.minigames.persistent.housing.game.getReference
 import mc.arch.minigames.persistent.housing.game.prevention.HousingItemService
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
+import mc.arch.minigames.persistent.housing.game.schematic.HousingSchematicService
 import mc.arch.minigames.persistent.housing.game.translateCC
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
@@ -18,6 +20,7 @@ import net.evilblock.cubed.entity.hologram.HologramEntity
 import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
@@ -34,7 +37,7 @@ class HousingHostedWorldInstance(
 )
 {
     var configuration = (request.configuration as VisitHouseConfiguration)
-    
+
     private val holograms: MutableMap<Location, HologramEntity> = mutableMapOf()
     private val npcs: MutableMap<Location, NpcEntity> = mutableMapOf()
 
@@ -46,10 +49,25 @@ class HousingHostedWorldInstance(
 
         if (house == null)
         {
-            //todo: emergency exit here if the house just isn't there and we try load
+            unload()
+            return
         } else
         {
             PlayerHousingService.cache(house)
+        }
+
+        Bukkit.getLogger().info("work plz")
+
+        if (!house.hasBeenSetup)
+        {
+            val houseSchematic = HousingSchematicService.findSchematicsOf(house.map)
+            val origin = Location(bukkitWorld, 0.0, 100.0, 0.0)
+
+            SchematicUtil.pasteSchematic(origin, houseSchematic)
+            Bukkit.getLogger().info("Pasting the selected map schematic for the first time: ${house.identifier}")
+
+            house.hasBeenSetup = true
+            house.save().join()
         }
 
         reconfigureWorld(firstSetup = true).join()
@@ -68,14 +86,14 @@ class HousingHostedWorldInstance(
     {
         destroyNPCEntities()
         destroyHologramEntities()
-    } 
+    }
 
     private fun destroyHologramEntities()
     {
-        holograms.values.forEach { 
+        holograms.values.forEach {
             it.destroyForCurrentWatchers()
         }
-        
+
         holograms.clear()
     }
 
@@ -84,7 +102,7 @@ class HousingHostedWorldInstance(
         npcs.values.forEach {
             it.destroyForCurrentWatchers()
         }
-        
+
         npcs.clear()
     }
 
@@ -112,7 +130,9 @@ class HousingHostedWorldInstance(
         "${CC.WHITE}${playerHouseReference?.getReference()?.onlinePlayers?.size ?: 0} out of ${playerHouseReference?.maxPlayers ?: 100}",
         "",
         "${CC.D_RED}Your Role:",
-        "${CC.WHITE}${playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"}",
+        "${CC.WHITE}${
+            playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"
+        }",
     )
 
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture

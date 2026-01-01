@@ -190,7 +190,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                 }
 
             buttons[36] = ItemBuilder.of(XMaterial.COMPASS)
-                .name("${CC.GREEN}Search")
+                .name("${CC.GREEN}Search For Realm")
                 .addToLore(
                     "${CC.GRAY}Want to search for a specific",
                     "${CC.GRAY}realm? Use this!",

@@ -54,7 +54,9 @@ object LegacyGridFSContentProvider : SlimeLoader
 
         Locks
             .withGlobalLock("ugc", p0) {
-                bucket.openUploadStream(p0).write(p1)
+                bucket.openUploadStream(p0).use { stream ->
+                    stream.write(p1)
+                }
             }.join()
     }
 

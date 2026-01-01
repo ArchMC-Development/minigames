@@ -95,6 +95,7 @@ object LegacySlimeProvider : SlimeProvider
     {
         val legacy = generic as LegacySlimeWorld
         val serialized = (legacy.worldInstance as CraftSlimeWorld).serialize()
+
         LegacyGridFSContentProvider.saveWorld(
             generic.worldInstance.name, serialized, true
         )
