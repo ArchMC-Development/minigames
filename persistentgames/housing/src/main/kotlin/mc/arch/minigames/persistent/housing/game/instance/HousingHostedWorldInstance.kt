@@ -3,20 +3,21 @@ package mc.arch.minigames.persistent.housing.game.instance
 import gg.scala.lemon.handler.PlayerHandler
 import gg.tropic.practice.extensions.unmount
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
+import gg.tropic.practice.map.metadata.impl.MapZoneMetadata
 import gg.tropic.practice.map.utilities.MapMetadataScanUtilities
 import gg.tropic.practice.schematics.SchematicUtil
 import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.instance.BaseHostedWorldInstance
-import gg.tropic.practice.versioned.Versioned
 import mc.arch.minigames.persistent.housing.api.VisitHouseConfiguration
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
 import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
 import mc.arch.minigames.persistent.housing.game.getReference
-import mc.arch.minigames.persistent.housing.game.prevention.HousingItemService
+import mc.arch.minigames.persistent.housing.game.item.HousingItemService
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import mc.arch.minigames.persistent.housing.game.schematic.HousingSchematicService
+import mc.arch.minigames.persistent.housing.game.spatial.SpatialZoneService
 import mc.arch.minigames.persistent.housing.game.spatial.toLocation
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import mc.arch.minigames.persistent.housing.game.translateCC
@@ -106,6 +107,15 @@ class HousingHostedWorldInstance(
                     house.save().join()
                 }
             }
+
+        val region = metadata.metadata
+            .filterIsInstance<MapZoneMetadata>()
+            .firstOrNull()
+
+        if (region != null)
+        {
+            SpatialZoneService.configure(region)
+        }
 
         reconfigureWorld(firstSetup = true).join()
 

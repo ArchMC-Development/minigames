@@ -11,7 +11,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.player.PlayerManagem
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
-import mc.arch.minigames.persistent.housing.game.prevention.HousingItemService
+import mc.arch.minigames.persistent.housing.game.item.HousingItemService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC

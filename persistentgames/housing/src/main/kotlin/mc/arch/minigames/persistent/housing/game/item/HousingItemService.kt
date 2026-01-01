@@ -1,4 +1,4 @@
-package mc.arch.minigames.persistent.housing.game.prevention
+package mc.arch.minigames.persistent.housing.game.item
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.flavor.service.Configure
