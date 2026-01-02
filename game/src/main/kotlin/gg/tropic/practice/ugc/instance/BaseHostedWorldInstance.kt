@@ -58,11 +58,6 @@ abstract class BaseHostedWorldInstance<R : HostedWorldInstancePlayerResources>(
         HostedWorldInstanceService.unregisterWorldInstance(this)
     }
 
-    fun save() = Versioned
-        .toProvider()
-        .getSlimeProvider()
-        .saveWorld(loadedWorld.generic)
-
     fun nonSpectatorPlayers() = bukkitWorld.players
         .filter {
             !GameService.isSpectating(it)

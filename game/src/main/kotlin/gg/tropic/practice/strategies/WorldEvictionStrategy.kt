@@ -18,6 +18,7 @@ object WorldEvictionStrategy
     fun evictWorld(world: World,
                    redirectTarget: String? = null,
                    kickPlayers: Boolean = true,
+                   unloadWorld: Boolean = true,
                    generateRedirectMetadataFor: (Player) -> Map<String, String> = { mapOf() }
     )
     {
@@ -64,7 +65,10 @@ object WorldEvictionStrategy
                         Schedulers
                             .sync()
                             .runLater({
-                                Bukkit.unloadWorld(world, false)
+                                if (!unloadWorld)
+                                {
+                                    Bukkit.unloadWorld(world, false)
+                                }
                             }, 20L)
                             .join()
                         return@runLater
@@ -76,7 +80,10 @@ object WorldEvictionStrategy
                 Schedulers
                     .sync()
                     .run {
-                        Bukkit.unloadWorld(world, false)
+                        if (unloadWorld)
+                        {
+                            Bukkit.unloadWorld(world, false)
+                        }
                     }
                     .join()
             }, 60L)

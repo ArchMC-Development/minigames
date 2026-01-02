@@ -72,8 +72,6 @@ class HousingHostedWorldInstance(
             SchematicUtil.pasteSchematic(origin, houseSchematic)
             Bukkit.getLogger().info("Pasting the selected map schematic for the first time: ${house.identifier}")
 
-            save()
-
             house.hasBeenSetup = true
             house.save().join()
         }

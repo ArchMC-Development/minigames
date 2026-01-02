@@ -1,11 +1,12 @@
 package mc.arch.minigames.versioned.legacy
 
 import com.grinderwolf.swm.api.SlimePlugin
-import com.grinderwolf.swm.nms.CraftSlimeWorld
+import com.grinderwolf.swm.nms.v1_8_R3.CustomWorldServer
 import com.grinderwolf.swm.plugin.config.WorldData
 import mc.arch.minigames.versioned.generics.SlimeProvider
 import mc.arch.minigames.versioned.generics.SlimeWorldGeneric
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld
 
 /**
  * @author Subham
@@ -24,6 +25,15 @@ object LegacySlimeProvider : SlimeProvider
             legacyWorld.worldInstance.clone(newName)
         )
     }
+
+    fun queueGenerateWorldUncloned(worldGeneric: SlimeWorldGeneric<*>)
+    {
+        val legacyWorld = worldGeneric as LegacySlimeWorld
+        slimePlugin.generateWorld(
+            legacyWorld.worldInstance
+        )
+    }
+
 
     override fun loadReadOnlyWorld(name: String): SlimeWorldGeneric<*>
     {
@@ -94,12 +104,29 @@ object LegacySlimeProvider : SlimeProvider
     override fun saveWorld(generic: SlimeWorldGeneric<*>)
     {
         val legacy = generic as LegacySlimeWorld
-        val serialized = (legacy.worldInstance as CraftSlimeWorld).serialize()
+        val worldName = legacy.worldInstance.name
+        val bukkitWorld = Bukkit.getWorld(worldName)
 
-        Bukkit.getLogger().info("Saving world content of ${generic.worldInstance.name}")
+        if (bukkitWorld != null)
+        {
+            val craftWorld = bukkitWorld as CraftWorld
 
-        LegacyGridFSContentProvider.saveWorld(
-            generic.worldInstance.name, serialized, false
-        )
+            if (craftWorld.getHandle() !is CustomWorldServer)
+            {
+                println("NOT A CUSTOM WORLD SERVER")
+                return
+            }
+
+            val worldServer: CustomWorldServer = craftWorld.handle as CustomWorldServer
+
+            Bukkit.unloadWorld(bukkitWorld, true)
+            val serialized = worldServer.slimeWorld.serialize()
+
+            println("Serialized ${serialized.size} bytes")
+
+            LegacyGridFSContentProvider.saveWorld(
+                worldName, serialized, false
+            )
+        }
     }
 }
