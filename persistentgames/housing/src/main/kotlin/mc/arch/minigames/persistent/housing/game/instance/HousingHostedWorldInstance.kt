@@ -111,7 +111,7 @@ class HousingHostedWorldInstance(
 
         if (region != null)
         {
-            SpatialZoneService.configure(region)
+            SpatialZoneService.configure(region, bukkitWorld)
         }
 
         reconfigureWorld(firstSetup = true).join()
@@ -155,11 +155,13 @@ class HousingHostedWorldInstance(
         Tasks.sync {
             npcs.values.forEach {
                 println("Spawning NPC #${it.id} for ${player.name}")
+                it.initializeData()
                 it.spawn(player)
             }
 
             holograms.values.forEach {
                 println("Spawning Hologram #${it.id} for ${player.name}")
+                it.initializeData()
                 it.spawn(player)
             }
         }
