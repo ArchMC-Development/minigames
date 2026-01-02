@@ -18,11 +18,13 @@ data class HouseRole(
                 displayName = "Guest",
                 permissions = mutableListOf(),
                 color = "&7",
+                prefix = "&7[GUEST]",
                 default = true,
             ),
             "resident" to HouseRole(
                 name = "resident",
                 displayName = "Resident",
+                prefix = "&6[RESIDENT]",
                 permissions = mutableListOf("house.interact"),
                 color = "&6",
             ),
@@ -31,12 +33,14 @@ data class HouseRole(
                 displayName = "Co-Owner",
                 permissions = mutableListOf("house.manage"),
                 color = "&e",
+                prefix = "&e[CO-OWNER]",
             ),
             "owner" to HouseRole(
                 name = "owner",
                 displayName = "Owner",
                 permissions = mutableListOf("house.manage"),
                 color = "&c",
+                prefix = "&c[OWNER]"
             ),
         )
     }

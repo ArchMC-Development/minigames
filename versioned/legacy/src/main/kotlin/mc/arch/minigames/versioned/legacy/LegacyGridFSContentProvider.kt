@@ -12,8 +12,7 @@ import gg.scala.store.ScalaDataStoreShared
  * @author Subham
  * @since 7/18/25
  */
-object LegacyGridFSContentProvider : SlimeLoader
-{
+object LegacyGridFSContentProvider : SlimeLoader {
     private val database = ScalaDataStoreShared.Companion.INSTANCE
         .getNewMongoConnection()
         .getConnection()
@@ -21,11 +20,10 @@ object LegacyGridFSContentProvider : SlimeLoader
 
     private val bucket = GridFSBuckets.create(database, "legacycontent")
 
-    init
-    {
-        database.getCollection("content")
+    init {
+        database.getCollection("legacycontent.files")
             .createIndex(
-                Indexes.ascending("name"),
+                Indexes.ascending("filename"),
                 IndexOptions().unique(true)
             )
     }
@@ -40,42 +38,47 @@ object LegacyGridFSContentProvider : SlimeLoader
     override fun worldExists(p0: String): Boolean = Locks
         .withGlobalLock("ugc", p0) {
             bucket
-                .find(Filters.eq("name", p0))
+                .find(Filters.eq("filename", p0))
                 .firstOrNull() != null
         }.join() == true
 
     override fun listWorlds() = listOf<String>()
-    override fun saveWorld(p0: String, p1: ByteArray, p2: Boolean)
-    {
-        if (p0.startsWith("temporary_"))
-        {
+
+    override fun saveWorld(p0: String, p1: ByteArray, p2: Boolean) {
+        if (p0.startsWith("temporary_")) {
             return
         }
 
         Locks
             .withGlobalLock("ugc", p0) {
+                // delete existing world if it exists
+                bucket
+                    .find(Filters.eq("filename", p0))
+                    .firstOrNull()
+                    ?.let {
+                        bucket.delete(it.objectId)
+                    }
+
                 bucket.openUploadStream(p0).use { stream ->
                     stream.write(p1)
                 }
             }.join()
     }
 
-    override fun unlockWorld(p0: String?)
-    {
+    override fun unlockWorld(p0: String?) {
         // Locked worlds don't matter, as world systems are managed by us
     }
 
     override fun isWorldLocked(p0: String?) = false
-    override fun deleteWorld(p0: String)
-    {
-        if (p0.startsWith("temporary_"))
-        {
+
+    override fun deleteWorld(p0: String) {
+        if (p0.startsWith("temporary_")) {
             return
         }
 
         Locks.withGlobalLock("ugc", p0) {
             bucket
-                .find(Filters.eq("name", p0))
+                .find(Filters.eq("filename", p0))
                 .firstOrNull()
                 ?.let {
                     bucket.delete(it.objectId)

@@ -3,6 +3,7 @@ package mc.arch.minigames.persistent.housing.game.displays
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
+import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.nametag.NametagHandler
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
@@ -31,7 +32,7 @@ object PlayerHousingNametagProvider : NametagProvider("realms", Int.MAX_VALUE - 
         val role = house.getRole(toRefresh.uniqueId)
 
         return createNametag(
-            prefix = "${role.prefix} ",
+            prefix = "${role.prefix.translateCC()} ",
             suffix = "",
             priority = 100
         )
