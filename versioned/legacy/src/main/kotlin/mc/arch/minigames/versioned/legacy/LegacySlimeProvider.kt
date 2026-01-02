@@ -63,7 +63,7 @@ object LegacySlimeProvider : SlimeProvider
                 .loadWorld(
                     LegacyGridFSContentProvider,
                     name,
-                    true,
+                    false,
                     worldData.toPropertyMap()
                 )
         )
@@ -85,7 +85,7 @@ object LegacySlimeProvider : SlimeProvider
                 .createEmptyWorld(
                     LegacyGridFSContentProvider,
                     name,
-                    true,
+                    false,
                     worldData.toPropertyMap()
                 )
         )
@@ -99,7 +99,7 @@ object LegacySlimeProvider : SlimeProvider
         Bukkit.getLogger().info("Saving world content of ${generic.worldInstance.name}")
 
         LegacyGridFSContentProvider.saveWorld(
-            generic.worldInstance.name, serialized, true
+            generic.worldInstance.name, serialized, false
         )
     }
 }
