@@ -11,8 +11,7 @@ import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.instance.BaseHostedWorldInstance
 import mc.arch.minigames.persistent.housing.api.VisitHouseConfiguration
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
-import mc.arch.minigames.persistent.housing.game.entity.toCubedHologram
-import mc.arch.minigames.persistent.housing.game.entity.toCubedNPC
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.getReference
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
@@ -23,8 +22,6 @@ import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import mc.arch.minigames.persistent.housing.game.translateCC
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
-import net.evilblock.cubed.entity.hologram.HologramEntity
-import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
 import org.bukkit.Bukkit
@@ -45,9 +42,6 @@ class HousingHostedWorldInstance(
 )
 {
     var configuration = (request.configuration as VisitHouseConfiguration)
-
-    private val holograms: MutableMap<Location, HologramEntity> = mutableMapOf()
-    private val npcs: MutableMap<Location, NpcEntity> = mutableMapOf()
 
     private val playerHouseReference get() = PlayerHousingService.cached(globalId)
 
@@ -128,43 +122,7 @@ class HousingHostedWorldInstance(
 
     override fun onUnload()
     {
-        destroyNPCEntities()
-        destroyHologramEntities()
-    }
-
-    private fun destroyHologramEntities()
-    {
-        holograms.values.forEach {
-            it.destroyForCurrentWatchers()
-        }
-
-        holograms.clear()
-    }
-
-    private fun destroyNPCEntities()
-    {
-        npcs.values.forEach {
-            it.destroyForCurrentWatchers()
-        }
-
-        npcs.clear()
-    }
-
-    private fun spawnEntities(player: Player)
-    {
-        Tasks.sync {
-            npcs.values.forEach {
-                println("Spawning NPC #${it.id} for ${player.name}")
-                it.initializeData()
-                it.spawn(player)
-            }
-
-            holograms.values.forEach {
-                println("Spawning Hologram #${it.id} for ${player.name}")
-                it.initializeData()
-                it.spawn(player)
-            }
-        }
+        HousingEntityService.destroyAll()
     }
 
     override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
@@ -184,29 +142,13 @@ class HousingHostedWorldInstance(
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
         .supplyAsync {
             Tasks.sync {
-                destroyNPCEntities()
-                destroyHologramEntities()
+                HousingEntityService.destroyAll()
 
                 val house = playerHouseReference
 
                 if (house != null)
                 {
-                    house.houseNPCMap.values.forEach { npc ->
-                        val entity = npc.toCubedNPC(bukkitWorld)
-
-                        npcs[entity.location] = entity
-                    }
-
-                    house.houseHologramMap.values.forEach { hologram ->
-                        val entity = hologram.toCubedHologram(bukkitWorld)
-
-                        holograms[entity.location] = entity
-                    }
-
-                    onlinePlayers()
-                        .forEach {
-                            spawnEntities(it)
-                        }
+                    HousingEntityService.configure(house, bukkitWorld)
                 }
             }
         }
@@ -219,7 +161,7 @@ class HousingHostedWorldInstance(
                 player.teleport(playerHouseReference!!.spawnPoint!!.toLocation(bukkitWorld))
             }
 
-            spawnEntities(player)
+            HousingEntityService.spawnEntities(player)
 
             player.inventory.setItem(8, HousingItemService.realmItem)
             player.updateInventory()

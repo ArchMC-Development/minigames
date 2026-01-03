@@ -11,7 +11,10 @@ import org.bukkit.World
 
 fun HousingNPC.toCubedNPC(world: World): NpcEntity = NpcEntity(this.aboveHeadText, this.location.toLocation(world))
     .also { npc ->
-        npc.updateTexture(this.skinTexture, this.skinSignature)
+        if (this.skinTexture != null && this.skinSignature != null)
+        {
+            npc.updateTexture(this.skinTexture, this.skinSignature)
+        }
 
         if (this.command != null)
         {
