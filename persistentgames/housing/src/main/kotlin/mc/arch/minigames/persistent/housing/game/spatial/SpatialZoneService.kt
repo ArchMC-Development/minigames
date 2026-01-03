@@ -13,11 +13,12 @@ import org.bukkit.event.block.BlockPlaceEvent
 
 object SpatialZoneService
 {
-    fun configure(mapZoneMetadata: MapZoneMetadata, world: World)
+    fun configure(bounds: Int, mapZoneMetadata: MapZoneMetadata, world: World)
     {
+        val zero = Location(world, 0.0, 100.0, 0.0)
         val regionAsCuboid = Cuboid(
-            mapZoneMetadata.lower.toLocation(world),
-            mapZoneMetadata.top.toLocation(world)
+            zero.clone().subtract(bounds.toDouble(), 100.0, bounds.toDouble()),
+            zero.clone().add(bounds.toDouble(), 156.0, bounds.toDouble())
         )
 
         // is this jank? Yes
@@ -27,14 +28,14 @@ object SpatialZoneService
                 val center = Location(
                     chunk.world,
                     (chunk.x * 16) + 7.5,
-                    100.0,
+                    102.0,
                     (chunk.z * 16) + 7.5
                 )
 
                 center.world
                     .getBlockAt(center)
                     .setType(
-                        Material.AIR, true
+                        Material.BEDROCK, true
                     )
 
                 println("Placing block to update chunk ${chunk.x},${chunk.z}")
