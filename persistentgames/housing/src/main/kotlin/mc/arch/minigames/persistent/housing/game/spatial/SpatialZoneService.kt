@@ -32,10 +32,20 @@ object SpatialZoneService
                     (chunk.z * 16) + 7.5
                 )
 
+                val originalType = center.world
+                    .getBlockAt(center)
+                    .type
+
                 center.world
                     .getBlockAt(center)
                     .setType(
                         Material.BEDROCK, true
+                    )
+
+                center.world
+                    .getBlockAt(center)
+                    .setType(
+                        originalType, true
                     )
 
                 println("Placing block to update chunk ${chunk.x},${chunk.z}")
