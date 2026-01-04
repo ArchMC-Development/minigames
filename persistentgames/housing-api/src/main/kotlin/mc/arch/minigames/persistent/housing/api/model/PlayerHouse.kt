@@ -27,8 +27,8 @@ import java.util.concurrent.CompletableFuture
 @Model
 data class PlayerHouse(
     val owner: UUID,
-    override val displayName: String,
-    override val name: String = displayName.lowercase(),
+    override var displayName: String,
+    override var name: String = displayName.lowercase(),
     var spawnPoint: WorldPosition? = null,
     var defaultGamemode: HousingGameMode = HousingGameMode.SURVIVAL,
     var maxPlayers: Int = 20,

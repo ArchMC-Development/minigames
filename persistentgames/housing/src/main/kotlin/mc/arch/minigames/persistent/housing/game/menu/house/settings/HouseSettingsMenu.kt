@@ -1,6 +1,8 @@
 package mc.arch.minigames.persistent.housing.game.menu.house.settings
 
 import com.cryptomorin.xseries.XMaterial
+import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
+import mc.arch.minigames.persistent.housing.api.content.HousingTime
 import mc.arch.minigames.persistent.housing.api.formatName
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.api.model.VisitationStatus
@@ -29,7 +31,7 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
             .name("${CC.GREEN}Max Players: ${CC.AQUA}${house.maxPlayers}")
             .addToLore(
                 "${CC.GRAY}Change the maximum number of",
-                "${CC.GRAY}players allowed in your house",
+                "${CC.GRAY}players allowed in your realm",
                 "${CC.GRAY}at one time.",
                 "",
                 "${CC.B_RED}WARNING ${CC.RED}High player counts could",
@@ -112,6 +114,25 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
 
                 Button.playNeutral(player)
                 house.save()
+            }
+
+        buttons[12] = ItemBuilder.of(XMaterial.WOODEN_AXE)
+            .name("${CC.GREEN}Realm GameMode: ${CC.AQUA}${house.defaultGamemode.name}")
+            .addToLore(
+                "${CC.GRAY}Change the gamemode that",
+                "${CC.GRAY}players will spawn in",
+                "${CC.GRAY}at one time.",
+                "",
+                "${CC.GREEN}Click to change gamemode",
+            ).toButton { _, _ ->
+                val currentIndex = HousingGameMode.entries.indexOf(house.defaultGamemode)
+                val next = HousingGameMode.entries.getOrElse(currentIndex + 1) { HousingGameMode.SURVIVAL }
+
+                house.defaultGamemode = next
+                house.save()
+
+                Button.playNeutral(player)
+                player.sendMessage("${CC.YELLOW}Your realm gamemode has been updated to: ${CC.GREEN}${next.name}")
             }
 
         buttons[31] = MainHouseMenu.mainMenuButton(house)

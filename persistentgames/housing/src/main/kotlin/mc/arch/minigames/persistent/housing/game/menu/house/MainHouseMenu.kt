@@ -1,9 +1,11 @@
 package mc.arch.minigames.persistent.housing.game.menu.house
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.content.HousingTime
 import mc.arch.minigames.persistent.housing.api.content.HousingWeather
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.hologram.HologramEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.npc.NPCEditorMenu
@@ -12,6 +14,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
+import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -224,6 +227,74 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                 ).toButton { _, _ ->
                     HouseSettingsMenu(house).openMenu(player)
                     Button.playNeutral(player)
+                }
+
+            buttons[40] = ItemBuilder.of(XMaterial.OAK_SIGN)
+                .name("${CC.GREEN}Realm Name")
+                .addToLore(
+                    "${CC.GRAY}Allows you to change the",
+                    "${CC.GRAY}name of your realm to something",
+                    "${CC.GRAY}different.",
+                    "",
+                    "${CC.YELLOW}Click to configure!"
+                ).toButton { _, _ ->
+                    CallbackInputPrompt("${CC.GREEN}Enter a new name for your realm! It must be only letters or numbers, and not contain spaces:") {
+                        if (!it.matches(Regex("^[a-zA-Z0-9]+$")))
+                        {
+                            player.sendMessage("${CC.RED}This name is not allowed. Please make sure it is only letters or numbers!")
+                            return@CallbackInputPrompt
+                        }
+
+                        if (it.length > 16)
+                        {
+                            player.sendMessage("${CC.RED}Your realm name must be less than 16 characters!")
+                            return@CallbackInputPrompt
+                        }
+
+                        PlayerHousingService.findByName(it.lowercase()).thenAccept { foundHouse ->
+                            if (foundHouse != null)
+                            {
+                                player.sendMessage("${CC.RED}A realm with this name already exists! Please try again later.")
+                                return@thenAccept
+                            }
+
+                            house.name = it.lowercase()
+                            house.save().join()
+
+                            player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}Your realm name has been updated to ${CC.WHITE}${it}")
+
+                            HouseSettingsMenu(house).openMenu(player)
+                            Button.playNeutral(player)
+                        }
+                    }.start(player)
+                }
+
+            buttons[41] = ItemBuilder.of(XMaterial.GOLDEN_APPLE)
+                .name("${CC.GREEN}Realm Display Name")
+                .addToLore(
+                    "${CC.GRAY}Allows you to change the",
+                    "${CC.GRAY}display name of your realm to",
+                    "${CC.GRAY}something different.",
+                    "",
+                    "${CC.YELLOW}You can use color codes for this!",
+                    "",
+                    "${CC.YELLOW}Click to configure!"
+                ).toButton { _, _ ->
+                    CallbackInputPrompt("${CC.GREEN}Enter a display name for your realm! (16 character maximum, can use colors):") {
+                        if (it.length > 16)
+                        {
+                            player.sendMessage("${CC.RED}Your realm name must be less than 16 characters!")
+                            return@CallbackInputPrompt
+                        }
+
+                        house.displayName = it.translateCC()
+                        house.save()
+
+                        player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}Your display name has been updated to ${CC.WHITE}${it.translateCC()}")
+
+                        HouseSettingsMenu(house).openMenu(player)
+                        Button.playNeutral(player)
+                    }.start(player)
                 }
 
             buttons[44] = ItemBuilder.of(XMaterial.JUKEBOX)
