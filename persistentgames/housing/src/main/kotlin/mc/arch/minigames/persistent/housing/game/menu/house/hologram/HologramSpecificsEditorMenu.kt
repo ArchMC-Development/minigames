@@ -8,6 +8,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.menus.TextEditorMenu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.entity.Player
@@ -31,7 +32,7 @@ class HologramSpecificsEditorMenu(val house: PlayerHouse, val hologram: HousingH
                 "${CC.GREEN}Click to edit lines"
             )
             .toButton { _, _ ->
-                player.sendMessage("${CC.RED}Feature coming soon!")
+                EditHologramLinesMenu(hologram, house).openMenu(player)
             },
         11 to ItemBuilder.of(XMaterial.ITEM_FRAME)
             .name("${CC.GREEN}Edit Floating Item")

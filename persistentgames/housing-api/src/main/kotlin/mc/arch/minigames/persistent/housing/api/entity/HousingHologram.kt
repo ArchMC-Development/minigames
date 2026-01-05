@@ -7,6 +7,6 @@ data class HousingHologram(
     val name: String,
     var location: WorldPosition,
     val id: String = name.lowercase(),
-    val lines: MutableList<String> = mutableListOf(name),
+    var lines: MutableList<String> = mutableListOf(name),
     val floatingItem: HousingItemStack? = null
 )

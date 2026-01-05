@@ -19,8 +19,8 @@ data class HousingNPC(
     val id: String = name.lowercase(),
     var displayName: String = name,
     var command: String? = null,
-    val aboveHeadText: MutableList<String> = mutableListOf(name),
-    val messagesToSend: MutableList<String> = mutableListOf(),
+    var aboveHeadText: MutableList<String> = mutableListOf(name),
+    var messagesToSend: MutableList<String> = mutableListOf(),
     val skinTexture: String? = null,
     val skinSignature: String? = null,
     var glowing: Boolean = false

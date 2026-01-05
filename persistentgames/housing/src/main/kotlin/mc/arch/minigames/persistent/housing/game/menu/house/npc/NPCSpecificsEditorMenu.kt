@@ -60,7 +60,7 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
                 "${CC.GREEN}Click to edit lines"
             )
             .toButton { _, _ ->
-                player.sendMessage("${CC.RED}Feature coming soon!")
+                EditNPCLinesMenu(npc, house).openMenu(player)
             },
         13 to ItemBuilder.of(XMaterial.PAPER)
             .name("${CC.GREEN}Edit Messages")
@@ -70,7 +70,7 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
                 "${CC.GREEN}Click to edit messages"
             )
             .toButton { _, _ ->
-                player.sendMessage("${CC.RED}Feature coming soon!")
+                EditNPCMessagesMenu(npc, house).openMenu(player)
             },
         14 to ItemBuilder.of(XMaterial.PLAYER_HEAD)
             .name("${CC.GREEN}Edit Skin")
