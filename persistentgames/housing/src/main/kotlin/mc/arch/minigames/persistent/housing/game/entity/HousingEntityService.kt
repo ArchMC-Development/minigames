@@ -57,6 +57,21 @@ object HousingEntityService
         npcs.clear()
     }
 
+    fun respawnAll(world: World)
+    {
+        npcs.values.forEach {
+            it.destroyForCurrentWatchers()
+        }
+
+        holograms.values.forEach {
+            it.destroyForCurrentWatchers()
+        }
+
+        world.players.forEach {
+            spawnEntities(it)
+        }
+    }
+
     fun spawnEntities(player: Player)
     {
         Tasks.sync {

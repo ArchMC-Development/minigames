@@ -2,6 +2,7 @@ package mc.arch.minigames.persistent.housing.game.menu.house.hologram
 
 import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import net.evilblock.cubed.menu.menus.TextEditorMenu
 import org.bukkit.entity.Player
 
@@ -17,6 +18,8 @@ class EditHologramLinesMenu(val hologram: HousingHologram, val house: PlayerHous
     override fun onSave(player: Player, list: List<String>)
     {
         hologram.lines = list.toMutableList()
+        house.save()
+        HousingEntityService.respawnAll(player.world)
     }
 
     override fun onClose(player: Player)

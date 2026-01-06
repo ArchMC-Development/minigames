@@ -14,6 +14,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
+import mc.arch.minigames.persistent.housing.game.menu.house.tags.HouseTagsEditorMenu
 import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -263,7 +264,7 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
                             player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}Your realm name has been updated to ${CC.WHITE}${it}")
 
-                            HouseSettingsMenu(house).openMenu(player)
+                            openMenu(player)
                             Button.playNeutral(player)
                         }
                     }.start(player)
@@ -292,9 +293,22 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
                         player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}Your display name has been updated to ${CC.WHITE}${it.translateCC()}")
 
-                        HouseSettingsMenu(house).openMenu(player)
+                        openMenu(player)
                         Button.playNeutral(player)
                     }.start(player)
+                }
+
+            buttons[42] = ItemBuilder.of(XMaterial.NAME_TAG)
+                .name("${CC.GREEN}Realm Tags")
+                .addToLore(
+                    "${CC.GRAY}Allows you to change the",
+                    "${CC.GRAY}tags of your realm to help",
+                    "${CC.GRAY}them it get discovered.",
+                    "",
+                    "${CC.YELLOW}Click to configure!"
+                ).toButton { _, _ ->
+                    Button.playNeutral(player)
+                    HouseTagsEditorMenu(house).openMenu(player)
                 }
 
             buttons[44] = ItemBuilder.of(XMaterial.JUKEBOX)

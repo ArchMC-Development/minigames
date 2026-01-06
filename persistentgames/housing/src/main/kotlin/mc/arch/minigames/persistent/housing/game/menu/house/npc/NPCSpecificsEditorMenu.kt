@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import net.evilblock.cubed.menu.Button
@@ -32,6 +33,8 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
             .toButton { _, _ ->
                 CallbackInputPrompt("${CC.GREEN}Type new display name:") { input ->
                     npc.displayName = input
+
+                    HousingEntityService.respawnAll(player.world)
                     house.save()
 
                     player.sendMessage("${CC.GREEN}Updated the display name of this NPC!")
@@ -47,6 +50,8 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
             .toButton { _, _ ->
                 CallbackInputPrompt("${CC.GREEN}Type in the new command (Do not use /):") { input ->
                     npc.command = input
+
+                    HousingEntityService.respawnAll(player.world)
                     house.save()
 
                     player.sendMessage("${CC.GREEN}Updated the command for this NPC!")
@@ -91,6 +96,8 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
             )
             .toButton { _, _ ->
                 npc.glowing = !npc.glowing
+
+                HousingEntityService.respawnAll(player.world)
                 house.save()
 
                 player.sendMessage("${CC.GREEN}Toggled glowing for this NPC!")
@@ -104,6 +111,8 @@ class NPCSpecificsEditorMenu(val house: PlayerHouse, val npc: HousingNPC) : Menu
             )
             .toButton { _, _ ->
                 npc.location = player.location.toWorldPosition()
+
+                HousingEntityService.respawnAll(player.world)
                 house.save()
 
                 player.sendMessage("${CC.GREEN}Moved this NPC to your location!")

@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import mc.arch.minigames.persistent.housing.game.translateCC
@@ -31,6 +32,7 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
 
                     house.houseHologramMap[hologram.id] = hologram
                     house.save()
+                    HousingEntityService.respawnAll(player.world)
 
                     player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created a hologram!")
                     HologramEditorMenu(house).openMenu(player)
@@ -73,8 +75,9 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     } else if (click.isRightClick) {
                          house.houseHologramMap.remove(hologram.name)
                          house.save()
-                         player.sendMessage("${CC.RED}Deleted Hologram!")
+                         HousingEntityService.respawnAll(player.world)
 
+                         player.sendMessage("${CC.RED}Deleted Hologram!")
                          HologramEditorMenu(house).openMenu(player)
                     }
                 }

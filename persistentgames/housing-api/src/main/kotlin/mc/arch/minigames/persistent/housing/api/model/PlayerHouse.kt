@@ -33,7 +33,7 @@ data class PlayerHouse(
     var defaultGamemode: HousingGameMode = HousingGameMode.SURVIVAL,
     var maxPlayers: Int = 20,
     var plotSizeBlocks: Int = 200,
-    val tags: MutableList<String> = mutableListOf(),
+    var tags: MutableList<String> = mutableListOf(),
     val actionEventMap: MutableMap<String, MutableList<Task>> = mutableMapOf(),
     val roles: MutableMap<String, HouseRole> = HouseRole.defaults(),
     val visitationStatuses: MutableMap<VisitationStatus, Boolean> = mutableMapOf(

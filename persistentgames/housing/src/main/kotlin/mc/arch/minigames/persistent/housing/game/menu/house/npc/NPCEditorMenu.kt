@@ -6,6 +6,7 @@ import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.entity.HousingNPC
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.actions.getDisplayBundle
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.events.EventActionTasksMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
@@ -35,6 +36,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
 
                     house.houseNPCMap[npc.id] = npc
                     house.save()
+                    HousingEntityService.respawnAll(player.world)
 
                     player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created an npc!")
                     NPCEditorMenu(house).openMenu(player)
@@ -80,6 +82,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     } else if (click.isRightClick) {
                         house.houseNPCMap.remove(npc.id)
                         house.save()
+                        HousingEntityService.respawnAll(player.world)
 
                         player.sendMessage("${CC.RED}Deleted NPC!")
                     }

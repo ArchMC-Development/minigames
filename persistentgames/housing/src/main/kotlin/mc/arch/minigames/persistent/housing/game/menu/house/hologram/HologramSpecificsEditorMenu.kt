@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.entity.HousingHologram
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
+import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import net.evilblock.cubed.menu.Button
@@ -54,6 +55,7 @@ class HologramSpecificsEditorMenu(val house: PlayerHouse, val hologram: HousingH
             .toButton { _, _ ->
                 hologram.location = player.location.toWorldPosition()
                 house.save()
+                HousingEntityService.respawnAll(player.world)
 
                 player.sendMessage("${CC.GREEN}Moved Hologram to your location!")
             },
@@ -69,6 +71,7 @@ class HologramSpecificsEditorMenu(val house: PlayerHouse, val hologram: HousingH
             .toButton { _, _ ->
                 house.houseHologramMap.remove(hologram.id)
                 house.save()
+                HousingEntityService.respawnAll(player.world)
 
                 player.sendMessage("${CC.RED}Deleted Hologram!")
                 HologramEditorMenu(house).openMenu(player)
