@@ -21,7 +21,7 @@ import gg.scala.commons.core.plugin.PluginWebsite
 @PluginDependencyComposite(
     PluginDependency("scala-commons"),
     PluginDependency("Lemon"),
-    PluginDependency("Minigames")
+    PluginDependency("Minigames"),
 )
 class PersistentGameHousing : ExtendedScalaPlugin()
 {
