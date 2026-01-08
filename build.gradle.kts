@@ -32,6 +32,10 @@ allprojects {
         maven {
             url = uri("https://repo.dmulloy2.net/repository/public/")
         }
+
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
 }
 
