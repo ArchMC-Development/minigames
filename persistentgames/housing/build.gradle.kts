@@ -4,4 +4,5 @@ dependencies {
     compileOnly(fileTree("spigot"))
     compileOnly(project(":spigot-integration"))
     api(project(":persistentgames:housing-api"))
+    implementation("com.github.koca2000:NoteBlockAPI:1.6.3")
 }

@@ -46,6 +46,7 @@ data class PlayerHouse(
     val lastLaunched: Long = System.currentTimeMillis(),
     val houseIcon: HousingItemStack? = null,
     var map: HousingMapType = HousingMapType.CITY,
+    var music: String? = null,
     var hasBeenSetup: Boolean = false,
     var housingTime: HousingTime? = null,
     var housingWeather: HousingWeather? = null,

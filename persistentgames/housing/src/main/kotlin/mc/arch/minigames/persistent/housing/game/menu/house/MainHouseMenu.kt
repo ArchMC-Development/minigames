@@ -14,6 +14,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
+import mc.arch.minigames.persistent.housing.game.menu.house.music.HouseMusicSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.tags.HouseTagsEditorMenu
 import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.menu.Button
@@ -320,7 +321,8 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     "",
                     "${CC.YELLOW}Click to change music!"
                 ).toButton { _, _ ->
-
+                    Button.playNeutral(player)
+                    HouseMusicSelectionMenu(house).openMenu(player)
                 }
         } else
         {

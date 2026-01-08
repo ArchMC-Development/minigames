@@ -1,6 +1,7 @@
 package mc.arch.minigames.persistent.housing.game
 
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.Plugin
 import gg.scala.commons.core.plugin.PluginAuthor
 import gg.scala.commons.core.plugin.PluginAuthorComposite
@@ -23,3 +24,16 @@ import gg.scala.commons.core.plugin.PluginWebsite
     PluginDependency("Minigames")
 )
 class PersistentGameHousing : ExtendedScalaPlugin()
+{
+    companion object
+    {
+        lateinit var instance: PersistentGameHousing
+    }
+
+
+    @ContainerEnable
+    fun containerEnable()
+    {
+        instance = this
+    }
+}
