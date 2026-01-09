@@ -183,6 +183,25 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     player.sendMessage("${CC.YELLOW}Your time has been updated to: ${next.displayName}")
                 }
 
+            buttons[13] = ItemBuilder.of(XMaterial.CAULDRON)
+                .name("${CC.GREEN}Allow Building Outside Zone")
+                .addToLore(
+                    "${CC.GRAY}Makes it so that people with",
+                    "${CC.GRAY}elevated permissions can modify",
+                    "${CC.GRAY}blocks outside of the grass zone.",
+                    "",
+                    "${CC.WHITE}Currently ${if (house.allowsMutatingOutsideRegion == true) "${CC.GREEN}Allowed" else "${CC.RED}Disallowed"}",
+                    "",
+                    "${CC.YELLOW}Click to edit cycle options!"
+                ).toButton { _, _ ->
+
+                    house.allowsMutatingOutsideRegion = !(house.allowsMutatingOutsideRegion ?: false)
+                    house.save()
+
+                    Button.playNeutral(player)
+                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have changed if people can build outside of the zone or not")
+                }
+
             buttons[27] = ItemBuilder.of(XMaterial.SPRUCE_DOOR)
                 .name("${CC.GREEN}Travel to someone else's realm")
                 .addToLore(

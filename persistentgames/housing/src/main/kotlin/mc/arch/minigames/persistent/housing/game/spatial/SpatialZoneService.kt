@@ -2,6 +2,7 @@ package mc.arch.minigames.persistent.housing.game.spatial
 
 import gg.scala.commons.spatial.toPosition
 import gg.tropic.practice.map.metadata.impl.MapZoneMetadata
+import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -54,23 +55,33 @@ object SpatialZoneService
 
         Events.subscribe(BlockBreakEvent::class.java)
             .handler { event ->
+                val player = event.player
                 val location = event.block.location
                 val region = mapZoneMetadata.bounds
+                val house = player.getPlayerHouseFromInstance()
 
                 if (!region.contains(location.toPosition()))
                 {
-                    event.isCancelled = true
+                    if (house?.allowsMutatingOutsideRegion != true)
+                    {
+                        event.isCancelled = true
+                    }
                 }
             }
 
         Events.subscribe(BlockPlaceEvent::class.java)
             .handler { event ->
+                val player = event.player
                 val location = event.block.location
                 val region = mapZoneMetadata.bounds
+                val house = player.getPlayerHouseFromInstance()
 
                 if (!region.contains(location.toPosition()))
                 {
-                    event.isCancelled = true
+                    if (house?.allowsMutatingOutsideRegion != true)
+                    {
+                        event.isCancelled = true
+                    }
                 }
             }
     }

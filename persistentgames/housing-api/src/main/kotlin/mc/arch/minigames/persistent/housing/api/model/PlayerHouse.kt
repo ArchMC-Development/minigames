@@ -48,6 +48,7 @@ data class PlayerHouse(
     var map: HousingMapType = HousingMapType.CITY,
     var music: String? = null,
     var hasBeenSetup: Boolean = false,
+    var allowsMutatingOutsideRegion: Boolean? = false,
     var housingTime: HousingTime? = null,
     var housingWeather: HousingWeather? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
