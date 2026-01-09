@@ -17,6 +17,7 @@ import mc.arch.minigames.persistent.housing.api.island.HousingMapType
 import mc.arch.minigames.persistent.housing.api.role.HouseRole
 import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.api.spatial.WorldPosition
+import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -51,6 +52,7 @@ data class PlayerHouse(
     var allowsMutatingOutsideRegion: Boolean? = false,
     var housingTime: HousingTime? = null,
     var housingWeather: HousingWeather? = null,
+    var region: Cuboid? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
     val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
     override val identifier: UUID = UUID.randomUUID(),

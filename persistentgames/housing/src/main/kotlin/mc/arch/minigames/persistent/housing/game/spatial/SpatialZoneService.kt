@@ -61,16 +61,21 @@ object SpatialZoneService
         border.setSize(playerHouse.plotSizeBlocks.toDouble(), 0)
         border.warningDistance = 5
 
+        playerHouse.region = regionAsCuboid
+        playerHouse.save()
+
         Events.subscribe(BlockBreakEvent::class.java)
             .handler { event ->
                 val player = event.player
                 val location = event.block.location
-                val region = mapZoneMetadata.bounds
                 val house = player.getPlayerHouseFromInstance()
+                    ?: return@handler
+                val region = house.region
+                    ?: return@handler
 
-                if (!region.contains(location.toPosition()))
+                if (!region.contains(location))
                 {
-                    if (house?.allowsMutatingOutsideRegion != true)
+                    if (house.allowsMutatingOutsideRegion != true)
                     {
                         event.isCancelled = true
                     }
@@ -81,12 +86,14 @@ object SpatialZoneService
             .handler { event ->
                 val player = event.player
                 val location = event.block.location
-                val region = mapZoneMetadata.bounds
                 val house = player.getPlayerHouseFromInstance()
+                    ?: return@handler
+                val region = house.region
+                    ?: return@handler
 
-                if (!region.contains(location.toPosition()))
+                if (!region.contains(location))
                 {
-                    if (house?.allowsMutatingOutsideRegion != true)
+                    if (house.allowsMutatingOutsideRegion != true)
                     {
                         event.isCancelled = true
                     }
