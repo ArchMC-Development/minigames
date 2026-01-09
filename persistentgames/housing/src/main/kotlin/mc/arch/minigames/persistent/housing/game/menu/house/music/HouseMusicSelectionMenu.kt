@@ -20,11 +20,9 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
         XMaterial.MUSIC_DISC_STAL,
         XMaterial.MUSIC_DISC_CHIRP,
         XMaterial.MUSIC_DISC_BLOCKS,
-        XMaterial.MUSIC_DISC_5,
         XMaterial.MUSIC_DISC_11,
         XMaterial.MUSIC_DISC_13,
         XMaterial.MUSIC_DISC_CAT,
-        XMaterial.MUSIC_DISC_CREATOR,
         XMaterial.MUSIC_DISC_FAR,
         XMaterial.MUSIC_DISC_MALL,
         XMaterial.MUSIC_DISC_MELLOHI
@@ -40,7 +38,7 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
     override fun getAllPagesButtonSlots() = (10..16).toList() + (19..25).toList() + (28..34).toList()
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
-        31 to MainHouseMenu.mainMenuButton(house)
+        40 to MainHouseMenu.mainMenuButton(house)
     )
 
     override fun getPrePaginatedTitle(player: Player): String = "Viewing All Music"

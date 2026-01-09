@@ -103,9 +103,9 @@ class HousingHostedWorldInstance(
             .filterIsInstance<MapZoneMetadata>()
             .firstOrNull()
 
-        if (region != null)
+        if (region != null && playerHouseReference != null)
         {
-            SpatialZoneService.configure(playerHouseReference?.plotSizeBlocks ?: 200, region, bukkitWorld)
+            SpatialZoneService.configure(playerHouseReference,playerHouseReference.plotSizeBlocks ?: 200, region, bukkitWorld)
         }
 
         reconfigureWorld(firstSetup = true).join()

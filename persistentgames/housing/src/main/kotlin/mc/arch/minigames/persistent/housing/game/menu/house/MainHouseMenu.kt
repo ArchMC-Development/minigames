@@ -16,6 +16,7 @@ import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisi
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
 import mc.arch.minigames.persistent.housing.game.menu.house.music.HouseMusicSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.tags.HouseTagsEditorMenu
+import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
 import mc.arch.minigames.persistent.housing.game.translateCC
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -199,7 +200,26 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     house.save()
 
                     Button.playNeutral(player)
-                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have changed if people can build outside of the zone or not")
+                    player.sendMessage("${CC.YELLOW}Your building zone status has been updated to: ${if (house.allowsMutatingOutsideRegion == true) "${CC.GREEN}Allowed" else "${CC.RED}Disallowed"}")
+                }
+
+            buttons[14] = ItemBuilder.of(XMaterial.BEACON)
+                .name("${CC.GREEN}Spawn Point")
+                .addToLore(
+                    "${CC.GRAY}Makes it so that on join,",
+                    "${CC.GRAY}people will spawn at your current",
+                    "${CC.GRAY}location.",
+                    "",
+                    "${CC.WHITE}Currently ${CC.GREEN}${house.spawnPoint?.x ?: 0}, ${house.spawnPoint?.y ?: 100}, ${house.spawnPoint?.z ?: 0}",
+                    "",
+                    "${CC.YELLOW}Click to set spawn location!"
+                ).toButton { _, _ ->
+
+                    house.spawnPoint = player.location.toWorldPosition()
+                    house.save()
+
+                    Button.playNeutral(player)
+                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have updated your realm's spawn point to your current location.")
                 }
 
             buttons[27] = ItemBuilder.of(XMaterial.SPRUCE_DOOR)
