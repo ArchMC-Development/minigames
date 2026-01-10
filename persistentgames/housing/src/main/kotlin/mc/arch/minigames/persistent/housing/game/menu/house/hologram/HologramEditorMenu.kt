@@ -32,7 +32,7 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
 
                     house.houseHologramMap[hologram.id] = hologram
                     house.save()
-                    HousingEntityService.respawnAll(player.world)
+                    HousingEntityService.recalculateAll(house, player.world)
 
                     player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created a hologram!")
                     HologramEditorMenu(house).openMenu(player)
@@ -75,7 +75,7 @@ class HologramEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     } else if (click.isRightClick) {
                          house.houseHologramMap.remove(hologram.name)
                          house.save()
-                         HousingEntityService.respawnAll(player.world)
+                         HousingEntityService.recalculateAll(house, player.world)
 
                          player.sendMessage("${CC.RED}Deleted Hologram!")
                          HologramEditorMenu(house).openMenu(player)

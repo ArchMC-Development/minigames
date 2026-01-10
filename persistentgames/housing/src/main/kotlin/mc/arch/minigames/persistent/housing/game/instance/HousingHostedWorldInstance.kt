@@ -1,5 +1,6 @@
 package mc.arch.minigames.persistent.housing.game.instance
 
+import gg.scala.basics.plugin.profile.BasicsProfileService
 import gg.scala.lemon.handler.PlayerHandler
 import gg.tropic.practice.extensions.unmount
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
@@ -14,8 +15,11 @@ import mc.arch.minigames.persistent.housing.api.service.PlayerHousingService
 import mc.arch.minigames.persistent.housing.game.entity.HousingEntityService
 import mc.arch.minigames.persistent.housing.game.getReference
 import mc.arch.minigames.persistent.housing.game.item.HousingItemService
+import mc.arch.minigames.persistent.housing.game.music.HousingMusicService
 import mc.arch.minigames.persistent.housing.game.resources.HousingPlayerResources
 import mc.arch.minigames.persistent.housing.game.schematic.HousingSchematicService
+import mc.arch.minigames.persistent.housing.game.settings.HousingSettingsCategory
+import mc.arch.minigames.persistent.housing.game.settings.type.MusicSetting
 import mc.arch.minigames.persistent.housing.game.spatial.SpatialZoneService
 import mc.arch.minigames.persistent.housing.game.spatial.toLocation
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
@@ -159,6 +163,18 @@ class HousingHostedWorldInstance(
             if (playerHouseReference?.spawnPoint != null)
             {
                 player.teleport(playerHouseReference!!.spawnPoint!!.toLocation(bukkitWorld))
+            }
+
+            if (playerHouseReference?.music != null)
+            {
+                val profile = BasicsProfileService.find(player)
+                val musicSetting = profile?.settings["${HousingSettingsCategory.SETTING_PREFIX}:music-settings"]
+                    ?: MusicSetting.SHOULD_PLAY
+
+                if (musicSetting == MusicSetting.SHOULD_PLAY)
+                {
+                    HousingMusicService.playSong(playerHouseReference!!.music!!, player)
+                }
             }
 
             HousingEntityService.spawnEntities(player)

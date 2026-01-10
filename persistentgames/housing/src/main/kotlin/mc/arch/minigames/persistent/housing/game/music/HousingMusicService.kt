@@ -41,6 +41,12 @@ object HousingMusicService
         val songPlayer = songPlayers[name]
             ?: RadioSongPlayer(NBSDecoder.parse(song.file))
 
+        // make sure tracks don't overlap here
+        if (isPlayingSong(player))
+        {
+            stopPlayingSong(player)
+        }
+
         songPlayer.isPlaying = true
         songPlayer.addPlayer(player)
         songTracker[player.uniqueId] = name

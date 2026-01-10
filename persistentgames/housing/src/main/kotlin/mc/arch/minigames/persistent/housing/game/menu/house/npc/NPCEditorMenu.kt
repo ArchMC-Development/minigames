@@ -36,7 +36,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
 
                     house.houseNPCMap[npc.id] = npc
                     house.save()
-                    HousingEntityService.respawnAll(player.world)
+                    HousingEntityService.recalculateAll(house, player.world)
 
                     player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You have created an npc!")
                     NPCEditorMenu(house).openMenu(player)
@@ -82,7 +82,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     } else if (click.isRightClick) {
                         house.houseNPCMap.remove(npc.id)
                         house.save()
-                        HousingEntityService.respawnAll(player.world)
+                        HousingEntityService.recalculateAll(house, player.world)
 
                         player.sendMessage("${CC.RED}Deleted NPC!")
                     }

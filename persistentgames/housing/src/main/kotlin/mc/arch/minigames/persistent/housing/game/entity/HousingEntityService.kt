@@ -57,6 +57,14 @@ object HousingEntityService
         npcs.clear()
     }
 
+    fun recalculateAll(house: PlayerHouse, world: World)
+    {
+        destroyNPCEntities()
+        destroyHologramEntities()
+
+        configure(house, world)
+    }
+
     fun respawnAll(world: World)
     {
         npcs.values.forEach {
