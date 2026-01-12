@@ -87,7 +87,7 @@ class RoleSpecificsEditorMenu(val house: PlayerHouse, val role: HouseRole) : Men
                 "${CC.GREEN}Click to edit permissions"
             )
             .toButton { _, _ ->
-
+                RolePermissionEditorMenu(house, role).openMenu(player)
             },
         15 to ItemBuilder.of(XMaterial.ARROW)
             .name("${CC.GREEN}Go Back")
