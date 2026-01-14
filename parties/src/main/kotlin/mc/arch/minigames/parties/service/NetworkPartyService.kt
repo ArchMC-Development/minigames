@@ -139,7 +139,7 @@ object NetworkPartyService : PartyService
 
             partyLock.write {
                 parties[uniqueId] = loadedParty
-                PartyUpdateEvent(loadedParty).callEvent()
+                Bukkit.getServer().pluginManager.callEvent(PartyUpdateEvent(loadedParty))
             }
         }
 
@@ -147,7 +147,7 @@ object NetworkPartyService : PartyService
             val uniqueId = retrieve<UUID>("uniqueId")
             partyLock.write {
                 parties.remove(uniqueId)?.apply {
-                    PartyDisbandEvent(this).callEvent()
+                    Bukkit.getServer().pluginManager.callEvent(PartyDisbandEvent(this))
                 }
             }
         }
