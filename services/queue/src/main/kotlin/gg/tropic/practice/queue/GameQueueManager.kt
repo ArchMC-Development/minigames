@@ -86,13 +86,13 @@ object GameQueueManager
             setData("kit", expectation.kitId)
             setData("queue_id", expectation.queueId ?: "N/A")
         }
-        
+
         fun fail(message: String)
         {
             transaction.setData("failure_reason", message)
             transaction.status = SpanStatus.INTERNAL_ERROR
             transaction.finish()
-            
+
             RedisShared.sendMessage(
                 expectation.players.toList(),
                 listOf(
@@ -172,7 +172,7 @@ object GameQueueManager
         val replicationSpan = transaction.startChild("replication.generate", serverToRequestReplication)
         replicationSpan.setData("map", map.name)
         replicationSpan.setData("requirement", if (availableReplication == null) "GENERATE" else "ALLOCATE")
-        
+
         return ReplicationManager
             .generateReplication(
                 server = serverToRequestReplication,
@@ -188,7 +188,7 @@ object GameQueueManager
                     replicationSpan.finish()
                     transaction.status = SpanStatus.OK
                     transaction.finish()
-                    
+
                     RedisShared.redirect(
                         expectation.players.toList(), serverToRequestReplication
                     )
@@ -197,7 +197,7 @@ object GameQueueManager
                     replicationSpan.setData("failure_message", it.message ?: "N/A")
                     replicationSpan.status = SpanStatus.INTERNAL_ERROR
                     replicationSpan.finish()
-                    
+
                     fail("${it.message ?: "N/A (Replication failure)"} (${serverToRequestReplication})")
                 }
             }
@@ -209,7 +209,7 @@ object GameQueueManager
                 transaction.throwable = it
                 transaction.status = SpanStatus.INTERNAL_ERROR
                 transaction.finish()
-                
+
                 it.printStackTrace()
                 RedisShared.sendMessage(
                     expectation.players.toList(),
@@ -537,16 +537,16 @@ object GameQueueManager
                     val kit = retrieve<String>("kit")
                     val queueType = retrieve<QueueType>("queueType")
                     val teamSize = retrieve<Int>("teamSize")
-                    
-                    transaction.setData("leader", entry.data.leader.toString())
+
+                    transaction.setData("leader", entry.leader.toString())
                     transaction.setData("kit", kit)
                     transaction.setData("queue_type", queueType.name)
                     transaction.setData("team_size", teamSize)
-                    transaction.setData("party_size", entry.data.players.size)
+                    transaction.setData("party_size", entry.players.size)
 
                     val queueId = "$kit:${queueType.name}:${teamSize}v${teamSize}"
                     queueHolder.subscribe(queueId, entry)
-                    
+
                     transaction.status = SpanStatus.OK
                 } catch (e: Exception) {
                     Sentry.captureException(e)

@@ -26,7 +26,7 @@ object SentryIntegration
     fun initialize(
         dsn: String,
         environment: String = "production",
-        serviceName: String = "arch-minigames"
+        serviceName: String = "app"
     )
     {
         if (initialized) return
@@ -35,7 +35,6 @@ object SentryIntegration
             options.dsn = dsn
             options.environment = environment
             options.tracesSampleRate = 1.0
-            options.isEnableTracing = true
             options.setTag("service", serviceName)
         }
         initialized = true
@@ -46,38 +45,4 @@ object SentryIntegration
      */
     @JvmStatic
     fun isInitialized(): Boolean = initialized
-
-    /**
-     * Capture an exception with additional context.
-     *
-     * @param throwable The exception to capture
-     * @param context Additional context data as key-value pairs
-     */
-    @JvmStatic
-    fun captureException(throwable: Throwable, context: Map<String, Any> = emptyMap())
-    {
-        Sentry.captureException(throwable) { scope ->
-            context.forEach { (key, value) ->
-                scope.setExtra(key, value)
-            }
-        }
-    }
-
-    /**
-     * Add a breadcrumb for tracing user actions.
-     *
-     * @param category The category of the breadcrumb
-     * @param message The message describing the action
-     * @param data Additional data for context
-     */
-    @JvmStatic
-    fun addBreadcrumb(category: String, message: String, data: Map<String, Any> = emptyMap())
-    {
-        Sentry.addBreadcrumb(message).apply {
-            this.category = category
-            data.forEach { (key, value) ->
-                setData(key, value)
-            }
-        }
-    }
 }
