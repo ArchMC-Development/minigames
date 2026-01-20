@@ -38,6 +38,8 @@ import gg.tropic.practice.replication.generation.rpc.GenerationRequirement
 import gg.tropic.practice.replications.manager.ReplicationManager
 import gg.tropic.practice.serializable.Message
 import gg.tropic.practice.suffixWhenDev
+import io.sentry.Sentry
+import io.sentry.SpanStatus
 import mc.arch.commons.communications.rpc.CommunicationGateway
 import mc.arch.minigame.bedwars.neo.BedWarsMode
 import mc.arch.minigame.miniwalls.MiniWallsMode
@@ -73,8 +75,24 @@ object GameQueueManager
         selectNewestInstance: Boolean = false
     ): CompletableFuture<Void>
     {
+        // Start Sentry transaction for game preparation
+        val transaction = Sentry.startTransaction(
+            "minigame.prepare_game",
+            "queue.prepare"
+        ).apply {
+            setData("map", map.name)
+            setData("players", expectation.players.size)
+            setData("region", region.name)
+            setData("kit", expectation.kitId)
+            setData("queue_id", expectation.queueId ?: "N/A")
+        }
+        
         fun fail(message: String)
         {
+            transaction.setData("failure_reason", message)
+            transaction.status = SpanStatus.INTERNAL_ERROR
+            transaction.finish()
+            
             RedisShared.sendMessage(
                 expectation.players.toList(),
                 listOf(
@@ -150,6 +168,11 @@ object GameQueueManager
                 CompletableFuture.completedFuture(null)
             }
 
+        // Start replication span
+        val replicationSpan = transaction.startChild("replication.generate", serverToRequestReplication)
+        replicationSpan.setData("map", map.name)
+        replicationSpan.setData("requirement", if (availableReplication == null) "GENERATE" else "ALLOCATE")
+        
         return ReplicationManager
             .generateReplication(
                 server = serverToRequestReplication,
@@ -161,17 +184,40 @@ object GameQueueManager
             .thenAcceptAsync {
                 if (it.status == ReplicationResultStatus.COMPLETED)
                 {
+                    replicationSpan.status = SpanStatus.OK
+                    replicationSpan.finish()
+                    transaction.status = SpanStatus.OK
+                    transaction.finish()
+                    
                     RedisShared.redirect(
                         expectation.players.toList(), serverToRequestReplication
                     )
                 } else
                 {
+                    replicationSpan.setData("failure_message", it.message ?: "N/A")
+                    replicationSpan.status = SpanStatus.INTERNAL_ERROR
+                    replicationSpan.finish()
+                    
                     fail("${it.message ?: "N/A (Replication failure)"} (${serverToRequestReplication})")
                 }
             }
             .exceptionally {
+                Sentry.captureException(it)
+                replicationSpan.throwable = it
+                replicationSpan.status = SpanStatus.INTERNAL_ERROR
+                replicationSpan.finish()
+                transaction.throwable = it
+                transaction.status = SpanStatus.INTERNAL_ERROR
+                transaction.finish()
+                
                 it.printStackTrace()
-                fail("${it.message ?: "N/A (Replication failure)"} (${serverToRequestReplication})")
+                RedisShared.sendMessage(
+                    expectation.players.toList(),
+                    listOf(
+                        "&cWe were not able to send you to a game server! :(",
+                        "&cPlease report the following message to an administrator: &f${it.message ?: "N/A (Replication failure)"} (${serverToRequestReplication})"
+                    )
+                )
                 return@exceptionally null
             }
 
@@ -485,14 +531,31 @@ object GameQueueManager
             }
 
             listen("join") {
-                val entry = retrieve<QueueEntry>("entry")
+                val transaction = Sentry.startTransaction("minigame.queue_join", "queue.join")
+                try {
+                    val entry = retrieve<QueueEntry>("entry")
+                    val kit = retrieve<String>("kit")
+                    val queueType = retrieve<QueueType>("queueType")
+                    val teamSize = retrieve<Int>("teamSize")
+                    
+                    transaction.setData("leader", entry.data.leader.toString())
+                    transaction.setData("kit", kit)
+                    transaction.setData("queue_type", queueType.name)
+                    transaction.setData("team_size", teamSize)
+                    transaction.setData("party_size", entry.data.players.size)
 
-                val kit = retrieve<String>("kit")
-                val queueType = retrieve<QueueType>("queueType")
-                val teamSize = retrieve<Int>("teamSize")
-
-                val queueId = "$kit:${queueType.name}:${teamSize}v${teamSize}"
-                queueHolder.subscribe(queueId, entry)
+                    val queueId = "$kit:${queueType.name}:${teamSize}v${teamSize}"
+                    queueHolder.subscribe(queueId, entry)
+                    
+                    transaction.status = SpanStatus.OK
+                } catch (e: Exception) {
+                    Sentry.captureException(e)
+                    transaction.throwable = e
+                    transaction.status = SpanStatus.INTERNAL_ERROR
+                    throw e
+                } finally {
+                    transaction.finish()
+                }
             }
 
             listen("leave") {

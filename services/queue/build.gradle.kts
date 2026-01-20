@@ -12,4 +12,7 @@ dependencies {
     compileOnly(project(":microgames:events-api"))
 
     implementation("net.md-5:bungeecord-chat:1.20-R0.1")
+    
+    // Sentry for distributed tracing
+    compileOnly("io.sentry:sentry:7.22.0")
 }

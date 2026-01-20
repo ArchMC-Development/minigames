@@ -20,4 +20,7 @@ dependencies {
     val commonsVersion = property("commonsVersion")
     compileOnly("gg.scala.commons:modern-access:$commonsVersion")
     compileOnly("com.lunarclient:apollo-extra-adventure4:1.1.8")
+    
+    // Sentry for distributed tracing
+    compileOnly("io.sentry:sentry:7.22.0")
 }
