@@ -71,6 +71,7 @@ object GameQueueManager
         expectation: GameExpectation,
         region: Region,
         excludeInstance: String? = null,
+        blacklistedInstances: Set<String> = emptySet(),
         version: MiniProviderVersion = MiniProviderVersion.LEGACY,
         selectNewestInstance: Boolean = false
     ): CompletableFuture<Void>
@@ -160,6 +161,7 @@ object GameQueueManager
                 requiredType = MiniProviderType.MINIGAME,
                 region = region,
                 excludeInstance = excludeInstance,
+                blacklistedInstances = blacklistedInstances,
                 minigameOrchestratorID = expectation.miniGameConfiguration?.orchestratorID,
                 selectNewestInstance = selectNewestInstance,
             )?.id)

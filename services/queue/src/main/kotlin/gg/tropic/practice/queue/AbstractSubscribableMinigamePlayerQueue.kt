@@ -48,6 +48,9 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         private const val FAILURE_RESET_INTERVAL_MS = 60_000L // Reset failures after 1 minute
         private val lastFailureReset = ConcurrentHashMap<String, Long>()
 
+        // Track which instances we've already sent restart requests to
+        private val restartRequestsSent = ConcurrentHashMap<String, Long>()
+        
         fun recordInstanceFailure(serverId: String) {
             val now = System.currentTimeMillis()
             val lastReset = lastFailureReset[serverId] ?: 0L
@@ -56,6 +59,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
             if (now - lastReset > FAILURE_RESET_INTERVAL_MS) {
                 instanceFailureCounts[serverId] = AtomicInteger(0)
                 lastFailureReset[serverId] = now
+                restartRequestsSent.remove(serverId)
             }
 
             val failures = instanceFailureCounts.computeIfAbsent(serverId) { AtomicInteger(0) }
@@ -68,7 +72,52 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                     scope.setExtra("server_id", serverId)
                     scope.setExtra("failure_count", count.toString())
                 }
+                
+                // Only send restart request once per failure window
+                if (!restartRequestsSent.containsKey(serverId)) {
+                    triggerInstanceRestart(serverId, count)
+                    restartRequestsSent[serverId] = now
+                }
             }
+        }
+        
+        /**
+         * Sends RPC to failing instance requesting it to restart
+         */
+        private fun triggerInstanceRestart(serverId: String, failureCount: Int) {
+            io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                category = "queue.instance_restart"
+                message = "Triggering restart for failing instance: $serverId"
+                level = io.sentry.SentryLevel.WARNING
+                setData("server_id", serverId)
+                setData("failure_count", failureCount)
+            })
+            
+            MiniGameRPC.restartInstanceService
+                .call(
+                    gg.tropic.practice.games.restart.RestartInstanceRequest(
+                        targetServer = serverId,
+                        delaySeconds = 60,
+                        reason = "RPC failure threshold exceeded ($failureCount failures)"
+                    )
+                )
+                .thenAccept { response ->
+                    io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                        category = "queue.instance_restart"
+                        message = "Restart response from $serverId: ${response.status}"
+                        level = if (response.status == gg.tropic.practice.games.restart.RestartStatus.SUCCESS) 
+                            io.sentry.SentryLevel.INFO else io.sentry.SentryLevel.WARNING
+                        setData("status", response.status.name)
+                        setData("message", response.message ?: "")
+                    })
+                }
+                .exceptionally { ex ->
+                    io.sentry.Sentry.captureException(ex) { scope ->
+                        scope.setTag("rpc_service", "restartInstanceService")
+                        scope.setExtra("server_id", serverId)
+                    }
+                    null
+                }
         }
 
         fun isInstanceFailing(serverId: String): Boolean {
@@ -86,6 +135,21 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         fun getInstanceFailureCount(serverId: String): Int {
             return instanceFailureCounts[serverId]?.get() ?: 0
+        }
+        
+        /**
+         * Returns all instances currently exceeding the failure threshold
+         */
+        fun getFailingInstances(): Set<String> {
+            val now = System.currentTimeMillis()
+            return instanceFailureCounts.entries
+                .filter { (serverId, count) ->
+                    val lastReset = lastFailureReset[serverId] ?: 0L
+                    // Only include if not expired and exceeds threshold
+                    (now - lastReset <= FAILURE_RESET_INTERVAL_MS) && count.get() >= FAILURE_THRESHOLD
+                }
+                .map { it.key }
+                .toSet()
         }
     }
 
@@ -282,6 +346,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 // prefer NA servers if queuing globally
                 region = preferredRegion,
                 excludeInstance = targetEntry.data.miniGameQueueConfiguration?.excludeMiniInstance,
+                blacklistedInstances = getFailingInstances(),
                 selectNewestInstance = selectNewestInstance,
                 version = miniProvider
             )
@@ -357,6 +422,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 expectation = expectation,
                 region = preferredRegion,
                 excludeInstance = targetEntry.data.miniGameQueueConfiguration?.excludeMiniInstance,
+                blacklistedInstances = getFailingInstances(),
                 selectNewestInstance = selectNewestInstance,
                 version = miniProvider
             )
