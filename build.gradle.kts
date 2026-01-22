@@ -124,6 +124,24 @@ subprojects {
             )
         }
     }
+    
+    // ktlint configuration
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("1.5.0")
+        android.set(false)
+        ignoreFailures.set(false)
+        reporters {
+            reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+            reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+        }
+    }
+    
+    // detekt configuration
+    configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
+        buildUponDefaultConfig = true
+        allRules = false
+        config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
+    }
 }
 
 fun RepositoryHandler.configureScalaRepository(dev: Boolean = false)
