@@ -167,9 +167,17 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         // Private games always create new instances - skip joining existing games
         val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
+        
+        // Get current failing instances to exclude from existing game selection
+        val failingInstances = getFailingInstances()
 
         val existingGameRequiringPlayers = if (isPrivateGame) null else GameManager.allGames()
             .filter {
+                // FIRST: Filter out games on failing instances
+                if (it.server in failingInstances) {
+                    return@filter false
+                }
+                
                 var conditions = it.queueId == id &&
                     (it.state == GameState.Waiting || it.state == GameState.Starting)
 
