@@ -35,7 +35,7 @@ class SubscribableDuelPlayerQueue(
         {
             return listOf()
         }
-        
+
         val matchmakingStart = System.currentTimeMillis()
 
         // don't unnecessarily load in and map to data class if not needed
@@ -163,7 +163,7 @@ class SubscribableDuelPlayerQueue(
         )
 
         val region = first.first().preferredQueueRegion
-        
+
         // Log match found event with timing and details
         val matchmakingDuration = System.currentTimeMillis() - matchmakingStart
         Sentry.addBreadcrumb(Breadcrumb().apply {
@@ -179,7 +179,7 @@ class SubscribableDuelPlayerQueue(
             setData("matchmaking_duration_ms", matchmakingDuration)
             setData("game_id", expectation.identifier.toString())
         })
-        
+
         GameQueueManager
             .prepareGameFor(
                 map = map,
@@ -191,7 +191,7 @@ class SubscribableDuelPlayerQueue(
                 Sentry.captureException(it) { scope ->
                     scope.setExtra("game_id", expectation.identifier.toString())
                     scope.setExtra("kit", kit.id)
-                    scope.setExtra("player_count", expectation.players.size)
+                    scope.setExtra("player_count", expectation.players.size.toString())
                 }
                 it.printStackTrace()
                 return@exceptionally null
