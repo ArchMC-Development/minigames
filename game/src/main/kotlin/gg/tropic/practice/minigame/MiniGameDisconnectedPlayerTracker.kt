@@ -66,21 +66,45 @@ class MiniGameDisconnectedPlayerTracker(private val lifecycle: MiniGameLifecycle
             )
     }
 
-    fun useRejoinToken(uniqueId: UUID)
+    /**
+     * Attempts to use a rejoin token for the player.
+     * @return true if successfully added to team, false if team no longer exists
+     */
+    fun useRejoinToken(uniqueId: UUID): Boolean
     {
+        var success = false
         lifecycle.game.teamMutLock.withLock {
             playersExpectedToRejoin.get(uniqueId)?.apply {
-                lifecycle.game.expectationModel.players += uniqueId
-                lifecycle.game.teams
+                val team = lifecycle.game.teams
                     .firstOrNull { team -> team.teamIdentifier == previousTeam }
-                    ?.apply {
-                        players += uniqueId
+
+                if (team != null) {
+                    // Only add to expectationModel if team exists
+                    lifecycle.game.expectationModel.players += uniqueId
+                    team.players += uniqueId
+                    success = true
+                } else {
+                    // Team no longer exists - report to Sentry async
+                    java.util.concurrent.CompletableFuture.runAsync {
+                        io.sentry.Sentry.captureMessage("Rejoin token team not found") { scope ->
+                            scope.level = io.sentry.SentryLevel.ERROR
+                            scope.setTag("alert_type", "rejoin_team_not_found")
+                            scope.setTag("map_id", lifecycle.game.mapId)
+                            scope.setTag("game_state", lifecycle.game.state.name)
+                            scope.setExtra("player_uuid", uniqueId.toString())
+                            scope.setExtra("previous_team", previousTeam.label)
+                            scope.setExtra("available_teams", lifecycle.game.teams.map { it.teamIdentifier.label }.toString())
+                            scope.setExtra("game_id", lifecycle.game.expectation.toString())
+                        }
                     }
+                }
             }
         }
 
         ScalaCommons.bundle().globals().redis().sync()
             .del("${namespace()}:minigames:rejoin:${uniqueId}")
+        
+        return success
     }
 
     override fun run()

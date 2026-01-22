@@ -50,7 +50,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         // Track which instances we've already sent restart requests to
         private val restartRequestsSent = ConcurrentHashMap<String, Long>()
-        
+
         fun recordInstanceFailure(serverId: String) {
             val now = System.currentTimeMillis()
             val lastReset = lastFailureReset[serverId] ?: 0L
@@ -72,7 +72,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                     scope.setExtra("server_id", serverId)
                     scope.setExtra("failure_count", count.toString())
                 }
-                
+
                 // Only send restart request once per failure window
                 if (!restartRequestsSent.containsKey(serverId)) {
                     triggerInstanceRestart(serverId, count)
@@ -80,7 +80,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 }
             }
         }
-        
+
         /**
          * Sends RPC to failing instance requesting it to restart
          */
@@ -92,7 +92,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 setData("server_id", serverId)
                 setData("failure_count", failureCount)
             })
-            
+
             MiniGameRPC.restartInstanceService
                 .call(
                     gg.tropic.practice.games.restart.RestartInstanceRequest(
@@ -105,7 +105,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                     io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
                         category = "queue.instance_restart"
                         message = "Restart response from $serverId: ${response.status}"
-                        level = if (response.status == gg.tropic.practice.games.restart.RestartStatus.SUCCESS) 
+                        level = if (response.status == gg.tropic.practice.games.restart.RestartStatus.SUCCESS)
                             io.sentry.SentryLevel.INFO else io.sentry.SentryLevel.WARNING
                         setData("status", response.status.name)
                         setData("message", response.message ?: "")
@@ -136,7 +136,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         fun getInstanceFailureCount(serverId: String): Int {
             return instanceFailureCounts[serverId]?.get() ?: 0
         }
-        
+
         /**
          * Returns all instances currently exceeding the failure threshold
          */
@@ -167,7 +167,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         // Private games always create new instances - skip joining existing games
         val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
-        
+
         // Get current failing instances to exclude from existing game selection
         val failingInstances = getFailingInstances()
 
@@ -177,7 +177,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 if (it.server in failingInstances) {
                     return@filter false
                 }
-                
+
                 var conditions = it.queueId == id &&
                     (it.state == GameState.Waiting || it.state == GameState.Starting)
 
@@ -279,7 +279,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                             scope.setExtra("game_id", existingGameRequiringPlayers.uniqueId.toString())
                             scope.setExtra("failure_count", getInstanceFailureCount(serverId).toString())
                         }
-                        println("RPC failed for join into game on $serverId - will create new game")
+                        println("RPC failed for join into game on $serverId - creating new game")
 
                         // Create a new game for these players since RPC failed
                         handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
