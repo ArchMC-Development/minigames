@@ -7,6 +7,9 @@ import gg.tropic.practice.games.team.GameTeam
 import gg.tropic.practice.games.team.TeamIdentifier
 import gg.tropic.practice.persistence.RedisShared
 import gg.tropic.practice.region.Region
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import java.util.UUID
 
 /**
@@ -32,6 +35,8 @@ class SubscribableDuelPlayerQueue(
         {
             return listOf()
         }
+        
+        val matchmakingStart = System.currentTimeMillis()
 
         // don't unnecessarily load in and map to data class if not needed
         val first: List<QueueEntry>
@@ -158,6 +163,23 @@ class SubscribableDuelPlayerQueue(
         )
 
         val region = first.first().preferredQueueRegion
+        
+        // Log match found event with timing and details
+        val matchmakingDuration = System.currentTimeMillis() - matchmakingStart
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "queue.match_found"
+            message = "Match found: ${expectation.players.size} players in ${kit.displayName} ($queueType)"
+            level = SentryLevel.INFO
+            setData("kit_id", kit.id)
+            setData("queue_type", queueType.name)
+            setData("team_size", teamSize)
+            setData("map", map.name)
+            setData("player_count", expectation.players.size)
+            setData("region", region.name)
+            setData("matchmaking_duration_ms", matchmakingDuration)
+            setData("game_id", expectation.identifier.toString())
+        })
+        
         GameQueueManager
             .prepareGameFor(
                 map = map,
@@ -166,6 +188,11 @@ class SubscribableDuelPlayerQueue(
                 region = if (region == Region.Both) Region.NA else region
             )
             .exceptionally {
+                Sentry.captureException(it) { scope ->
+                    scope.setExtra("game_id", expectation.identifier.toString())
+                    scope.setExtra("kit", kit.id)
+                    scope.setExtra("player_count", expectation.players.size)
+                }
                 it.printStackTrace()
                 return@exceptionally null
             }

@@ -189,6 +189,18 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
             isPrivateGame = isPrivateGame,
             privateGameSettings = targetEntry.data.miniGameQueueConfiguration?.privateGameSettings
         )
+        
+        // Log minigame match found
+        io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+            category = "queue.minigame_match"
+            message = "Minigame match created: ${miniGameMode.name} with ${targetEntry.data.players.size} players"
+            level = io.sentry.SentryLevel.INFO
+            setData("minigame_mode", miniGameMode.name)
+            setData("kit_id", kit.id)
+            setData("player_count", targetEntry.data.players.size)
+            setData("is_private", isPrivateGame)
+            setData("game_id", expectation.identifier.toString())
+        })
 
         GameQueueManager
             .prepareGameFor(
@@ -201,6 +213,11 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 version = miniProvider
             )
             .exceptionally {
+                io.sentry.Sentry.captureException(it) { scope ->
+                    scope.setExtra("game_id", expectation.identifier.toString())
+                    scope.setExtra("minigame_mode", miniGameMode.name)
+                    scope.setExtra("player_count", targetEntry.data.players.size)
+                }
                 it.printStackTrace()
                 return@exceptionally null
             }
