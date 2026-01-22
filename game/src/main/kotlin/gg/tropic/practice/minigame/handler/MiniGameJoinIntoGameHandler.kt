@@ -31,7 +31,7 @@ class MiniGameJoinIntoGameHandler : RPCHandler<JoinIntoGameRequest, JoinIntoGame
         span?.setData("server", request.server)
         span?.setData("game_id", request.game.uniqueId.toString())
         span?.setData("player_count", request.players.size)
-        
+
         try {
             if (ServerSync.local.id != request.server)
             {
@@ -201,12 +201,21 @@ class MiniGameJoinIntoGameHandler : RPCHandler<JoinIntoGameRequest, JoinIntoGame
                 request.players.forEach { player ->
                     gameImpl.pendingLogins[player] = System.currentTimeMillis()
                 }
+            } else {
+                // Capture business logic failures as Sentry events
+                Sentry.captureMessage("Join into game failed: ${status.name}") { scope ->
+                    scope.setTag("failure_status", status.name)
+                    scope.setExtra("game_id", request.game.uniqueId.toString())
+                    scope.setExtra("server", request.server)
+                    scope.setExtra("player_count", request.players.size.toString())
+                    scope.level = io.sentry.SentryLevel.WARNING
+                }
             }
 
             span?.setData("result_status", status.name)
             span?.status = if (status == JoinIntoGameStatus.SUCCESS) SpanStatus.OK else SpanStatus.INTERNAL_ERROR
             span?.finish()
-            
+
             context.reply(JoinIntoGameResult(status = status))
         } catch (e: Exception) {
             Sentry.captureException(e)

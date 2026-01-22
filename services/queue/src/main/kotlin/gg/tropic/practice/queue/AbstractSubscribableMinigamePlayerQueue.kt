@@ -112,7 +112,14 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                         )
                     )
                     .join()
-            }.getOrElse {
+            }.getOrElse { ex ->
+                // Capture RPC call failure as Sentry event
+                io.sentry.Sentry.captureException(ex) { scope ->
+                    scope.setTag("rpc_service", "joinIntoGameService")
+                    scope.setExtra("server", existingGameRequiringPlayers.server)
+                    scope.setExtra("game_id", existingGameRequiringPlayers.uniqueId.toString())
+                    scope.setExtra("leader", targetEntry.data.leader.toString())
+                }
                 JoinIntoGameResult(
                     status = JoinIntoGameStatus.FAILED_RPC_FAILURE
                 )
@@ -127,6 +134,14 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 return listOf(targetEntry.data)
             } else
             {
+                // Capture business logic failures as Sentry events
+                io.sentry.Sentry.captureMessage("Failed to join into game: ${joinGameResult.status}") { scope ->
+                    scope.setTag("failure_status", joinGameResult.status.name)
+                    scope.setExtra("leader", targetEntry.data.leader.toString())
+                    scope.setExtra("server", existingGameRequiringPlayers.server)
+                    scope.setExtra("game_id", existingGameRequiringPlayers.uniqueId.toString())
+                    scope.level = io.sentry.SentryLevel.WARNING
+                }
                 println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status})")
             }
         }
