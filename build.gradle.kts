@@ -47,6 +47,7 @@ subprojects {
     apply(plugin = "com.gradleup.shadow")
     apply(plugin = "maven-publish")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
 
     dependencies {
         compileOnly(kotlin("stdlib"))
@@ -124,7 +125,7 @@ subprojects {
             )
         }
     }
-    
+
     // ktlint configuration
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("1.5.0")
@@ -135,7 +136,7 @@ subprojects {
             reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
         }
     }
-    
+
     // detekt configuration
     configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
         buildUponDefaultConfig = true
