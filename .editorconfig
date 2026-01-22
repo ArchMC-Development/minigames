@@ -1,0 +1,41 @@
+# EditorConfig for arch-minigames
+# https://editorconfig.org/
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+# Kotlin specific settings
+indent_size = 4
+max_line_length = 140
+
+# ktlint rules for Allman brace style
+# https://pinterest.github.io/ktlint/latest/rules/
+
+# Disable some default rules that conflict with Allman style
+ktlint_standard_function-signature = disabled
+ktlint_standard_if-else-bracing = disabled
+ktlint_standard_multiline-if-else = disabled
+
+# Keep braces on their own line (Allman style)
+# Note: ktlint doesn't have native Allman support, but we configure what we can
+ktlint_standard_indent = disabled
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{yaml,yml}]
+indent_size = 2
+
+[*.json]
+indent_size = 2
+
+[Makefile]
+indent_style = tab

@@ -10,6 +10,7 @@ plugins {
     id("org.ajoberstar.grgit") version "4.1.1"
     id("com.gradleup.shadow") version "9.0.0-beta6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+    id("io.gitlab.arturbosch.detekt") version "1.23.7"
 }
 
 var currentBranch: String = "master"/*grgit.branch.current().name
