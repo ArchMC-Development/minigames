@@ -126,7 +126,6 @@ subprojects {
         }
     }
 
-    // ktlint configuration
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("1.5.0")
         android.set(false)
@@ -137,7 +136,6 @@ subprojects {
         }
     }
 
-    // detekt configuration
     configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
         buildUponDefaultConfig = true
         allRules = false

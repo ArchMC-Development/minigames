@@ -1,0 +1,263 @@
+# Detekt configuration for arch-minigames
+# Static analysis for Kotlin code
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+
+comments:
+  active: true
+  CommentOverPrivateProperty:
+    active: false
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+  UndocumentedPublicProperty:
+    active: false
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 10
+    constructorThreshold: 10
+  NestedBlockDepth:
+    active: true
+    threshold: 5
+  TooManyFunctions:
+    active: false
+
+naming:
+  active: true
+  ClassNaming:
+    active: true
+    classPattern: "[A-Z][a-zA-Z0-9]*"
+  ConstructorParameterNaming:
+    active: true
+  EnumNaming:
+    active: true
+    enumEntryPattern: "[A-Z][_a-zA-Z0-9]*"
+  ForbiddenClassName:
+    active: false
+  FunctionMaxLength:
+    active: false
+  FunctionMinLength:
+    active: false
+  FunctionNaming:
+    active: true
+    functionPattern: "[a-z][a-zA-Z0-9]*"
+    ignoreAnnotated: ["Composable"]
+  FunctionParameterNaming:
+    active: true
+  InvalidPackageDeclaration:
+    active: true
+  MatchingDeclarationName:
+    active: true
+  MemberNameEqualsClassName:
+    active: true
+  NoNameShadowing:
+    active: true
+  NonBooleanPropertyPrefixedWithIs:
+    active: false
+  ObjectPropertyNaming:
+    active: true
+  PackageNaming:
+    active: true
+  TopLevelPropertyNaming:
+    active: true
+  VariableMaxLength:
+    active: false
+  VariableMinLength:
+    active: false
+  VariableNaming:
+    active: true
+
+performance:
+  active: true
+  ArrayPrimitive:
+    active: true
+  CouldBeSequence:
+    active: false
+  ForEachOnRange:
+    active: true
+  SpreadOperator:
+    active: false
+  UnnecessaryPartOfBinaryExpression:
+    active: true
+  UnnecessaryTemporaryInstantiation:
+    active: true
+
+style:
+  active: true
+  BracesOnIfStatements:
+    active: false # Disabled - we use Allman style
+  ClassOrdering:
+    active: true
+  CollapsibleIfStatements:
+    active: true
+  DataClassContainsFunctions:
+    active: false
+  DestructuringDeclarationWithTooManyEntries:
+    active: true
+  EqualsNullCall:
+    active: true
+  EqualsOnSignatureLine:
+    active: false
+  ExplicitCollectionElementAccessMethod:
+    active: true
+  ExplicitItLambdaParameter:
+    active: true
+  ExpressionBodySyntax:
+    active: false
+  ForbiddenComment:
+    active: false
+  ForbiddenImport:
+    active: false
+  ForbiddenMethodCall:
+    active: false
+  FunctionOnlyReturningConstant:
+    active: true
+    ignoreAnnotated: ["dagger.Provides"]
+  LoopWithTooManyJumpStatements:
+    active: true
+  MagicNumber:
+    active: false
+  MandatoryBracesLoops:
+    active: false
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+    excludePackageStatements: true
+    excludeImportStatements: true
+    excludeCommentStatements: true
+  MayBeConst:
+    active: true
+  ModifierOrder:
+    active: true
+  MultilineLambdaItParameter:
+    active: true
+  NestedClassesVisibility:
+    active: true
+  NewLineAtEndOfFile:
+    active: true
+  NoTabs:
+    active: true
+  NullableBooleanCheck:
+    active: true
+  ObjectLiteralToLambda:
+    active: true
+  OptionalAbstractKeyword:
+    active: true
+  OptionalUnit:
+    active: false
+  PreferToOverPairSyntax:
+    active: true
+  ProtectedMemberInFinalClass:
+    active: true
+  RedundantExplicitType:
+    active: true
+  RedundantHigherOrderMapUsage:
+    active: true
+  RedundantVisibilityModifierRule:
+    active: false
+  ReturnCount:
+    active: false
+  SafeCast:
+    active: true
+  SerialVersionUIDInSerializableClass:
+    active: true
+  SpacingBetweenPackageAndImports:
+    active: true
+  ThrowsCount:
+    active: false
+  TrailingWhitespace:
+    active: true
+  TrimMultilineRawString:
+    active: true
+  UnderscoresInNumericLiterals:
+    active: true
+  UnnecessaryAbstractClass:
+    active: true
+  UnnecessaryAnnotationUseSiteTarget:
+    active: true
+  UnnecessaryApply:
+    active: true
+  UnnecessaryBackticks:
+    active: true
+  UnnecessaryBracesAroundTrailingLambda:
+    active: true
+  UnnecessaryFilter:
+    active: true
+  UnnecessaryInheritance:
+    active: true
+  UnnecessaryInnerClass:
+    active: true
+  UnnecessaryLet:
+    active: true
+  UnnecessaryParentheses:
+    active: true
+  UntilInsteadOfRangeTo:
+    active: true
+  UnusedImports:
+    active: true
+  UnusedParameter:
+    active: true
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: ["Preview"]
+  UnusedPrivateProperty:
+    active: true
+  UseAnyOrNoneInsteadOfFind:
+    active: true
+  UseArrayLiteralsInAnnotations:
+    active: true
+  UseCheckNotNull:
+    active: true
+  UseCheckOrError:
+    active: true
+  UseDataClass:
+    active: false
+  UseEmptyCounterpart:
+    active: true
+  UseIfEmptyOrIfBlank:
+    active: true
+  UseIfInsteadOfWhen:
+    active: false
+  UseIsNullOrEmpty:
+    active: true
+  UseLet:
+    active: true
+  UseOrEmpty:
+    active: true
+  UseRequire:
+    active: true
+  UseRequireNotNull:
+    active: true
+  UseSumOfInsteadOfFlatMapSize:
+    active: true
+  UselessCallOnNotNull:
+    active: true
+  VarCouldBeVal:
+    active: true
+  WildcardImport:
+    active: true
+    excludeImports: []
