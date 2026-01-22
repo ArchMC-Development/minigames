@@ -22,6 +22,7 @@ object ServerSelectionStrategy
         requiredType: MiniProviderType,
         region: Region,
         excludeInstance: String? = null,
+        blacklistedInstances: Set<String> = emptySet(),
         minigameOrchestratorID: String? = null,
         selectNewestInstance: Boolean = false,
         hostedWorldInstanceProviderType: WorldInstanceProviderType? = null
@@ -31,7 +32,14 @@ object ServerSelectionStrategy
         return ServerContainer
             .getServersInGroupCasted<GameServer>(gameGroup().suffixWhenDev())
             .filter {
+                // Exclude specific instance if provided
                 if (excludeInstance != null && it.id == excludeInstance)
+                {
+                    return@filter false
+                }
+                
+                // Filter out blacklisted/failing instances
+                if (it.id in blacklistedInstances)
                 {
                     return@filter false
                 }
@@ -69,3 +77,4 @@ object ServerSelectionStrategy
             }
     }
 }
+
