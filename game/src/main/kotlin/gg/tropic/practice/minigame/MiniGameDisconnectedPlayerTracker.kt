@@ -89,7 +89,7 @@ class MiniGameDisconnectedPlayerTracker(private val lifecycle: MiniGameLifecycle
                         io.sentry.Sentry.captureMessage("Rejoin token team not found") { scope ->
                             scope.level = io.sentry.SentryLevel.ERROR
                             scope.setTag("alert_type", "rejoin_team_not_found")
-                            scope.setTag("map_id", lifecycle.game.mapId)
+                            scope.setTag("map_id", lifecycle.game.map.name)
                             scope.setTag("game_state", lifecycle.game.state.name)
                             scope.setExtra("player_uuid", uniqueId.toString())
                             scope.setExtra("previous_team", previousTeam.label)
@@ -103,7 +103,7 @@ class MiniGameDisconnectedPlayerTracker(private val lifecycle: MiniGameLifecycle
 
         ScalaCommons.bundle().globals().redis().sync()
             .del("${namespace()}:minigames:rejoin:${uniqueId}")
-        
+
         return success
     }
 
