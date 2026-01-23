@@ -79,7 +79,7 @@ class JoinQueueMenu(
     private fun topLeaderboardConciseDescription(player: Player, leaderboardID: StatisticID, label: String): List<String>
     {
         val statistic = PracticeProfileService.find(player)
-            ?.getStatisticValue(leaderboardID)
+            ?.getCachedStatisticValueWithDeferredEnqueue(leaderboardID)
             ?: return LeaderboardManagerService
                 .getCachedFormattedLeaderboards(leaderboardID.toId())
                 .take(3)

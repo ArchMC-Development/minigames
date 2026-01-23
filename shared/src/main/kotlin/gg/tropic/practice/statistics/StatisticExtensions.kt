@@ -20,7 +20,7 @@ fun <T> PracticeProfile.statisticRead(id: StatisticID, use: Statistic.() -> T) =
 fun <T> PracticeProfile.statisticRead(vararg id: StatisticID, use: Statistic.() -> T) = id.forEach { StatisticService.statistic(it.toId(), use) }
 fun <T> PracticeProfile.statisticRead(ids: List<StatisticID>, use: Statistic.() -> T) = ids.forEach { StatisticService.statistic(it.toId(), use) }
 
-fun PracticeProfile.valueOf(statisticID: StatisticID) = getStatisticValue(statisticID)
+fun PracticeProfile.valueOf(statisticID: StatisticID) = getCachedStatisticValueWithDeferredEnqueue(statisticID)
     ?.let {
         "${CC.WHITE}${
             Numbers.format(it.score.toLong())
@@ -32,7 +32,7 @@ fun PracticeProfile.valueOf(statisticID: StatisticID) = getStatisticValue(statis
     }
     ?: "???"
 
-fun PracticeProfile.valueOfReset(statisticID: StatisticID) = getStatisticValue(statisticID)
+fun PracticeProfile.valueOfReset(statisticID: StatisticID) = getCachedStatisticValueWithDeferredEnqueue(statisticID)
     ?.let {
         "${
             Numbers.format(it.score.toLong())
@@ -44,4 +44,4 @@ fun PracticeProfile.valueOfReset(statisticID: StatisticID) = getStatisticValue(s
     }
     ?: "???"
 
-fun PracticeProfile.numericalValueOf(statisticID: StatisticID) = getStatisticValue(statisticID)
+fun PracticeProfile.numericalValueOf(statisticID: StatisticID) = getCachedStatisticValueWithDeferredEnqueue(statisticID)
