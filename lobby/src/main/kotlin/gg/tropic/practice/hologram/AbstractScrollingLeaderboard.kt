@@ -62,7 +62,7 @@ abstract class AbstractScrollingLeaderboard(
             .toStatisticID(currentRef.kit)
 
         val value = PracticeProfileService.find(player)
-            ?.getStatisticValue(
+            ?.getCachedStatisticValueWithDeferredEnqueue(
                 statisticID
             )
 

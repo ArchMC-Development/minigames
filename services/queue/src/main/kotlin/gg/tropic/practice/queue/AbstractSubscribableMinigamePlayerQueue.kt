@@ -18,6 +18,9 @@ import gg.tropic.practice.persistence.RedisShared
 import gg.tropic.practice.provider.MiniProviderVersion
 import gg.tropic.practice.region.Region
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author Subham
@@ -38,6 +41,118 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
     override val internalQueue: InternalQueue<QueueEntry> = InternalQueue()
 ) : SubscribablePlayerQueue
 {
+    companion object {
+        // Track RPC failures per server instance
+        private val instanceFailureCounts = ConcurrentHashMap<String, AtomicInteger>()
+        private const val FAILURE_THRESHOLD = 3
+        private const val FAILURE_RESET_INTERVAL_MS = 60_000L // Reset failures after 1 minute
+        private val lastFailureReset = ConcurrentHashMap<String, Long>()
+
+        // Track which instances we've already sent restart requests to
+        private val restartRequestsSent = ConcurrentHashMap<String, Long>()
+
+        fun recordInstanceFailure(serverId: String) {
+            val now = System.currentTimeMillis()
+            val lastReset = lastFailureReset[serverId] ?: 0L
+
+            // Reset counter if it's been more than a minute
+            if (now - lastReset > FAILURE_RESET_INTERVAL_MS) {
+                instanceFailureCounts[serverId] = AtomicInteger(0)
+                lastFailureReset[serverId] = now
+                restartRequestsSent.remove(serverId)
+            }
+
+            val failures = instanceFailureCounts.computeIfAbsent(serverId) { AtomicInteger(0) }
+            val count = failures.incrementAndGet()
+
+            if (count >= FAILURE_THRESHOLD) {
+                io.sentry.Sentry.captureMessage("Instance $serverId exceeded failure threshold ($count failures)") { scope ->
+                    scope.level = io.sentry.SentryLevel.ERROR
+                    scope.setTag("alert_type", "instance_failure")
+                    scope.setExtra("server_id", serverId)
+                    scope.setExtra("failure_count", count.toString())
+                }
+
+                // Only send restart request once per failure window
+                if (!restartRequestsSent.containsKey(serverId)) {
+                    triggerInstanceRestart(serverId, count)
+                    restartRequestsSent[serverId] = now
+                }
+            }
+        }
+
+        /**
+         * Sends RPC to failing instance requesting it to restart
+         */
+        private fun triggerInstanceRestart(serverId: String, failureCount: Int) {
+            io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                category = "queue.instance_restart"
+                message = "Triggering restart for failing instance: $serverId"
+                level = io.sentry.SentryLevel.WARNING
+                setData("server_id", serverId)
+                setData("failure_count", failureCount)
+            })
+
+            MiniGameRPC.restartInstanceService
+                .call(
+                    gg.tropic.practice.games.restart.RestartInstanceRequest(
+                        targetServer = serverId,
+                        delaySeconds = 60,
+                        reason = "RPC failure threshold exceeded ($failureCount failures)"
+                    )
+                )
+                .thenAccept { response ->
+                    io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                        category = "queue.instance_restart"
+                        message = "Restart response from $serverId: ${response.status}"
+                        level = if (response.status == gg.tropic.practice.games.restart.RestartStatus.SUCCESS)
+                            io.sentry.SentryLevel.INFO else io.sentry.SentryLevel.WARNING
+                        setData("status", response.status.name)
+                        setData("message", response.message ?: "")
+                    })
+                }
+                .exceptionally { ex ->
+                    io.sentry.Sentry.captureException(ex) { scope ->
+                        scope.setTag("rpc_service", "restartInstanceService")
+                        scope.setExtra("server_id", serverId)
+                    }
+                    null
+                }
+        }
+
+        fun isInstanceFailing(serverId: String): Boolean {
+            val now = System.currentTimeMillis()
+            val lastReset = lastFailureReset[serverId] ?: 0L
+
+            // If it's been more than a minute, give the instance another chance
+            if (now - lastReset > FAILURE_RESET_INTERVAL_MS) {
+                return false
+            }
+
+            val failures = instanceFailureCounts[serverId]?.get() ?: 0
+            return failures >= FAILURE_THRESHOLD
+        }
+
+        fun getInstanceFailureCount(serverId: String): Int {
+            return instanceFailureCounts[serverId]?.get() ?: 0
+        }
+
+        /**
+         * Returns all instances currently exceeding the failure threshold
+         */
+        fun getFailingInstances(): Set<String> {
+            val now = System.currentTimeMillis()
+            return instanceFailureCounts.entries
+                .filter { (serverId, count) ->
+                    val lastReset = lastFailureReset[serverId] ?: 0L
+                    // Only include if not expired and exceeds threshold
+                    (now - lastReset <= FAILURE_RESET_INTERVAL_MS) && count.get() >= FAILURE_THRESHOLD
+                }
+                .map { it.key }
+                .toSet()
+        }
+    }
+
     abstract fun constructConfigurationForInitiatorEntry(entry: QueueEntry): MiniGameConfiguration
     override fun onProcess(): List<QueueEntry>
     {
@@ -53,8 +168,16 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         // Private games always create new instances - skip joining existing games
         val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
 
+        // Get current failing instances to exclude from existing game selection
+        val failingInstances = getFailingInstances()
+
         val existingGameRequiringPlayers = if (isPrivateGame) null else GameManager.allGames()
             .filter {
+                // FIRST: Filter out games on failing instances
+                if (it.server in failingInstances) {
+                    return@filter false
+                }
+
                 var conditions = it.queueId == id &&
                     (it.state == GameState.Waiting || it.state == GameState.Starting)
 
@@ -102,32 +225,69 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
 
         if (existingGameRequiringPlayers != null)
         {
-            val joinGameResult = runCatching {
+            val serverId = existingGameRequiringPlayers.server
+
+            // Skip instances that have failed too many times recently
+            if (isInstanceFailing(serverId)) {
+                io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                    category = "queue.instance_skip"
+                    message = "Skipping failing instance $serverId (${getInstanceFailureCount(serverId)} failures)"
+                    level = io.sentry.SentryLevel.WARNING
+                })
+                // Don't try to join, fall through to create a new game instead
+            } else {
+                // NON-BLOCKING: Fire the RPC and handle result async
+                // Return entry immediately so it's removed from queue
                 MiniGameRPC.joinIntoGameService
                     .call(
                         JoinIntoGameRequest(
-                            server = existingGameRequiringPlayers.server,
+                            server = serverId,
                             players = targetEntry.data.players.toSet(),
                             game = existingGameRequiringPlayers
                         )
                     )
-                    .join()
-            }.getOrElse {
-                JoinIntoGameResult(
-                    status = JoinIntoGameStatus.FAILED_RPC_FAILURE
-                )
-            }
+                    .orTimeout(500, TimeUnit.MILLISECONDS)
+                    .thenAccept { joinGameResult ->
+                        if (joinGameResult.status == JoinIntoGameStatus.SUCCESS) {
+                            RedisShared.redirect(
+                                targetEntry.data.players,
+                                serverId
+                            )
+                        } else {
+                            // Record the failure
+                            recordInstanceFailure(serverId)
+                            io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                                category = "queue.join_failed"
+                                message = "Failed to join game on $serverId: ${joinGameResult.status}"
+                                level = io.sentry.SentryLevel.WARNING
+                                setData("server", serverId)
+                                setData("status", joinGameResult.status.name)
+                            })
+                            println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status}) - will create new game")
 
-            if (joinGameResult.status == JoinIntoGameStatus.SUCCESS)
-            {
-                RedisShared.redirect(
-                    targetEntry.data.players,
-                    existingGameRequiringPlayers.server
-                )
+                            // Create a new game for these players since join failed
+                            handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
+                        }
+                    }
+                    .exceptionally { ex ->
+                        // RPC timeout or failure - record and create new game
+                        recordInstanceFailure(serverId)
+                        io.sentry.Sentry.captureException(ex) { scope ->
+                            scope.setTag("rpc_service", "joinIntoGameService")
+                            scope.setTag("alert_type", "rpc_timeout")
+                            scope.setExtra("server", serverId)
+                            scope.setExtra("game_id", existingGameRequiringPlayers.uniqueId.toString())
+                            scope.setExtra("failure_count", getInstanceFailureCount(serverId).toString())
+                        }
+                        println("RPC failed for join into game on $serverId - creating new game")
+
+                        // Create a new game for these players since RPC failed
+                        handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
+                        null
+                    }
+
+                // Return entry immediately - it's being handled async
                 return listOf(targetEntry.data)
-            } else
-            {
-                println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status})")
             }
         }
 
@@ -175,6 +335,18 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
             privateGameSettings = targetEntry.data.miniGameQueueConfiguration?.privateGameSettings
         )
 
+        // Log minigame match found
+        io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+            category = "queue.minigame_match"
+            message = "Minigame match created: ${miniGameMode.javaClass.name} with ${targetEntry.data.players.size} players"
+            level = io.sentry.SentryLevel.INFO
+            setData("minigame_mode", miniGameMode.javaClass.name)
+            setData("kit_id", kit.id)
+            setData("player_count", targetEntry.data.players.size)
+            setData("is_private", isPrivateGame)
+            setData("game_id", expectation.identifier.toString())
+        })
+
         GameQueueManager
             .prepareGameFor(
                 map = map,
@@ -182,14 +354,93 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                 // prefer NA servers if queuing globally
                 region = preferredRegion,
                 excludeInstance = targetEntry.data.miniGameQueueConfiguration?.excludeMiniInstance,
+                blacklistedInstances = getFailingInstances(),
                 selectNewestInstance = selectNewestInstance,
                 version = miniProvider
             )
             .exceptionally {
+                io.sentry.Sentry.captureException(it) { scope ->
+                    scope.setExtra("game_id", expectation.identifier.toString())
+                    scope.setExtra("minigame_mode", miniGameMode.javaClass.name)
+                    scope.setExtra("player_count", targetEntry.data.players.size.toString())
+                }
                 it.printStackTrace()
                 return@exceptionally null
             }
 
         return listOf(targetEntry.data)
+    }
+
+    /**
+     * Creates a new game for players when joining an existing game fails.
+     * Called from async RPC failure handlers.
+     */
+    private fun handleFailedJoinWithNewGame(
+        targetEntry: InternalQueueEntry<QueueEntry>,
+        preferredRegion: Region,
+        map: gg.tropic.practice.application.api.defaults.map.ImmutableMap
+    ) {
+        val playersToTake = targetEntry.data.players.toMutableSet()
+        val teams = TeamIdentifier.ID.values
+            .take(miniGameMode.teamCount)
+            .mapIndexed { _, identifier ->
+                if (playersToTake.isEmpty()) {
+                    return@mapIndexed GameTeam(identifier, mutableSetOf())
+                }
+                val amount = playersToTake.take(teamSize)
+                playersToTake.removeAll(amount)
+                return@mapIndexed GameTeam(identifier, amount.toMutableSet())
+            }
+
+        if (playersToTake.isNotEmpty()) {
+            RedisShared.sendMessage(
+                targetEntry.data.players,
+                listOf("&cWe were unable to fit your party of players into a game!")
+            )
+            return
+        }
+
+        val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
+        val expectation = GameExpectation(
+            identifier = UUID.randomUUID(),
+            players = targetEntry.data.players.toMutableSet(),
+            teams = teams.toSet(),
+            kitId = kit.id,
+            mapId = map.name,
+            queueType = queueType,
+            queueId = id,
+            matchmakingMetadataAPIV2 = MatchmakingMetadata(
+                region = Region.NA,
+                bracket = targetEntry.data.miniGameQueueConfiguration?.bracket
+            ),
+            miniGameConfiguration = constructConfigurationForInitiatorEntry(targetEntry.data),
+            isPrivateGame = isPrivateGame,
+            privateGameSettings = targetEntry.data.miniGameQueueConfiguration?.privateGameSettings
+        )
+
+        io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+            category = "queue.fallback_game"
+            message = "Creating fallback game after failed join: ${targetEntry.data.players.size} players"
+            level = io.sentry.SentryLevel.INFO
+        })
+
+        GameQueueManager
+            .prepareGameFor(
+                map = map,
+                expectation = expectation,
+                region = preferredRegion,
+                excludeInstance = targetEntry.data.miniGameQueueConfiguration?.excludeMiniInstance,
+                blacklistedInstances = getFailingInstances(),
+                selectNewestInstance = selectNewestInstance,
+                version = miniProvider
+            )
+            .exceptionally {
+                io.sentry.Sentry.captureException(it) { scope ->
+                    scope.setExtra("game_id", expectation.identifier.toString())
+                    scope.setExtra("context", "fallback_game_creation")
+                }
+                it.printStackTrace()
+                null
+            }
     }
 }

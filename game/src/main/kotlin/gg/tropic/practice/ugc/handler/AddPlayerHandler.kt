@@ -6,6 +6,8 @@ import gg.tropic.practice.ugc.HostedWorldState
 import gg.tropic.practice.ugc.generation.addplayer.AddPlayerRequest
 import gg.tropic.practice.ugc.generation.addplayer.AddPlayerResponse
 import gg.tropic.practice.ugc.generation.addplayer.AddPlayerStatus
+import io.sentry.Sentry
+import io.sentry.SpanStatus
 import mc.arch.commons.communications.rpc.RPCContext
 import mc.arch.commons.communications.rpc.RPCHandler
 
@@ -20,33 +22,65 @@ class AddPlayerHandler : RPCHandler<AddPlayerRequest, AddPlayerResponse>
         context: RPCContext<AddPlayerResponse>
     )
     {
-        if (request.server != ServerSync.local.id)
-        {
-            return
-        }
-
-        val hostedWorld = HostedWorldInstanceService
-            .instanceByGID(request.globalWorldId)
-            ?: return run {
-                context.reply(AddPlayerResponse(
-                    status = AddPlayerStatus.FAILURE_WORLD_NOT_LOADED
-                ))
+        val span = Sentry.getSpan()?.startChild("handler.add_player", "process")
+        span?.setData("server", request.server)
+        span?.setData("world_global_id", request.globalWorldId.toString())
+        span?.setData("visiting_players_count", request.visitingPlayers.size)
+        
+        try {
+            if (request.server != ServerSync.local.id)
+            {
+                span?.setData("skipped", "not_target_server")
+                span?.status = SpanStatus.OK
+                span?.finish()
+                return
             }
 
-        if (hostedWorld.state == HostedWorldState.DRAINING)
-        {
+            val hostedWorld = HostedWorldInstanceService
+                .instanceByGID(request.globalWorldId)
+                ?: return run {
+                    span?.setData("failure_reason", "world_not_loaded")
+                    span?.status = SpanStatus.NOT_FOUND
+                    span?.finish()
+                    context.reply(AddPlayerResponse(
+                        status = AddPlayerStatus.FAILURE_WORLD_NOT_LOADED
+                    ))
+                }
+
+            span?.setData("world_state", hostedWorld.state.name)
+            
+            if (hostedWorld.state == HostedWorldState.DRAINING)
+            {
+                span?.setData("failure_reason", "world_draining")
+                span?.status = SpanStatus.UNAVAILABLE
+                span?.finish()
+                context.reply(AddPlayerResponse(
+                    status = AddPlayerStatus.FAILURE_WORLD_DRAINING
+                ))
+                return
+            }
+
+            val trackSpan = span?.startChild("track_pending_logins")
+            request.visitingPlayers.forEach { player ->
+                HostedWorldInstanceService.trackPendingLogin(player, hostedWorld)
+            }
+            trackSpan?.setData("tracked_count", request.visitingPlayers.size)
+            trackSpan?.status = SpanStatus.OK
+            trackSpan?.finish()
+
+            span?.setData("result_status", AddPlayerStatus.SUCCESS.name)
+            span?.status = SpanStatus.OK
+            span?.finish()
+            
             context.reply(AddPlayerResponse(
-                status = AddPlayerStatus.FAILURE_WORLD_DRAINING
+                status = AddPlayerStatus.SUCCESS
             ))
-            return
+        } catch (e: Exception) {
+            Sentry.captureException(e)
+            span?.throwable = e
+            span?.status = SpanStatus.INTERNAL_ERROR
+            span?.finish()
+            throw e
         }
-
-        request.visitingPlayers.forEach { player ->
-            HostedWorldInstanceService.trackPendingLogin(player, hostedWorld)
-        }
-
-        context.reply(AddPlayerResponse(
-            status = AddPlayerStatus.SUCCESS
-        ))
     }
 }

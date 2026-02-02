@@ -814,21 +814,57 @@ open class GameImpl(
             }
     }
 
-    fun getTeamOf(player: Player) = this.teams
-        .firstOrNull {
-            player.uniqueId in it.players
+    fun getTeamOf(player: Player): GameTeam {
+        val team = this.teams.firstOrNull { player.uniqueId in it.players }
+        if (team != null) {
+            return team
         }
-        ?: throw IllegalArgumentException(
-            "Player ${player.name} (${player.uniqueId}} was in no team on minigame $expectationModel on map $mapId, gameState=$state, teams=${
-                teams.joinToString(", ") {
-                    "(id=${it.teamIdentifier.label},players=${it.players})"
+        
+        // Capture stack trace on main thread before going async
+        val callStackTrace = Thread.currentThread().stackTrace
+            .drop(2) // Skip getStackTrace and getTeamOf
+            .take(10) // Top 10 frames
+            .joinToString("\n") { "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
+        
+        // Report to Sentry async with structured data for filtering
+        CompletableFuture.runAsync {
+            io.sentry.Sentry.captureMessage("Player not in any team") { scope ->
+                scope.level = io.sentry.SentryLevel.ERROR
+                scope.setTag("alert_type", "player_no_team")
+                scope.setTag("map_id", mapId)
+                scope.setTag("kit_id", kit.id)
+                scope.setTag("game_state", state.name)
+                scope.setTag("queue_type", expectationModel.queueType?.name ?: "unknown")
+                scope.setTag("is_minigame", (miniGameLifecycle != null).toString())
+                
+                // Extract caller info for quick filtering
+                val caller = Thread.currentThread().stackTrace.getOrNull(4)
+                scope.setTag("caller_class", caller?.className?.substringAfterLast('.') ?: "unknown")
+                scope.setTag("caller_method", caller?.methodName ?: "unknown")
+                
+                scope.setExtra("player_name", player.name)
+                scope.setExtra("player_uuid", player.uniqueId.toString())
+                scope.setExtra("game_id", expectation.toString())
+                scope.setExtra("expected_players", expectationModel.players.joinToString(",") { it.toString() })
+                scope.setExtra("is_spectating", GameService.isSpectating(player).toString())
+                scope.setExtra("is_expected_spectator", expectedSpectators.contains(player.uniqueId).toString())
+                scope.setExtra("team_count", teams.size.toString())
+                scope.setExtra("call_stack", callStackTrace)
+                
+                // Structured team data
+                val teamData = teams.map { t ->
+                    mapOf(
+                        "id" to t.teamIdentifier.label,
+                        "player_count" to t.players.size,
+                        "players" to t.players.map { it.toString() }
+                    )
                 }
-            }, spectating=${
-                GameService.isSpectating(player)
-            }, expectedSpectator=${
-                expectedSpectators.contains(player.uniqueId)
-            }"
-        )
+                scope.setExtra("teams", teamData.toString())
+            }
+        }
+        
+        throw IllegalArgumentException("Player ${player.name} was not in any team")
+    }
 
     fun getTeamOf(player: UUID) = this.teams
         .firstOrNull {

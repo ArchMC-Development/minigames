@@ -31,6 +31,7 @@ import gg.tropic.practice.games.manager.GameManager
 import gg.tropic.practice.metadata.Metadata
 import gg.tropic.practice.minigame.MiniGameSerializers
 import gg.tropic.practice.namespace
+import gg.tropic.practice.observability.SentryIntegration
 import mc.arch.commons.communications.rpc.CommunicationGateway
 import gg.tropic.practice.persistence.RedisShared
 import gg.tropic.practice.queue.GameQueueManager
@@ -112,6 +113,12 @@ class ApplicationServerArgs(parser: ArgParser)
         )
         .default("mongodb://127.0.0.1:27017")
 
+    val sentryDSN by parser
+        .storing(
+            "--dsn",
+            help = "sentry dsn"
+        )
+
     val maxConcurrentBatches by parser
         .storing("--maxConcurrentBatches", help = "The maximum amount of concurrent batches") { toInt() }
         .default(15)
@@ -143,6 +150,9 @@ fun main(args: Array<String>) = mainBody {
     }
 
     ScalaCommons.registerBundle(PracticeAPIPlatform)
+    SentryIntegration.initialize(
+        dsn = parsedArgs.sentryDSN
+    )
 
     RedisShared.keyValueCache
     ServerSync.configureIndependent()

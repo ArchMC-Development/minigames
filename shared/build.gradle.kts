@@ -19,4 +19,7 @@ dependencies {
     api("joda-time:joda-time:2.12.5")
     api("xyz.xenondevs:particle:1.7.1")
     api("lol.arch.symphony:api:1.1.0")
+    
+    // Sentry for distributed tracing
+    compileOnly("io.sentry:sentry:7.22.0")
 }

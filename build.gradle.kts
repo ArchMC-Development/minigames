@@ -9,6 +9,8 @@ plugins {
     kotlin("kapt") version "2.1.0"
     id("org.ajoberstar.grgit") version "4.1.1"
     id("com.gradleup.shadow") version "9.0.0-beta6"
+//    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+//    id("io.gitlab.arturbosch.detekt") version "1.23.7"
 }
 
 var currentBranch: String = "master"/*grgit.branch.current().name
@@ -44,6 +46,8 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.kapt")
     apply(plugin = "com.gradleup.shadow")
     apply(plugin = "maven-publish")
+//    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+//    apply(plugin = "io.gitlab.arturbosch.detekt")
 
     dependencies {
         compileOnly(kotlin("stdlib"))

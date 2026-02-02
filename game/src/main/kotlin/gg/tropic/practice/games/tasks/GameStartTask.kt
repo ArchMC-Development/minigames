@@ -125,7 +125,7 @@ class GameStartTask(
                     .filterNotNull()
                     .forEach {
                         val statistic = PracticeProfileService.find(it)
-                            ?.getStatisticValue(
+                            ?.getCachedStatisticValue(
                                 statisticIdFrom(TrackedKitStatistic.ELO) {
                                     kit(game.kit)
                                     ranked()

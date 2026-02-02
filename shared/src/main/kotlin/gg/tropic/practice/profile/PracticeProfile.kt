@@ -11,6 +11,7 @@ import gg.tropic.practice.statistics.Statistic
 import gg.tropic.practice.statistics.StatisticID
 import gg.tropic.practice.statistics.StatisticService
 import io.lettuce.core.ScoredValue
+import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.time.Duration
 import org.bukkit.entity.Player
 import java.util.*
@@ -51,6 +52,30 @@ data class PracticeProfile(
         trackedStatisticChangeMutations[statistic] = use
     }
 
+    fun getCachedStatisticValueWithDeferredEnqueue(id: String) = cachedStatistics?.get(id)
+        .let {
+            if (it == null)
+            {
+                Schedulers
+                    .async()
+                    .run {
+                        StatisticService.statisticBy(id)?.scoreAndPosition()
+                            ?.apply {
+                                if (cachedStatistics == null)
+                                {
+                                    cachedStatistics = ConcurrentHashMap()
+                                }
+
+                                cachedStatistics!![id] = this
+                            }
+                    }
+                return@let null
+            }
+
+            return@let it
+        }
+
+    fun getCachedStatisticValue(id: String) = cachedStatistics?.get(id)
     fun getStatisticValue(id: String) = cachedStatistics?.get(id)
         ?: StatisticService.statisticBy(id)?.scoreAndPosition()
             ?.apply {
@@ -62,6 +87,8 @@ data class PracticeProfile(
                 cachedStatistics!![id] = this
             }
 
+    fun getCachedStatisticValueWithDeferredEnqueue(id: StatisticID) = getCachedStatisticValueWithDeferredEnqueue(id.toId())
+    fun getCachedStatisticValue(id: StatisticID) = getCachedStatisticValue(id.toId())
     fun getStatisticValue(id: StatisticID) = getStatisticValue(id.toId())
 
     private var statistics: ConcurrentHashMap<String, Long>? = ConcurrentHashMap<String, Long>()

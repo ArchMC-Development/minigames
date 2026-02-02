@@ -43,6 +43,8 @@ dependencies {
     implementation("gg.scala.aware:aware:1.2.1")
     implementation("io.lettuce:lettuce-core:6.2.6.RELEASE")
 
+    implementation("io.sentry:sentry:7.22.0")
+
     implementation("org.litote.kmongo:kmongo:4.11.0")
 }
 

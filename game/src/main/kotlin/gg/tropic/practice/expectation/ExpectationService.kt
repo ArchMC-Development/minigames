@@ -181,9 +181,10 @@ object ExpectationService
                             return@handler
                         }
 
-                        game.playerTracker.useRejoinToken(event.uniqueId)
-                        if (rejoinEvent.persistentSpectator)
+                        val rejoinSuccess = game.playerTracker.useRejoinToken(event.uniqueId)
+                        if (rejoinEvent.persistentSpectator || !rejoinSuccess)
                         {
+                            // If rejoin failed (team gone) or persistent spectator, add as spectator
                             game.expectedSpectators += event.uniqueId
                             GameService.spectatorToGameMappings[event.uniqueId] = game
                         } else
