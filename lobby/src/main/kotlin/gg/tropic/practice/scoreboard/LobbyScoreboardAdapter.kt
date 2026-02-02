@@ -99,7 +99,7 @@ object LobbyScoreboardAdapter : ScoreboardAdapter()
                 board += ""
                 board += "${primaryColor()}${Constants.THIN_VERTICAL_LINE} ${CC.GRAY}Rank: ${
                     QuickAccess.realRank(player).getColoredName()
-                }"
+                }${getCGEPlusColor(player) ?: ""}"
 
                 val profile = EconomyProfileService.find(player)
                 if (profile != null)
@@ -301,6 +301,9 @@ object LobbyScoreboardAdapter : ScoreboardAdapter()
                 it.player.removeMetadata("region", Helper.hostPlugin())
             }
     }
+
+    fun getCGEPlusColor(player: Player): String? =
+        player.getMetadata("cge-gift-plus").firstOrNull()?.asString()
 
     override fun getTitle(player: Player): String
     {
