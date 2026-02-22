@@ -100,7 +100,7 @@ object MapRatingService
                     "\$group",
                     Document(
                         mapOf(
-                            "_id" to "\$_id",
+                            "_id" to null,
                             "average" to Document(
                                 "\$avg", "\$rating"
                             )
