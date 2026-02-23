@@ -36,7 +36,6 @@ data class MinigameLobbyConfiguration(
     var minigameLobbyNPCs: MutableList<MinigameLobbyNPC> = mutableListOf(),
     var levitationPortals: MutableList<LevitationPortalSpec> = mutableListOf(),
     var quests: MutableMap<String, Quest> = mutableMapOf(),
-    var rankGiftLeaderboardLocation: Position? = null,
     var questMasterLocation: Position = Position(
         0.0, 0.0, 0.0, 180.0F, 0.0F
     )

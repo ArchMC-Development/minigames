@@ -6,7 +6,6 @@ import gg.scala.commons.configurable.editString
 import gg.scala.commons.configurable.editStringList
 import gg.scala.commons.spatial.Position
 import gg.tropic.practice.configuration.PracticeConfigurationService
-import gg.tropic.practice.integration.RankGiftLeaderboardHologram
 import gg.tropic.practice.menu.manage.bezierteleporters.ViewBezierTeleportersMenu
 import gg.tropic.practice.menu.manage.leaderboards.ViewMinigameLeaderboardsMenu
 import gg.tropic.practice.menu.manage.levitationportals.ViewLevitationPortalsMenu
@@ -16,7 +15,6 @@ import gg.tropic.practice.menu.manage.quests.ViewQuestsMenu
 import gg.tropic.practice.menu.manage.scoreboard.ManageScoreboardMenu
 import gg.tropic.practice.menu.manage.top3.ViewTop3LeaderboardsMenu
 import gg.tropic.practice.parkour.ManageParkourMenu
-import gg.tropic.practice.parkour.ParkourLeaderboardHologram
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -180,21 +178,7 @@ class ManageLobbyMenu : Menu("Managing Minigame Lobby")
             .toButton { _, _ ->
                 ViewLevitationPortalsMenu().openMenu(player)
             },
-        28 to editPosition(
-            PracticeConfigurationService,
-            title = "Rank Gift Leaderboard Location",
-            material = XMaterial.END_PORTAL_FRAME,
-            getter = {
-                local().rankGiftLeaderboardLocation ?: Position(0.0, 0.0, 0.0)
-            },
-            setter = {
-                local().rankGiftLeaderboardLocation = it
-                val hologram = RankGiftLeaderboardHologram(player.location)
-
-                hologram.configure()
-            }
-        ),
     )
 
-    override fun size(buttons: Map<Int, Button>) = 45
+    override fun size(buttons: Map<Int, Button>) = 36
 }
