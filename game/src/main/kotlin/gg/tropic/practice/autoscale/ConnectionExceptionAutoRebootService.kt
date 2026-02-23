@@ -30,7 +30,7 @@ object ConnectionExceptionAutoRebootService
     /**
      * Number of connection exception kicks before triggering auto-reboot.
      */
-    private const val KICK_THRESHOLD = 3
+    private const val KICK_THRESHOLD = 10
 
     /**
      * Time window in milliseconds to track kicks.
