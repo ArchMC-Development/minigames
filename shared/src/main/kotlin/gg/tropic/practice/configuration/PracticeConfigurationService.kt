@@ -128,6 +128,12 @@ object PracticeConfigurationService : DataSyncService<PracticeConfiguration>()
                 value.levitationPortals = mutableListOf()
             }
         }
+
+        stage("add-rankgift-leaderboard") {
+            minigameConfigurations.forEach { (_, value) ->
+                value.rankGiftLeaderboardLocation = null
+            }
+        }
     }
 
     internal var typeProvider: MiniGameTypeProvider? = null
