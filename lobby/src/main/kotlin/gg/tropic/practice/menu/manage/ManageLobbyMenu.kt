@@ -183,7 +183,7 @@ class ManageLobbyMenu : Menu("Managing Minigame Lobby")
         28 to editPosition(
             PracticeConfigurationService,
             title = "Rank Gift Leaderboard Location",
-            material = XMaterial.END_PORTAL_FRAME,
+            material = XMaterial.ENDER_CHEST,
             getter = {
                 local().rankGiftLeaderboardLocation ?: Position(0.0, 0.0, 0.0)
             },
