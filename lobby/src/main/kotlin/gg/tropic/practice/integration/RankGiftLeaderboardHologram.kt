@@ -33,16 +33,15 @@ class RankGiftLeaderboardHologram(
 
         lines += "${CC.B_YELLOW}Rank Gifting Leaderboard"
         lines += ""
-        lines += RankGiftingPerkService.getLeaderboardPositions().thenApply { entries ->
-            entries.map {
+        lines += RankGiftingPerkService.getCachedLeaderboardPositions()
+            .map {
                 "${
                     QuickAccess.computeColoredName(it.first, it.first.username()).join()
                 } ${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.GREEN}${it.second} Ranks"
             }
-        }.join()
 
         return lines
     }
 
-    override fun getTickInterval() = 2500L
+    override fun getTickInterval() = 60000L
 }

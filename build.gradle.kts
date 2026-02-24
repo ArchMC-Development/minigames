@@ -60,7 +60,7 @@ subprojects {
         compileOnly("gg.scala.staff:scala-scstaff-plugin:1.1.1")
         compileOnly("gg.scala.friends:scala-friends:2.1.2")
         compileOnly("gg.scala.basics.plugin:scala-basics-plugin:1.2.0")
-        compileOnly("gg.tropic.game.extensions:tropic-core-game-extensions:1.9.0")
+        compileOnly("gg.tropic.game.extensions:tropic-core-game-extensions:1.9.1")
 
         compileOnly("gg.scala.spigot:server:1.1.3")
         compileOnly("com.lunarclient:apollo-api:1.1.8")
