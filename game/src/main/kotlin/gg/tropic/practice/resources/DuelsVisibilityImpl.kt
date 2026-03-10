@@ -35,6 +35,11 @@ object DuelsVisibilityImpl : VisibilityAdapter
             val isTargetSpectating = GameService.isSpectating(viewed)
             val isViewerSpectating = GameService.isSpectating(viewer)
 
+            if (isViewerSpectating && !isTargetSpectating)
+            {
+                return VirtualVisibility.NEUTRAL
+            }
+
             if (isTargetSpectating)
             {
                 if (!isViewerSpectating) // Viewer is not spectating, but the target is spectating
@@ -85,6 +90,11 @@ object DuelsVisibilityImpl : VisibilityAdapter
         {
             val isTargetSpectating = GameService.isSpectating(toRefresh)
             val isViewerSpectating = GameService.isSpectating(refreshFor)
+
+            if (isViewerSpectating && !isTargetSpectating)
+            {
+                return VisibilityAction.NEUTRAL
+            }
 
             if (isTargetSpectating)
             {
