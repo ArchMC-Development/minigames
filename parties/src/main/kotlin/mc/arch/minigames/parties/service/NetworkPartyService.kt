@@ -1,6 +1,7 @@
 package mc.arch.minigames.parties.service
 
 import gg.scala.aware.AwareBuilder
+import gg.scala.aware.Aware
 import gg.scala.aware.codec.codecs.interpretation.AwareMessageCodec
 import gg.scala.aware.message.AwareMessage
 import gg.scala.aware.thread.AwareThreadContext
@@ -47,17 +48,17 @@ object NetworkPartyService : PartyService
     private val partyLock = ReentrantReadWriteLock()
     private var parties = mutableMapOf<UUID, Party>()
 
-    private val sync by lazy {
-        AwareBuilder
-            .of<AwareMessage>("minigames:parties")
-            .codec(AwareMessageCodec)
-            .logger(plugin.logger)
-            .build()
-    }
+    private lateinit var sync: Aware<AwareMessage>
 
     @Configure
     fun configure()
     {
+        sync = AwareBuilder
+            .of<AwareMessage>("minigames:parties")
+            .codec(AwareMessageCodec)
+            .logger(plugin.logger)
+            .build()
+
         preLoadAllParties()
         configureSyncReceiver()
 
@@ -236,13 +237,18 @@ object NetworkPartyService : PartyService
             parties[party.uniqueId] = party
         }
 
-        AwareMessage.of(
-            packet = "update",
-            aware = sync,
-            "uniqueId" to party.uniqueId
-        ).publish(
-            context = AwareThreadContext.SYNC
-        )
+        runCatching {
+            AwareMessage.of(
+                packet = "update",
+                aware = sync,
+                "uniqueId" to party.uniqueId
+            ).publish(
+                context = AwareThreadContext.SYNC
+            )
+        }.onFailure { throwable ->
+            plugin.logger.warning("[Parties] Something went wrong while trying to distribute a message.")
+            throwable.printStackTrace()
+        }
     }
 
     override fun warpPartyHere(party: Party)
@@ -282,13 +288,18 @@ object NetworkPartyService : PartyService
             parties.remove(party.uniqueId)
         }
 
-        AwareMessage.of(
-            packet = "delete",
-            aware = sync,
-            "uniqueId" to party.uniqueId
-        ).publish(
-            context = AwareThreadContext.SYNC
-        )
+        runCatching {
+            AwareMessage.of(
+                packet = "delete",
+                aware = sync,
+                "uniqueId" to party.uniqueId
+            ).publish(
+                context = AwareThreadContext.SYNC
+            )
+        }.onFailure { throwable ->
+            plugin.logger.warning("[Parties] Something went wrong while trying to distribute a deletion message.")
+            throwable.printStackTrace()
+        }
     }
 
     override fun findPartyByID(id: UUID) = partyLock.read {

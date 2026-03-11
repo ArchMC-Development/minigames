@@ -7,9 +7,6 @@ import net.evilblock.cubed.visibility.VisibilityAction
 import net.evilblock.cubed.visibility.VisibilityAdapter
 import net.evilblock.cubed.visibility.VisibilityAdapterRegister
 import org.bukkit.entity.Player
-
-import gg.tropic.practice.games.GameService
-
 /**
  * @author Elb1to
  * @since 10/18/2023
@@ -23,10 +20,6 @@ object SpawnPlayerVisibility : VisibilityAdapter
     {
         val profile = BasicsProfileService.find(refreshFor)
             ?: return VisibilityAction.NEUTRAL
-
-        if (GameService.isSpectating(refreshFor)) {
-            return VisibilityAction.NEUTRAL
-        }
 
         val messagesRef = profile.settings["${DuelsSettingCategory.DUEL_SETTING_PREFIX}:spawn-visibility-def"]!!
         val visible = messagesRef.map<StateSettingValue>()
