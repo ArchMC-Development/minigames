@@ -179,16 +179,31 @@ object NetworkPartyService : PartyService
     private fun preLoadAllParties()
     {
         partyLock.write {
-            parties = ScalaCommonsGlobals.redis()
-                .sync()
-                .hgetall("minigames:parties")
-                .mapValues { entry ->
-                    Serializers.gson.fromJson(entry.value, Party::class.java)
-                }
-                .mapKeys { UUID.fromString(it.key) }
-                .toMutableMap()
+            val redisSync = ScalaCommonsGlobals.redis().sync()
+            val rawEntries = redisSync.hgetall("minigames:parties")
+            val loaded = mutableMapOf<UUID, Party>()
 
-            plugin.logger.info("[cache] Pre loaded ${parties.size} ${if (parties.size == 1) "" else "s"} in memory.")
+            for ((key, value) in rawEntries)
+            {
+                val uuid = runCatching { UUID.fromString(key) }.getOrNull()
+                if (uuid == null)
+                {
+                    plugin.logger.warning("[cache] Skipping party with invalid UUID key: $key")
+                    continue
+                }
+
+                runCatching {
+                    Serializers.gson.fromJson(value, Party::class.java)
+                }.onSuccess { party ->
+                    loaded[uuid] = party
+                }.onFailure { throwable ->
+                    plugin.logger.warning("[cache] Failed to deserialize party $key, removing corrupted entry: ${throwable.message}")
+                    redisSync.hdel("minigames:parties", key)
+                }
+            }
+
+            parties = loaded
+            plugin.logger.info("[cache] Pre loaded ${parties.size} part${if (parties.size == 1) "y" else "ies"} in memory.")
         }
     }
 
