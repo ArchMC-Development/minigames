@@ -146,7 +146,7 @@ open class GameImpl(
     var shouldBroadcastRespawnChatMsg = true
     var shouldSendHealthHUD = true
     var unplacedSpawnProtectionZone = false
-    var voidDamageMin: Int? = 0
+    var voidDamageMin: Int? = null
 
     var isMinIndependent = false
     var isMinMaxLevelRange = false
@@ -819,13 +819,13 @@ open class GameImpl(
         if (team != null) {
             return team
         }
-        
+
         // Capture stack trace on main thread before going async
         val callStackTrace = Thread.currentThread().stackTrace
             .drop(2) // Skip getStackTrace and getTeamOf
             .take(10) // Top 10 frames
             .joinToString("\n") { "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
-        
+
         // Report to Sentry async with structured data for filtering
         CompletableFuture.runAsync {
             io.sentry.Sentry.captureMessage("Player not in any team") { scope ->
@@ -836,12 +836,12 @@ open class GameImpl(
                 scope.setTag("game_state", state.name)
                 scope.setTag("queue_type", expectationModel.queueType?.name ?: "unknown")
                 scope.setTag("is_minigame", (miniGameLifecycle != null).toString())
-                
+
                 // Extract caller info for quick filtering
                 val caller = Thread.currentThread().stackTrace.getOrNull(4)
                 scope.setTag("caller_class", caller?.className?.substringAfterLast('.') ?: "unknown")
                 scope.setTag("caller_method", caller?.methodName ?: "unknown")
-                
+
                 scope.setExtra("player_name", player.name)
                 scope.setExtra("player_uuid", player.uniqueId.toString())
                 scope.setExtra("game_id", expectation.toString())
@@ -850,7 +850,7 @@ open class GameImpl(
                 scope.setExtra("is_expected_spectator", expectedSpectators.contains(player.uniqueId).toString())
                 scope.setExtra("team_count", teams.size.toString())
                 scope.setExtra("call_stack", callStackTrace)
-                
+
                 // Structured team data
                 val teamData = teams.map { t ->
                     mapOf(
@@ -862,7 +862,7 @@ open class GameImpl(
                 scope.setExtra("teams", teamData.toString())
             }
         }
-        
+
         throw IllegalArgumentException("Player ${player.name} was not in any team")
     }
 
