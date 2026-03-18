@@ -400,24 +400,39 @@ object MapReplicationService
 
     private fun populateSlimeCache()
     {
-        for (arena in MapService.maps())
-        {
-            kotlin.runCatching {
-                readyMaps[arena.name] = ReadyMapTemplate(
-                    slimeWorld = Versioned.toProvider()
+        val startTime = System.currentTimeMillis()
+        val maps = MapService.maps()
+
+        val futures = maps.map { arena ->
+            CompletableFuture.supplyAsync {
+                kotlin.runCatching {
+                    val world = Versioned.toProvider()
                         .getSlimeProvider()
                         .loadReadOnlyWorld(arena.associatedSlimeTemplate)
-                )
 
-                plugin.logger.info(
-                    "Populated slime cache with SlimeWorld for arena ${arena.name}."
-                )
-            }.onFailure {
-                plugin.logger.log(
-                    Level.SEVERE, "Failed to populate cache", it
-                )
+                    arena.name to ReadyMapTemplate(slimeWorld = world)
+                }.onFailure {
+                    plugin.logger.log(
+                        Level.SEVERE, "Failed to populate cache for arena ${arena.name}", it
+                    )
+                }.getOrNull()
             }
         }
+
+        CompletableFuture.allOf(*futures.toTypedArray()).join()
+
+        for (future in futures)
+        {
+            val result = future.getNow(null) ?: continue
+            readyMaps[result.first] = result.second
+            plugin.logger.info(
+                "Populated slime cache with SlimeWorld for arena ${result.first}."
+            )
+        }
+
+        plugin.logger.info(
+            "Slime cache population completed in ${System.currentTimeMillis() - startTime}ms for ${maps.size} maps."
+        )
     }
 
     private fun versionedCurrentTickProvider() = if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
@@ -478,7 +493,7 @@ object MapReplicationService
                 worldRequests.remove(worldID)?.complete(bukkitWorld)
             }
 
-            Thread.sleep(350L)
+            Thread.sleep(50L)
         }
     }
 
