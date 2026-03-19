@@ -63,7 +63,6 @@ subprojects {
         compileOnly("gg.tropic.game.extensions:tropic-core-game-extensions:1.9.1")
 
         compileOnly("gg.scala.spigot:server:1.1.3")
-        compileOnly("com.lunarclient:apollo-api:1.1.8")
         compileOnly("gg.scala.lemon:bukkit:2.3.0")
         compileOnly("gg.scala.cloudsync:spigot:1.0.4")
     }

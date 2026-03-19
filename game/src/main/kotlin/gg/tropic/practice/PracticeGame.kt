@@ -42,7 +42,6 @@ import org.bukkit.Bukkit
     PluginDependency("cloudsync", soft = true),
     PluginDependency("Friends", soft = true),
     PluginDependency("ScStaff", soft = true),
-    PluginDependency("Apollo-Bukkit", soft = true)
 )
 class PracticeGame : ExtendedScalaPlugin()
 {
