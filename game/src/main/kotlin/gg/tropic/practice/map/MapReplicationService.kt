@@ -38,6 +38,7 @@ import org.bukkit.World
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.logging.Level
 import kotlin.concurrent.read
@@ -55,7 +56,7 @@ object MapReplicationService
     @Inject
     lateinit var plugin: ExtendedScalaPlugin
 
-    private val readyMaps = mutableMapOf<String, ReadyMapTemplate>()
+    private val readyMaps = ConcurrentHashMap<String, ReadyMapTemplate>()
 
     private val mapLock = ReentrantReadWriteLock()
     private val mapReplications = mutableListOf<BuiltMapReplication>()
@@ -402,41 +403,62 @@ object MapReplicationService
     {
         val startTime = System.currentTimeMillis()
         val maps = MapService.maps()
-        val mapLoadExecutor = Executors.newFixedThreadPool(12)
         val loadedCount = AtomicInteger(0)
+        val failedCount = AtomicInteger(0)
 
-        val futures = maps.map { arena ->
-            CompletableFuture.supplyAsync({
-                kotlin.runCatching {
-                    val world = Versioned.toProvider()
-                        .getSlimeProvider()
-                        .loadReadOnlyWorld(arena.associatedSlimeTemplate)
+        plugin.logger.info("Starting async slime cache population for ${maps.size} maps...")
 
-                    val count = loadedCount.incrementAndGet()
-                    plugin.logger.info(
-                        "Loaded map ${arena.name} ($count/${maps.size})"
-                    )
-                    arena.name to ReadyMapTemplate(slimeWorld = world)
-                }.onFailure {
-                    plugin.logger.log(
-                        Level.SEVERE, "Failed to populate cache for arena ${arena.name}", it
-                    )
-                }.getOrNull()
-            }, mapLoadExecutor)
+        thread(isDaemon = true, name = "slime-cache-populator") {
+            val batchSize = 10
+            val batches = maps.chunked(batchSize)
+
+            for ((batchIndex, batch) in batches.withIndex())
+            {
+                val batchExecutor = Executors.newFixedThreadPool(batch.size)
+
+                val futures = batch.map { arena ->
+                    CompletableFuture.supplyAsync({
+                        kotlin.runCatching {
+                            val world = Versioned.toProvider()
+                                .getSlimeProvider()
+                                .loadReadOnlyWorld(arena.associatedSlimeTemplate)
+
+                            readyMaps[arena.name] = ReadyMapTemplate(slimeWorld = world)
+
+                            val count = loadedCount.incrementAndGet()
+                            plugin.logger.info(
+                                "Loaded map ${arena.name} ($count/${maps.size})"
+                            )
+                        }.onFailure {
+                            failedCount.incrementAndGet()
+                            plugin.logger.log(
+                                Level.SEVERE, "Failed to populate cache for arena ${arena.name}", it
+                            )
+                        }
+                    }, batchExecutor)
+                        .orTimeout(15L, TimeUnit.SECONDS)
+                        .exceptionally { throwable ->
+                            failedCount.incrementAndGet()
+                            plugin.logger.warning(
+                                "Timed out loading map ${arena.name} after 15s (batch ${batchIndex + 1}/${batches.size})"
+                            )
+                            null
+                        }
+                }
+
+                CompletableFuture.allOf(*futures.toTypedArray()).join()
+                batchExecutor.shutdownNow()
+
+                plugin.logger.info(
+                    "Completed batch ${batchIndex + 1}/${batches.size} (${loadedCount.get()} loaded, ${failedCount.get()} failed)"
+                )
+            }
+
+            plugin.logger.info(
+                "Slime cache population completed in ${System.currentTimeMillis() - startTime}ms — " +
+                    "${readyMaps.size}/${maps.size} maps loaded successfully, ${failedCount.get()} failed."
+            )
         }
-
-        CompletableFuture.allOf(*futures.toTypedArray()).join()
-        mapLoadExecutor.shutdown()
-
-        for (future in futures)
-        {
-            val result = future.getNow(null) ?: continue
-            readyMaps[result.first] = result.second
-        }
-
-        plugin.logger.info(
-            "Slime cache population completed in ${System.currentTimeMillis() - startTime}ms for ${maps.size} maps."
-        )
     }
 
     private fun versionedCurrentTickProvider() = if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
