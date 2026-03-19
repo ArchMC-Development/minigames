@@ -402,8 +402,8 @@ object MapReplicationService
     {
         val startTime = System.currentTimeMillis()
         val maps = MapService.maps()
-        val mapLoadExecutor = Executors.newFixedThreadPool(minOf(maps.size, 24))
-        val loadedCount = java.util.concurrent.atomic.AtomicInteger(0)
+        val mapLoadExecutor = Executors.newFixedThreadPool(12)
+        val loadedCount = AtomicInteger(0)
 
         val futures = maps.map { arena ->
             CompletableFuture.supplyAsync({
