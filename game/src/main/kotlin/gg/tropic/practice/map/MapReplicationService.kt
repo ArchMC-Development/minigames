@@ -38,7 +38,6 @@ import org.bukkit.World
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 import java.util.concurrent.*
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.logging.Level
 import kotlin.concurrent.read
@@ -56,7 +55,7 @@ object MapReplicationService
     @Inject
     lateinit var plugin: ExtendedScalaPlugin
 
-    private val readyMaps = ConcurrentHashMap<String, ReadyMapTemplate>()
+    private val readyMaps = mutableMapOf<String, ReadyMapTemplate>()
 
     private val mapLock = ReentrantReadWriteLock()
     private val mapReplications = mutableListOf<BuiltMapReplication>()
@@ -401,63 +400,23 @@ object MapReplicationService
 
     private fun populateSlimeCache()
     {
-        val startTime = System.currentTimeMillis()
-        val maps = MapService.maps()
-        val loadedCount = AtomicInteger(0)
-        val failedCount = AtomicInteger(0)
-
-        plugin.logger.info("Starting async slime cache population for ${maps.size} maps...")
-
-        thread(isDaemon = true, name = "slime-cache-populator") {
-            val batchSize = 10
-            val batches = maps.chunked(batchSize)
-
-            for ((batchIndex, batch) in batches.withIndex())
-            {
-                val batchExecutor = Executors.newFixedThreadPool(batch.size)
-
-                val futures = batch.map { arena ->
-                    CompletableFuture.supplyAsync({
-                        kotlin.runCatching {
-                            val world = Versioned.toProvider()
-                                .getSlimeProvider()
-                                .loadReadOnlyWorld(arena.associatedSlimeTemplate)
-
-                            readyMaps[arena.name] = ReadyMapTemplate(slimeWorld = world)
-
-                            val count = loadedCount.incrementAndGet()
-                            plugin.logger.info(
-                                "Loaded map ${arena.name} ($count/${maps.size})"
-                            )
-                        }.onFailure {
-                            failedCount.incrementAndGet()
-                            plugin.logger.log(
-                                Level.SEVERE, "Failed to populate cache for arena ${arena.name}", it
-                            )
-                        }
-                    }, batchExecutor)
-                        .orTimeout(15L, TimeUnit.SECONDS)
-                        .exceptionally { throwable ->
-                            failedCount.incrementAndGet()
-                            plugin.logger.warning(
-                                "Timed out loading map ${arena.name} after 15s (batch ${batchIndex + 1}/${batches.size})"
-                            )
-                            null
-                        }
-                }
-
-                CompletableFuture.allOf(*futures.toTypedArray()).join()
-                batchExecutor.shutdownNow()
+        for (arena in MapService.maps())
+        {
+            kotlin.runCatching {
+                readyMaps[arena.name] = ReadyMapTemplate(
+                    slimeWorld = Versioned.toProvider()
+                        .getSlimeProvider()
+                        .loadReadOnlyWorld(arena.associatedSlimeTemplate)
+                )
 
                 plugin.logger.info(
-                    "Completed batch ${batchIndex + 1}/${batches.size} (${loadedCount.get()} loaded, ${failedCount.get()} failed)"
+                    "Populated slime cache with SlimeWorld for arena ${arena.name}."
+                )
+            }.onFailure {
+                plugin.logger.log(
+                    Level.SEVERE, "Failed to populate cache", it
                 )
             }
-
-            plugin.logger.info(
-                "Slime cache population completed in ${System.currentTimeMillis() - startTime}ms — " +
-                    "${readyMaps.size}/${maps.size} maps loaded successfully, ${failedCount.get()} failed."
-            )
         }
     }
 
@@ -519,7 +478,7 @@ object MapReplicationService
                 worldRequests.remove(worldID)?.complete(bukkitWorld)
             }
 
-            Thread.sleep(50L)
+            Thread.sleep(350L)
         }
     }
 
