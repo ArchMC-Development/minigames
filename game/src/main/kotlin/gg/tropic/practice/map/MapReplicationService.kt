@@ -402,32 +402,36 @@ object MapReplicationService
     {
         val startTime = System.currentTimeMillis()
         val maps = MapService.maps()
+        val mapLoadExecutor = Executors.newFixedThreadPool(minOf(maps.size, 24))
+        val loadedCount = java.util.concurrent.atomic.AtomicInteger(0)
 
         val futures = maps.map { arena ->
-            CompletableFuture.supplyAsync {
+            CompletableFuture.supplyAsync({
                 kotlin.runCatching {
                     val world = Versioned.toProvider()
                         .getSlimeProvider()
                         .loadReadOnlyWorld(arena.associatedSlimeTemplate)
 
+                    val count = loadedCount.incrementAndGet()
+                    plugin.logger.info(
+                        "Loaded map ${arena.name} ($count/${maps.size})"
+                    )
                     arena.name to ReadyMapTemplate(slimeWorld = world)
                 }.onFailure {
                     plugin.logger.log(
                         Level.SEVERE, "Failed to populate cache for arena ${arena.name}", it
                     )
                 }.getOrNull()
-            }
+            }, mapLoadExecutor)
         }
 
         CompletableFuture.allOf(*futures.toTypedArray()).join()
+        mapLoadExecutor.shutdown()
 
         for (future in futures)
         {
             val result = future.getNow(null) ?: continue
             readyMaps[result.first] = result.second
-            plugin.logger.info(
-                "Populated slime cache with SlimeWorld for arena ${result.first}."
-            )
         }
 
         plugin.logger.info(
