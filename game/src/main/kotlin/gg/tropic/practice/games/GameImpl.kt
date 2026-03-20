@@ -1198,6 +1198,12 @@ open class GameImpl(
             .onEach {
                 it.remove()
             }
+
+        arenaWorld.entities
+            .filterIsInstance<org.bukkit.entity.EnderPearl>()
+            .onEach {
+                it.remove()
+            }
     }
 
     fun buildLimit(): Int?
