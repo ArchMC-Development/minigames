@@ -60,6 +60,12 @@ enum class FeatureFlag(
             "notifications.",
         )
     ),
+    Modern(
+        description = listOf(
+            "Restricts this kit for modern",
+            "duels only.",
+        )
+    ),
     ExplodePlacedBlocks(
         description = listOf(
             "Allows any explosion event",
