@@ -32,6 +32,13 @@ class PlayerRespawnTask(
 {
     companion object
     {
+        private val activeTasks = mutableMapOf<UUID, PlayerRespawnTask>()
+
+        fun cancel(uuid: UUID)
+        {
+            activeTasks.remove(uuid)?.task?.closeAndReportException()
+        }
+
         fun GameImpl.startDelayedRespawn(player: Player, optionalTime: Int? = null) =
             with(PlayerRespawnTask(player, this, optionalTime)) {
                 task = Schedulers.sync()
@@ -43,6 +50,8 @@ class PlayerRespawnTask(
 
                 game.with(this)
                 task.bindWith(game)
+
+                activeTasks[player.uniqueId] = this
             }
     }
 
@@ -63,10 +72,20 @@ class PlayerRespawnTask(
 
     override fun run()
     {
+        val currentPlayer = Bukkit.getPlayer(player.uniqueId)
+        if (currentPlayer == null || currentPlayer != player)
+        {
+            task.closeAndReportException()
+            activeTasks.remove(player.uniqueId)
+            return
+        }
+
         if (!game.state(GameState.Playing) || tick <= 0)
         {
             if (game.prepareForNewLife(player, volatile = false))
             {
+                activeTasks.remove(player.uniqueId)
+
                 GameService.audiences.player(player).apply {
                     clearTitle()
                     sendActionBar { Component.empty() }
@@ -92,6 +111,7 @@ class PlayerRespawnTask(
                 task.closeAndReportException()
             } else
             {
+                activeTasks.remove(player.uniqueId)
                 player.sendMessage("${CC.RED}We were unable to respawn you! Use /lobby to return the lobby and join another game.")
             }
             return
@@ -128,6 +148,6 @@ class PlayerRespawnTask(
 
     override fun close()
     {
-
+        activeTasks.remove(player.uniqueId)
     }
 }

@@ -23,6 +23,7 @@ import gg.tropic.practice.minigame.event.PlayerMiniGameRejoinWithTokenEvent
 import gg.tropic.practice.minigame.event.PlayerMiniGameSpectateWithTokenEvent
 import gg.tropic.practice.minigame.menu.SpectatorMenu
 import gg.tropic.practice.minigame.rejoin.RejoinToken
+import gg.tropic.practice.games.tasks.lifecycle.PlayerRespawnTask
 import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import gg.tropic.practice.ugc.HostedWorldInstanceService
 import gg.tropic.practice.ugc.toHostedWorld
@@ -227,6 +228,7 @@ object ExpectationService
             .handler {
                 GameService.spectatorToGameMappings.remove(it.player.uniqueId)
                 GameService.playerToGameMappings.remove(it.player.uniqueId)
+                PlayerRespawnTask.cancel(it.player.uniqueId)
 
                 expectedRejoinWithTokens.remove(it.player.uniqueId)
             }
@@ -398,6 +400,8 @@ object ExpectationService
                     ?: return@handler
 
                 it.player.resetAttributes()
+
+                PlayerRespawnTask.cancel(it.player.uniqueId)
 
                 val isRejoiningGame = expectedRejoinWithTokens.containsKey(it.player.uniqueId)
                 if (it.player.uniqueId in game.expectedSpectators)
