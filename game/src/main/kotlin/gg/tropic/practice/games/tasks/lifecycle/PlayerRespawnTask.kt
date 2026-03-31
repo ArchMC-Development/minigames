@@ -17,6 +17,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import java.time.Duration
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 
