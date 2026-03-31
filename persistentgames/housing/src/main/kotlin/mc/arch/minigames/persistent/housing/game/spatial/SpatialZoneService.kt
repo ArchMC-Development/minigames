@@ -1,5 +1,6 @@
 package mc.arch.minigames.persistent.housing.game.spatial
 
+import gg.scala.commons.spatial.toLocation
 import gg.scala.commons.spatial.toPosition
 import gg.tropic.practice.map.metadata.impl.MapZoneMetadata
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
@@ -61,7 +62,7 @@ object SpatialZoneService
         border.setSize(playerHouse.plotSizeBlocks.toDouble(), 0)
         border.warningDistance = 5
 
-        playerHouse.region = regionAsCuboid
+        playerHouse.region = Cuboid(mapZoneMetadata.bounds.lowerLeft.toLocation(world), mapZoneMetadata.bounds.upperRight.toLocation(world))
         playerHouse.save()
 
         Events.subscribe(BlockBreakEvent::class.java)
