@@ -113,6 +113,42 @@ val taskBundles = mutableMapOf(
     "preventBlockBreak" to ActionDisplayBundle(
         "Prevent Block Break",
         XMaterial.BARRIER
+    ),
+    "kill" to ActionDisplayBundle(
+        "Kill Player",
+        XMaterial.SKELETON_SKULL
+    ),
+    "feed" to ActionDisplayBundle(
+        "Feed Player",
+        XMaterial.COOKED_BEEF
+    ),
+    "starve" to ActionDisplayBundle(
+        "Starve Player",
+        XMaterial.ROTTEN_FLESH
+    ),
+    "clearInventory" to ActionDisplayBundle(
+        "Clear Inventory",
+        XMaterial.CAULDRON
+    ),
+    "dropInventory" to ActionDisplayBundle(
+        "Drop Inventory",
+        XMaterial.DROPPER
+    ),
+    "removePotionEffects" to ActionDisplayBundle(
+        "Remove Potion Effects",
+        XMaterial.MILK_BUCKET
+    ),
+    "burn" to ActionDisplayBundle(
+        "Burn Player",
+        XMaterial.BLAZE_POWDER
+    ),
+    "extinguish" to ActionDisplayBundle(
+        "Extinguish Player",
+        XMaterial.WATER_BUCKET
+    ),
+    "cancelEvent" to ActionDisplayBundle(
+        "Cancel Event",
+        XMaterial.REDSTONE_BLOCK
     )
 )
 

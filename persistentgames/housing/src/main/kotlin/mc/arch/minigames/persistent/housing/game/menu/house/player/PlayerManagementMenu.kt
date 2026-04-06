@@ -69,7 +69,11 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
                 .toButton { _, click ->
                     if (click!!.isLeftClick)
                     {
-
+                        if (house.owner == player.uniqueId || house.hasPermission(player.uniqueId, "house.manage")) {
+                            PlayerRoleAssignMenu(house, other.uniqueId).openMenu(player)
+                        } else {
+                            player.sendMessage("${CC.RED}You do not have permission to manage roles!")
+                        }
                     }
 
                     // don't let people ban or kick themselves
