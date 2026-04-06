@@ -35,7 +35,7 @@ class PlayerRoleAssignMenu(val house: PlayerHouse, val targetUuid: UUID) : Pagin
         val currentRole = house.getRole(targetUuid)
 
         house.roles.values.forEach { role ->
-            buttons[buttons.size] = ItemBuilder.of(RoleEditorMenu.getMaterialForRole(role.weight))
+            buttons[buttons.size] = ItemBuilder.of(RoleEditorMenu.getWoolForColor(role.color))
                 .name(role.coloredName())
                 .addToLore(
                     "",
@@ -48,11 +48,11 @@ class PlayerRoleAssignMenu(val house: PlayerHouse, val targetUuid: UUID) : Pagin
                         } else {
                             house.playerRoles[targetUuid] = role.id
                         }
-                        
+
                         house.save()
                         player.sendMessage("${CC.GREEN}Successfully assigned ${role.coloredName()} ${CC.GREEN}to the player!")
                     }
-                    
+
                     PlayerManagementMenu(house).openMenu(player)
                 }
         }

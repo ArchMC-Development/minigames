@@ -19,6 +19,31 @@ class RoleEditorMenu(val house: PlayerHouse) : PaginatedMenu()
         placeholdBorders = true
     }
 
+    companion object
+    {
+        fun getWoolForColor(colorCode: String): XMaterial {
+            return when (colorCode.replace("&", "")) {
+                "0" -> XMaterial.BLACK_WOOL
+                "1" -> XMaterial.BLUE_WOOL
+                "2" -> XMaterial.GREEN_WOOL
+                "3" -> XMaterial.CYAN_WOOL
+                "4" -> XMaterial.RED_WOOL
+                "5" -> XMaterial.PURPLE_WOOL
+                "6" -> XMaterial.ORANGE_WOOL
+                "7" -> XMaterial.LIGHT_GRAY_WOOL
+                "8" -> XMaterial.GRAY_WOOL
+                "9" -> XMaterial.BLUE_WOOL
+                "a" -> XMaterial.LIME_WOOL
+                "b" -> XMaterial.LIGHT_BLUE_WOOL
+                "c" -> XMaterial.RED_WOOL
+                "d" -> XMaterial.PINK_WOOL
+                "e" -> XMaterial.YELLOW_WOOL
+                "f" -> XMaterial.WHITE_WOOL
+                else -> XMaterial.WHITE_WOOL
+            }
+        }
+    }
+
     override fun size(buttons: Map<Int, Button>) = 27
     override fun getMaxItemsPerPage(player: Player) = 9
     override fun getAllPagesButtonSlots() = (10..18).toList()
@@ -75,28 +100,6 @@ class RoleEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                          RoleEditorMenu(house).openMenu(player)
                     }
                 }
-        }
-    }
-
-    fun getWoolForColor(colorCode: String): XMaterial {
-        return when (colorCode.replace("&", "")) {
-            "0" -> XMaterial.BLACK_WOOL
-            "1" -> XMaterial.BLUE_WOOL
-            "2" -> XMaterial.GREEN_WOOL
-            "3" -> XMaterial.CYAN_WOOL
-            "4" -> XMaterial.RED_WOOL
-            "5" -> XMaterial.PURPLE_WOOL
-            "6" -> XMaterial.ORANGE_WOOL
-            "7" -> XMaterial.LIGHT_GRAY_WOOL
-            "8" -> XMaterial.GRAY_WOOL
-            "9" -> XMaterial.BLUE_WOOL
-            "a" -> XMaterial.LIME_WOOL
-            "b" -> XMaterial.LIGHT_BLUE_WOOL
-            "c" -> XMaterial.RED_WOOL
-            "d" -> XMaterial.PINK_WOOL
-            "e" -> XMaterial.YELLOW_WOOL
-            "f" -> XMaterial.WHITE_WOOL
-            else -> XMaterial.WHITE_WOOL
         }
     }
 }
