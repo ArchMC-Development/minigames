@@ -18,6 +18,10 @@ import mc.arch.minigames.parties.PartiesPlugin
 import mc.arch.minigames.parties.model.Party
 import mc.arch.minigames.parties.model.PartyMember
 import mc.arch.minigames.parties.model.PartyRole
+import gg.tropic.practice.ugc.HostedWorldRPC
+import gg.tropic.practice.ugc.generation.addplayer.AddPlayerRequest
+import gg.tropic.practice.persistence.RedisShared
+import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
 import mc.arch.minigames.parties.service.event.PartyCreateEvent
 import mc.arch.minigames.parties.service.event.PartyDisbandEvent
 import mc.arch.minigames.parties.service.event.PartyUpdateEvent
@@ -159,6 +163,8 @@ object NetworkPartyService : PartyService
                 ?: return@listen
 
             val server = retrieve<String>("server")
+            val instanceId = retrieve<String?>("instance-id")
+
             for (uuid in party.members.keys)
             {
                 val bukkitPlayer = Bukkit
@@ -166,10 +172,26 @@ object NetworkPartyService : PartyService
                     ?: continue
 
                 bukkitPlayer.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}")
-                bukkitPlayer.sendMessage("${CC.GREEN}Your party is being warped to ${CC.GOLD}$server${CC.GREEN}!")
+                bukkitPlayer.sendMessage("${CC.GREEN}Your party is being warped to ${CC.GOLD}${if (instanceId != null) "a Realm" else server}${CC.GREEN}!")
                 bukkitPlayer.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}")
 
-                VelocityRedirectSystem.redirect(bukkitPlayer, server)
+                if (instanceId != null)
+                {
+                    HostedWorldRPC.visitWorldAddPlayerRPCService
+                        .call(
+                            AddPlayerRequest(
+                                globalWorldId = UUID.fromString(instanceId),
+                                server = server,
+                                visitingPlayers = setOf(uuid)
+                            )
+                        )
+                        .thenAccept {
+                            RedisShared.redirect(listOf(uuid), server)
+                        }
+                } else
+                {
+                    VelocityRedirectSystem.redirect(bukkitPlayer, server)
+                }
             }
         }
 
@@ -268,11 +290,15 @@ object NetworkPartyService : PartyService
 
     override fun warpPartyHere(party: Party)
     {
+        val leader = Bukkit.getPlayer(party.leader.uniqueId)
+        val house = leader?.getPlayerHouseFromInstance()
+
         AwareMessage.of(
             packet = "warp",
             aware = sync,
             "uniqueId" to party.uniqueId,
             "server" to ServerSync.local.id,
+            "instance-id" to house?.identifier?.toString()
         ).publish(
             context = AwareThreadContext.ASYNC
         )
