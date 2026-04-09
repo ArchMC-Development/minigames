@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import java.util.*
 import java.util.logging.Level
+import okio.withLock
 
 /**
  * @author GrowlyX
@@ -144,6 +145,23 @@ object ExpectationService
                         AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST,
                         "${CC.RED}You do not have a game to join!"
                     )
+
+                // Safety cleanup: remove player from any OTHER game's player list they shouldn't be in.
+                // This catches stale references from race conditions in the matchmaking pipeline.
+                GameService.gameMappings.values
+                    .filter { it.identifier != game.identifier }
+                    .forEach { otherGame ->
+                        if (event.uniqueId in otherGame.toPlayers())
+                        {
+                            otherGame.teamMutLock.withLock {
+                                otherGame.expectationModel.players -= event.uniqueId
+                                otherGame.getNullableTeamOfID(event.uniqueId)?.players?.remove(event.uniqueId)
+                            }
+                            plugin.logger.warning(
+                                "[double-match-fix] Cleaned up stale player reference: ${event.uniqueId} was in game ${otherGame.identifier} but logging into game ${game.identifier}"
+                            )
+                        }
+                    }
 
                 if (game.state(GameState.Playing) && event.uniqueId !in game.expectedSpectators && game.miniGameLifecycle != null)
                 {

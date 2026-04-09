@@ -165,6 +165,23 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         val preferredRegion = if (targetEntry.data.preferredQueueRegion == Region.Both)
             Region.NA else targetEntry.data.preferredQueueRegion
 
+        // Guard: check if any players in this entry are already in a game reference
+        val alreadyInGame = GameManager.allGames().any { gameRef ->
+            targetEntry.data.players.any { it in gameRef.players }
+        }
+
+        if (alreadyInGame)
+        {
+            RedisShared.sendMessage(
+                targetEntry.data.players,
+                listOf(
+                    "&cYou were removed from the queue as you are already in a game!"
+                )
+            )
+
+            return listOf(targetEntry.data)
+        }
+
         // Private games always create new instances - skip joining existing games
         val isPrivateGame = targetEntry.data.miniGameQueueConfiguration?.isPrivateGame == true
 

@@ -59,6 +59,25 @@ class MiniGameJoinIntoGameHandler : RPCHandler<JoinIntoGameRequest, JoinIntoGame
                 status = JoinIntoGameStatus.FAILED_ALREADY_STARTED
             } else
             {
+                // Guard: reject if any player is already in a different game on this server
+                val alreadyInGame = request.players.filter { playerId ->
+                    GameService.gameMappings.values.any { existingGame ->
+                        existingGame.identifier != request.game.uniqueId &&
+                            playerId in existingGame.toPlayers()
+                    }
+                }
+
+                if (alreadyInGame.isNotEmpty())
+                {
+                    span?.setData("failure_reason", "players_already_in_game")
+                    span?.setData("conflicting_players", alreadyInGame.size)
+                    span?.status = SpanStatus.ABORTED
+                    span?.finish()
+
+                    context.reply(JoinIntoGameResult(status = JoinIntoGameStatus.FAILED_ALREADY_STARTED))
+                    return
+                }
+
                 val teamAssignSpan = span?.startChild("team_assignment", "assign_players")
                 gameImpl.teamMutLock.withLock {
                     val maxPlayersPerTeam = gameImpl.miniGameLifecycle!!.configuration.maximumPlayersPerTeam
