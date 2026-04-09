@@ -1653,6 +1653,25 @@ object GameService
                         return@handler
                     }
                 }
+
+                // Prevent fishing rod hits from degrading armor durability.
+                // Snapshot each armor piece's durability and restore it on the next tick.
+                val victim = event.entity as Player
+                val armorDurabilities = victim.inventory.armorContents
+                    .map { it?.durability }
+
+                Tasks.delayed(1L) {
+                    if (Bukkit.getPlayer(victim.uniqueId) == null) return@delayed
+
+                    val armorContents = victim.inventory.armorContents
+                    armorDurabilities.forEachIndexed { index, durability ->
+                        if (durability != null && armorContents[index] != null)
+                        {
+                            armorContents[index].durability = durability
+                        }
+                    }
+                    victim.inventory.armorContents = armorContents
+                }
             }
             .bindWith(plugin)
 
