@@ -37,6 +37,22 @@ class GameStartTask(
 
     override fun run()
     {
+        // Safety guard: abort if any expected player disconnected during countdown.
+        // Without this, the game can enter Playing state with missing players
+        // (showing as "0 ms" on the scoreboard with the opponent invisible).
+        if (game.miniGameLifecycle == null)
+        {
+            val presentCount = game.toBukkitPlayers().filterNotNull().size
+            val expectedCount = game.toPlayers().size
+            if (presentCount != expectedCount)
+            {
+                game.state = GameState.Completed
+                game.closeAndCleanup()
+                task.closeAndReportException()
+                return
+            }
+        }
+
         if (this.game.currentGameStartCountdown >= 5)
         {
             this.game.state = GameState.Starting

@@ -183,6 +183,7 @@ object MapReplicationService
         {
             if (
                 game.humanSide().toBukkitPlayers().all { it != null } &&
+                game.humanSide().players.all { it in game.readyPlayers } &&
                 game.robotInstance.isNotEmpty()
             )
             {
@@ -192,11 +193,15 @@ object MapReplicationService
             return false
         }
 
+        // Require both Bukkit.getPlayer() non-null AND PlayerJoinEvent to have fired.
+        // Bukkit.getPlayer() can return non-null during the login handshake before
+        // the player is fully connected, causing the "ghost player" / "0 ms" bug.
         if (
             game.toBukkitPlayers()
                 .none { other ->
                     other == null
-                }
+                } &&
+            game.toPlayers().all { it in game.readyPlayers }
         )
         {
             game.initializeAndStart()

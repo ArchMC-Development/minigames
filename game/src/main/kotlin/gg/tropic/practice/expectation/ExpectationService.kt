@@ -245,6 +245,10 @@ object ExpectationService
             )
             .handler {
                 GameService.spectatorToGameMappings.remove(it.player.uniqueId)
+
+                // Clean up readyPlayers tracking before removing the mapping
+                GameService.byPlayer(it.player)?.readyPlayers?.remove(it.player.uniqueId)
+
                 GameService.playerToGameMappings.remove(it.player.uniqueId)
                 PlayerRespawnTask.cancel(it.player.uniqueId)
 
@@ -454,6 +458,11 @@ object ExpectationService
                             robot.participantConnected(it.player)
                         }
                     }
+
+                    // Mark the player as fully connected and ready.
+                    // startIfReady() checks this set instead of just Bukkit.getPlayer() to avoid
+                    // starting the game before the player has fully loaded in.
+                    game.readyPlayers += it.player.uniqueId
 
                     Bukkit.getPluginManager().callEvent(PlayerJoinGameEvent(game, it.player))
                     if (!isRejoiningGame)

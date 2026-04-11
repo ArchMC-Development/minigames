@@ -157,6 +157,14 @@ open class GameImpl(
 
     val pendingLogins = ConcurrentHashMap<UUID, Long>()
 
+    /**
+     * Tracks players who have fully connected and fired [PlayerJoinEvent].
+     * This is used by [MapReplicationService.startIfReady] to avoid starting the game
+     * when [Bukkit.getPlayer] returns non-null during the login handshake but the player
+     * hasn't actually loaded in yet (causing the "ghost player" / "0 ms" bug).
+     */
+    val readyPlayers: MutableSet<UUID> = ConcurrentHashMap.newKeySet()
+
     fun loadout(player: Player) = selectedKitLoadouts[player.uniqueId] ?: defaultLoadout
 
     fun takeSnapshot(player: Player)
