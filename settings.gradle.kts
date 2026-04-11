@@ -54,5 +54,8 @@ include(
     "minigames:miniwalls-lobby",
     "minigames:miniwalls-shared",
 
+    "minigames:hunger-games",
+    "minigames:hunger-games-shared",
+
     "spigot-integration"
 )
