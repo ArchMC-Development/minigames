@@ -16,9 +16,9 @@ enum class HungerGamesMode(
     SOLO_NORMAL("Solo Normal", QueueType.Casual, MiniProviderVersion.LEGACY)
     {
         override val teamSize = 1
-        override val teamCount = 24
+        override val teamCount = 16
 
-        override fun maxPlayers() = 24
+        override fun maxPlayers() = 16
     },
     DOUBLES_NORMAL("Doubles Normal", QueueType.Casual, MiniProviderVersion.LEGACY)
     {

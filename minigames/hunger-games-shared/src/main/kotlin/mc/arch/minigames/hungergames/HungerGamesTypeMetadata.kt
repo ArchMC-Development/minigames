@@ -18,7 +18,7 @@ object HungerGamesTypeMetadata : MiniGameTypeMetadata(
             id = "solo_normal",
             queueId = "sg_solo_normal:Casual:1v1",
             displayName = "Solo Normal",
-            description = "Classic 24-player Survival Games!",
+            description = "Classic 16-player Survival Games!",
             displayItem = XMaterial.IRON_SWORD.parseItem()!!,
             mapGroup = "sg_solo_normal",
             kitID = "sg_solo_normal",
