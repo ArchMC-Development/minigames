@@ -19,6 +19,7 @@ class SelectKitMenu : Menu("Select a Kit...")
 
     init
     {
+        placeholder = true
         shouldLoadInSync()
     }
 
@@ -37,7 +38,7 @@ class SelectKitMenu : Menu("Select a Kit...")
                     "${CC.GRAY}Purchase levels to unlock them!",
                     "",
                     "${CC.I_WHITE}Left-Click a kit to select it!",
-                    "${CC.I_WHITE}Right-Click a kit to view contents!"
+                    "${CC.I_WHITE}Right-Click a kit to view levels!"
                 )
                 .toButton()
         )
@@ -66,7 +67,7 @@ class SelectKitMenu : Menu("Select a Kit...")
             }
                 .name("${CC.GREEN}${kit.displayName}")
                 .addToLore(
-                    "${CC.GRAY}Levels Owned: ${CC.WHITE}$highestOwned${CC.GRAY}/$totalLevels",
+                    "${CC.GRAY}Levels Owned: ${CC.WHITE}$highestOwned${CC.GRAY}/${CC.WHITE}$totalLevels",
                 )
                 .apply {
                     if (isSelected)
@@ -82,8 +83,8 @@ class SelectKitMenu : Menu("Select a Kit...")
                     {
                         addToLore(
                             "",
-                            "${CC.GOLD}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
-                            "${CC.GOLD}Cost: ${CC.YELLOW}${Numbers.format(nextUnownedLevel.value.price)} Coins"
+                            "${CC.GRAY}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
+                            "${CC.GRAY}Cost: ${CC.GOLD}${Numbers.format(nextUnownedLevel.value.price)} Coins"
                         )
                     } else
                     {
@@ -96,7 +97,7 @@ class SelectKitMenu : Menu("Select a Kit...")
                 .addToLore(
                     "",
                     "${CC.YELLOW}Left-Click to select!",
-                    "${CC.AQUA}Right-Click to view contents!"
+                    "${CC.AQUA}Right-Click to view levels!"
                 )
                 .toButton { _, click ->
                     if (click?.isRightClick == true)

@@ -33,6 +33,7 @@ class ViewKitContentsMenu(
 
     init
     {
+        placeholder = true
         shouldLoadInSync()
     }
 
@@ -59,9 +60,8 @@ class ViewKitContentsMenu(
                 "",
                 "${CC.GRAY}Levels: ${CC.WHITE}${kit.levels.size}",
                 "",
-                "${CC.GOLD}Your Balance: ${
-                    if (economy != null) economy.format(balance) 
-                    else "${CC.YELLOW}${Numbers.format(balance)} Coins"
+                "${CC.GRAY}Your Balance: ${
+                    economy?.format(balance) ?: "${CC.GOLD}${Numbers.format(balance)} Coins"
                 }",
             )
             .apply {
@@ -115,14 +115,13 @@ class ViewKitContentsMenu(
                         loreLines.add("")
                     } else
                     {
-                        loreLines.add("${CC.RED}🔒 Locked")
-                        loreLines.add("${CC.GOLD}Price: ${CC.YELLOW}${Numbers.format(price)} Coins")
+                        loreLines.add("${CC.GRAY}Price: ${CC.GOLD}${Numbers.format(price)} Coins")
                         if (balance >= price)
                         {
                             loreLines.add("${CC.GREEN}You can afford this!")
                         } else
                         {
-                            loreLines.add("${CC.RED}You need ${Numbers.format(price - balance)} more coins!")
+                            loreLines.add("${CC.RED}You need ${CC.YELLOW}${Numbers.format(price - balance)} ${CC.RED}more coins!")
                         }
                         loreLines.add("")
                     }
@@ -130,6 +129,7 @@ class ViewKitContentsMenu(
                     // Show armor contents
                     val armorNames = listOf("Helmet", "Chestplate", "Leggings", "Boots")
                     val armorItems = kitLevel.armor
+                        .reversed()
                         .mapIndexed { i, item -> armorNames[i] to item }
                         .filter { it.second != null && it.second!!.type != XMaterial.AIR.parseMaterial() }
 
