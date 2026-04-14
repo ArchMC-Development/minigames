@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
  */
 class SelectKitMenu : Menu("Select a Kit...")
 {
-    override fun size(buttons: Map<Int, Button>) = 45
+    override fun size(buttons: Map<Int, Button>) = 27
 
     init
     {
@@ -43,7 +43,7 @@ class SelectKitMenu : Menu("Select a Kit...")
         )
 
         val profile = HungerGamesProfileService.find(player)
-        val slots = (10..16) + (19..25) + (28..34)
+        val slots = (10..16)
         val kits = HungerGamesKitDataSync.cached().kits.values.toList()
 
         slots.withIndex().forEach { slot ->
