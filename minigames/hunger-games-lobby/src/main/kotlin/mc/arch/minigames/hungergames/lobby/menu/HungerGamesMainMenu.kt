@@ -2,9 +2,7 @@ package mc.arch.minigames.hungergames.lobby.menu
 
 import com.cryptomorin.xseries.XMaterial
 import gg.tropic.practice.menu.StatisticsMenu
-import gg.tropic.practice.minigame.joinGame
 import gg.tropic.practice.profile.PracticeProfileService
-import mc.arch.minigames.hungergames.HungerGamesTypeMetadata
 import mc.arch.minigames.hungergames.kits.menu.SelectKitMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -36,14 +34,7 @@ class HungerGamesMainMenu : Menu("Survival Games Menu")
                 "${CC.GREEN}Click to start playing!"
             )
             .toButton { _, _ ->
-                player.closeInventory()
-                player.sendMessage("${CC.GRAY}Finding a game for you to join...")
-
-                HungerGamesTypeMetadata
-                    .computeGameTypeRequiringPlayers()
-                    .thenAccept { metadata ->
-                        metadata.joinGame(player)
-                    }
+                HungerGamesQuickJoinMenu().openMenu(player)
             },
         13 to ItemBuilder
             .of(XMaterial.NETHER_STAR)
