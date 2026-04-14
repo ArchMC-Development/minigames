@@ -34,18 +34,21 @@ class SelectKitMenu : Menu("Select a Kit...")
                     "${CC.GRAY}Each kit has multiple levels.",
                     "${CC.GRAY}Higher levels give better gear.",
                     "",
-                    "${CC.I_WHITE}Select a kit by clicking",
-                    "${CC.I_WHITE}the items below!"
+                    "${CC.I_WHITE}Left-Click a kit to select it!",
+                    "${CC.I_WHITE}Right-Click a kit to view contents!"
                 )
                 .toButton()
         )
 
+        val profile = HungerGamesProfileService.find(player)
         val slots = (10..16) + (19..25) + (28..34)
         val kits = HungerGamesKitDataSync.cached().kits.values.toList()
 
         slots.withIndex().forEach { slot ->
             val kit = kits.getOrNull(slot.index)
                 ?: return@forEach
+
+            val isSelected = profile?.selectedKit == kit.id
 
             buttons[slot.value] = runCatching {
                 ItemBuilder.copyOf(kit.icon)
@@ -55,18 +58,37 @@ class SelectKitMenu : Menu("Select a Kit...")
                 .name("${CC.GREEN}${kit.displayName}")
                 .addToLore(
                     "${CC.GRAY}Levels: ${kit.levels.size}",
-                    "",
-                    "${CC.YELLOW}Click to select!"
                 )
-                .toButton { _, _ ->
-                    val profile = HungerGamesProfileService.find(player)
+                .apply {
+                    if (isSelected)
+                    {
+                        addToLore(
+                            "",
+                            "${CC.GREEN}✔ Currently Selected",
+                            "${CC.GRAY}Level: ${CC.WHITE}${profile?.selectedKitLevel ?: 1}"
+                        )
+                    }
+                }
+                .addToLore(
+                    "",
+                    "${CC.YELLOW}Left-Click to select!",
+                    "${CC.AQUA}Right-Click to view contents!"
+                )
+                .toButton { _, click ->
+                    if (click?.isRightClick == true)
+                    {
+                        ViewKitContentsMenu(kit).openMenu(player)
+                        return@toButton
+                    }
+
+                    val prof = HungerGamesProfileService.find(player)
                         ?: return@toButton
 
                     Button.playNeutral(player)
 
-                    profile.selectedKit = kit.id
-                    profile.selectedKitLevel = 1
-                    profile.save()
+                    prof.selectedKit = kit.id
+                    prof.selectedKitLevel = 1
+                    prof.save()
 
                     player.sendMessage("${CC.GREEN}You selected the ${CC.GOLD}${kit.displayName}${CC.GREEN} kit!")
                     player.closeInventory()
@@ -76,3 +98,4 @@ class SelectKitMenu : Menu("Select a Kit...")
         return buttons
     }
 }
+
