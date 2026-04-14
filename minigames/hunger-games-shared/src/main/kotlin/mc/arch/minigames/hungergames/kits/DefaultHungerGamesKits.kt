@@ -125,10 +125,29 @@ object DefaultHungerGamesKits
     private val LOOTING = Enchantment.LOOT_BONUS_MOBS
     private val RESPIRATION = Enchantment.OXYGEN
 
-    private fun level(level: Int, armor: Array<ItemStack?>, inventory: Array<ItemStack?>): Pair<Int, HungerGamesKitLevel>
+    /**
+     * Default price curve for kit levels.
+     * Level 1 is free, higher levels cost progressively more.
+     */
+    private val DEFAULT_LEVEL_PRICES = mapOf(
+        1 to 0L,
+        2 to 500L,
+        3 to 1_000L,
+        4 to 2_500L,
+        5 to 5_000L,
+        6 to 10_000L
+    )
+
+    private fun level(
+        level: Int,
+        armor: Array<ItemStack?>,
+        inventory: Array<ItemStack?>,
+        price: Long = DEFAULT_LEVEL_PRICES[level] ?: (level * 2_000L)
+    ): Pair<Int, HungerGamesKitLevel>
     {
         return level to HungerGamesKitLevel(
             level = level,
+            price = price,
             armor = armor,
             inventory = inventory
         )

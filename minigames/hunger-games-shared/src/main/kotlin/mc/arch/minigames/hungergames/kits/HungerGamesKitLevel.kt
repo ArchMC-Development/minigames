@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack
  */
 data class HungerGamesKitLevel(
     val level: Int,
+    var price: Long = 0L,
     var armor: Array<ItemStack?> = arrayOfNulls(4),
     var inventory: Array<ItemStack?> = arrayOfNulls(36)
 )

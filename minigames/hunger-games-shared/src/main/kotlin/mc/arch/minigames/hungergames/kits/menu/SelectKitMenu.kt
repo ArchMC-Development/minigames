@@ -7,6 +7,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.entity.Player
 
 /**
@@ -33,6 +34,7 @@ class SelectKitMenu : Menu("Select a Kit...")
                     "",
                     "${CC.GRAY}Each kit has multiple levels.",
                     "${CC.GRAY}Higher levels give better gear.",
+                    "${CC.GRAY}Purchase levels to unlock them!",
                     "",
                     "${CC.I_WHITE}Left-Click a kit to select it!",
                     "${CC.I_WHITE}Right-Click a kit to view contents!"
@@ -49,6 +51,13 @@ class SelectKitMenu : Menu("Select a Kit...")
                 ?: return@forEach
 
             val isSelected = profile?.selectedKit == kit.id
+            val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
+            val totalLevels = kit.levels.size
+
+            // Find the next level the player can buy
+            val nextUnownedLevel = kit.levels.entries
+                .sortedBy { it.key }
+                .firstOrNull { profile?.hasKit(kit.id, it.key) != true }
 
             buttons[slot.value] = runCatching {
                 ItemBuilder.copyOf(kit.icon)
@@ -57,7 +66,7 @@ class SelectKitMenu : Menu("Select a Kit...")
             }
                 .name("${CC.GREEN}${kit.displayName}")
                 .addToLore(
-                    "${CC.GRAY}Levels: ${kit.levels.size}",
+                    "${CC.GRAY}Levels Owned: ${CC.WHITE}$highestOwned${CC.GRAY}/$totalLevels",
                 )
                 .apply {
                     if (isSelected)
@@ -66,6 +75,21 @@ class SelectKitMenu : Menu("Select a Kit...")
                             "",
                             "${CC.GREEN}✔ Currently Selected",
                             "${CC.GRAY}Level: ${CC.WHITE}${profile?.selectedKitLevel ?: 1}"
+                        )
+                    }
+
+                    if (nextUnownedLevel != null)
+                    {
+                        addToLore(
+                            "",
+                            "${CC.GOLD}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
+                            "${CC.GOLD}Cost: ${CC.YELLOW}${Numbers.format(nextUnownedLevel.value.price)} Coins"
+                        )
+                    } else
+                    {
+                        addToLore(
+                            "",
+                            "${CC.GREEN}✔ All levels unlocked!"
                         )
                     }
                 }
@@ -81,16 +105,20 @@ class SelectKitMenu : Menu("Select a Kit...")
                         return@toButton
                     }
 
+                    // Left-click: select kit at the highest owned level
                     val prof = HungerGamesProfileService.find(player)
                         ?: return@toButton
 
                     Button.playNeutral(player)
 
+                    val selectLevel = prof.highestOwnedLevel(kit.id, kit.maxLevel())
                     prof.selectedKit = kit.id
-                    prof.selectedKitLevel = 1
+                    prof.selectedKitLevel = selectLevel
                     prof.save()
 
-                    player.sendMessage("${CC.GREEN}You selected the ${CC.GOLD}${kit.displayName}${CC.GREEN} kit!")
+                    player.sendMessage(
+                        "${CC.GREEN}You selected the ${CC.GOLD}${kit.displayName}${CC.GREEN} kit at level ${CC.GOLD}$selectLevel${CC.GREEN}!"
+                    )
                     player.closeInventory()
                 }
         }
@@ -98,4 +126,3 @@ class SelectKitMenu : Menu("Select a Kit...")
         return buttons
     }
 }
-

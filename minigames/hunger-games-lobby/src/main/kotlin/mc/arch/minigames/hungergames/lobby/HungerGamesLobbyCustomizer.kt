@@ -4,6 +4,8 @@ import com.cryptomorin.xseries.XMaterial
 import gg.scala.basics.plugin.profile.BasicsProfileService
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
+import gg.tropic.game.extensions.economy.EconomyDataSync
+import gg.tropic.game.extensions.economy.EconomyProfileService
 import gg.tropic.game.extensions.profile.CorePlayerProfileService
 import gg.tropic.practice.extensions.createProgressBar
 import gg.tropic.practice.extensions.toShortString
@@ -97,6 +99,19 @@ object HungerGamesLobbyCustomizer : MinigameLobbyCustomizer, MinigameLobbyScoreb
                 )
             }"
         )
+
+        // Coin balance
+        val economyProfile = EconomyProfileService.find(player)
+        if (economyProfile != null)
+        {
+            val economy = EconomyDataSync.cached().economies["hunger-games-coins"]
+            if (economy != null)
+            {
+                lines += "${CC.D_RED}${Constants.THIN_VERTICAL_LINE} ${CC.GRAY}Coins: ${
+                    economy.format(economyProfile.balance("hunger-games-coins"))
+                }"
+            }
+        }
 
         val view = BasicsProfileService.find(player)
             ?.setting(

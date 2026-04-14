@@ -1,6 +1,13 @@
 package mc.arch.minigames.hungergames.kits.menu
 
 import com.cryptomorin.xseries.XMaterial
+import gg.tropic.game.extensions.economy.Accounts
+import gg.tropic.game.extensions.economy.EconomyDataSync
+import gg.tropic.game.extensions.economy.EconomyProfileService
+import gg.tropic.game.extensions.economy.Transaction
+import gg.tropic.game.extensions.economy.TransactionResult
+import gg.tropic.game.extensions.economy.TransactionService
+import gg.tropic.game.extensions.economy.TransactionType
 import mc.arch.minigames.hungergames.kits.HungerGamesKit
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
 import me.lucko.helper.Schedulers
@@ -8,6 +15,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -18,6 +26,11 @@ class ViewKitContentsMenu(
     private val kit: HungerGamesKit
 ) : Menu("${kit.displayName} - Kit Contents")
 {
+    companion object
+    {
+        private const val ECONOMY_ID = "hunger-games-coins"
+    }
+
     init
     {
         shouldLoadInSync()
@@ -31,6 +44,11 @@ class ViewKitContentsMenu(
         val profile = HungerGamesProfileService.find(player)
         val isSelected = profile?.selectedKit == kit.id
 
+        // Get economy info for balance display
+        val economy = EconomyDataSync.cached().economies[ECONOMY_ID]
+        val economyProfile = EconomyProfileService.find(player)
+        val balance = economyProfile?.balance(ECONOMY_ID) ?: 0L
+
         // Header info item
         buttons[4] = ItemBuilder
             .of(XMaterial.BOOK)
@@ -40,6 +58,11 @@ class ViewKitContentsMenu(
                 "${CC.GRAY}each level of this kit.",
                 "",
                 "${CC.GRAY}Levels: ${CC.WHITE}${kit.levels.size}",
+                "",
+                "${CC.GOLD}Your Balance: ${
+                    if (economy != null) economy.format(balance) 
+                    else "${CC.YELLOW}${Numbers.format(balance)} Coins"
+                }",
             )
             .apply {
                 if (isSelected)
@@ -52,34 +75,55 @@ class ViewKitContentsMenu(
             }
             .addToLore(
                 "",
-                "${CC.I_WHITE}Click a level to select",
-                "${CC.I_WHITE}the kit at that level!"
+                "${CC.I_WHITE}Click a level to select or",
+                "${CC.I_WHITE}purchase it!"
             )
             .toButton()
 
-        // Level buttons - lay them out in the body of the menu
+        // Level buttons
         val slots = (10..16) + (19..25) + (28..34)
         val sortedLevels = kit.levels.entries.sortedBy { it.key }
 
         sortedLevels.forEachIndexed { index, (level, kitLevel) ->
             if (index >= slots.size) return@forEachIndexed
 
+            val isOwned = profile?.hasKit(kit.id, level) ?: (level <= 1)
             val isSelectedLevel = isSelected && profile?.selectedKitLevel == level
+            val price = kitLevel.price
 
             buttons[slots[index]] = runCatching {
                 ItemBuilder.copyOf(kit.icon)
             }.getOrElse {
                 ItemBuilder.of(XMaterial.BARRIER)
             }
-                .name("${CC.GOLD}Level $level")
+                .name(
+                    if (isOwned) "${CC.GREEN}Level $level"
+                    else "${CC.RED}Level $level ${CC.GRAY}(Locked)"
+                )
                 .amount(level.coerceIn(1, 64))
                 .apply {
                     val loreLines = mutableListOf<String>()
 
-                    // Show selected indicator
+                    // Show ownership/selection status
                     if (isSelectedLevel)
                     {
                         loreLines.add("${CC.GREEN}✔ Selected")
+                        loreLines.add("")
+                    } else if (isOwned)
+                    {
+                        loreLines.add("${CC.GREEN}✔ Owned")
+                        loreLines.add("")
+                    } else
+                    {
+                        loreLines.add("${CC.RED}🔒 Locked")
+                        loreLines.add("${CC.GOLD}Price: ${CC.YELLOW}${Numbers.format(price)} Coins")
+                        if (balance >= price)
+                        {
+                            loreLines.add("${CC.GREEN}You can afford this!")
+                        } else
+                        {
+                            loreLines.add("${CC.RED}You need ${Numbers.format(price - balance)} more coins!")
+                        }
                         loreLines.add("")
                     }
 
@@ -106,8 +150,6 @@ class ViewKitContentsMenu(
                     if (inventoryItems.isNotEmpty())
                     {
                         loreLines.add("${CC.YELLOW}Items:")
-
-                        // Group duplicate items and show count
                         val grouped = inventoryItems.groupBy { formatItemName(it) }
                         grouped.forEach { (name, items) ->
                             val totalAmount = items.sumOf { it.amount }
@@ -132,9 +174,12 @@ class ViewKitContentsMenu(
                     if (isSelectedLevel)
                     {
                         loreLines.add("${CC.GREEN}Currently selected!")
-                    } else
+                    } else if (isOwned)
                     {
                         loreLines.add("${CC.YELLOW}Click to select this level!")
+                    } else
+                    {
+                        loreLines.add("${CC.GOLD}Click to purchase for ${CC.YELLOW}${Numbers.format(price)} Coins${CC.GOLD}!")
                     }
 
                     setLore(loreLines)
@@ -143,22 +188,85 @@ class ViewKitContentsMenu(
                     val prof = HungerGamesProfileService.find(player)
                         ?: return@toButton
 
-                    Button.playNeutral(player)
+                    if (prof.hasKit(kit.id, level))
+                    {
+                        // Already owned — select it
+                        Button.playNeutral(player)
 
-                    prof.selectedKit = kit.id
-                    prof.selectedKitLevel = level
-                    prof.save()
+                        prof.selectedKit = kit.id
+                        prof.selectedKitLevel = level
+                        prof.save()
 
-                    player.sendMessage(
-                        "${CC.GREEN}You selected ${CC.GOLD}${kit.displayName}${CC.GREEN} at level ${CC.GOLD}$level${CC.GREEN}!"
-                    )
+                        player.sendMessage(
+                            "${CC.GREEN}You selected ${CC.GOLD}${kit.displayName}${CC.GREEN} at level ${CC.GOLD}$level${CC.GREEN}!"
+                        )
 
-                    // Refresh menu to update selection indicators
-                    Schedulers
-                        .sync()
-                        .runLater({
+                        Schedulers.sync().runLater({
                             ViewKitContentsMenu(kit).openMenu(player)
                         }, 1L)
+                    } else
+                    {
+                        // Need to purchase
+                        val currentBalance = EconomyProfileService.find(player)
+                            ?.balance(ECONOMY_ID) ?: 0L
+
+                        if (currentBalance < price)
+                        {
+                            Button.playFail(player)
+                            player.sendMessage(
+                                "${CC.RED}You don't have enough coins! You need ${CC.GOLD}${
+                                    Numbers.format(price - currentBalance)
+                                }${CC.RED} more coins."
+                            )
+                            return@toButton
+                        }
+
+                        // Check previous levels are owned
+                        val previousLevel = level - 1
+                        if (previousLevel > 1 && !prof.hasKit(kit.id, previousLevel))
+                        {
+                            Button.playFail(player)
+                            player.sendMessage(
+                                "${CC.RED}You must purchase level ${CC.GOLD}$previousLevel${CC.RED} first!"
+                            )
+                            return@toButton
+                        }
+
+                        // Submit purchase transaction
+                        TransactionService.submit(
+                            Transaction(
+                                sender = player.uniqueId,
+                                receiver = Accounts.SERVER,
+                                type = TransactionType.Purchase,
+                                economy = ECONOMY_ID,
+                                amount = price
+                            )
+                        ).thenAccept { result ->
+                            if (result != TransactionResult.Success)
+                            {
+                                player.sendMessage("${CC.RED}Transaction failed! Please try again.")
+                                return@thenAccept
+                            }
+
+                            // Unlock the kit level
+                            prof.unlockKit(kit.id, level)
+                            prof.selectedKit = kit.id
+                            prof.selectedKitLevel = level
+                            prof.save()
+
+                            Button.playNeutral(player)
+                            player.sendMessage(
+                                "${CC.GREEN}You purchased ${CC.GOLD}${kit.displayName} Level $level${CC.GREEN} for ${CC.GOLD}${
+                                    Numbers.format(price)
+                                } Coins${CC.GREEN}!"
+                            )
+
+                            // Refresh menu
+                            Schedulers.sync().runLater({
+                                ViewKitContentsMenu(kit).openMenu(player)
+                            }, 1L)
+                        }
+                    }
                 }
         }
 
@@ -179,7 +287,6 @@ class ViewKitContentsMenu(
 
     private fun formatItemName(item: ItemStack): String
     {
-        // Use display name if it has custom meta, otherwise format the material name
         if (item.hasItemMeta() && item.itemMeta?.hasDisplayName() == true)
         {
             return "${CC.RESET}${item.itemMeta!!.displayName}"
