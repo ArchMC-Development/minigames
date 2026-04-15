@@ -7,15 +7,15 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.entity.Player
 
 /**
- * Kit shop menu for purchasing kit levels.
+ * In-game kit selection menu shown during pre-game waiting/starting phases.
+ * Players can only select from kits they already own.
  *
  * @author ArchMC
  */
-class HungerGamesSelectKitMenu : Menu("Kit Shop")
+class InGameKitSelectMenu : Menu("Select a Kit...")
 {
     override fun size(buttons: Map<Int, Button>) = 27
 
@@ -30,17 +30,15 @@ class HungerGamesSelectKitMenu : Menu("Kit Shop")
         val buttons = mutableMapOf(
             4 to ItemBuilder
                 .of(XMaterial.BOOK)
-                .name("${CC.GREEN}Kit Shop")
+                .name("${CC.GREEN}Kit Selection")
                 .addToLore(
-                    "${CC.GRAY}You are viewing Survival",
-                    "${CC.GRAY}Games kits!",
+                    "${CC.GRAY}Select a kit to use",
+                    "${CC.GRAY}in this game!",
                     "",
                     "${CC.GRAY}Each kit has multiple levels.",
                     "${CC.GRAY}Higher levels give better gear.",
-                    "${CC.GRAY}Purchase levels to unlock them!",
                     "",
-                    "${CC.I_WHITE}Click a kit to view and",
-                    "${CC.I_WHITE}purchase levels!"
+                    "${CC.I_WHITE}Click a kit to select it!"
                 )
                 .toButton()
         )
@@ -53,13 +51,8 @@ class HungerGamesSelectKitMenu : Menu("Kit Shop")
             val kit = kits.getOrNull(slot.index)
                 ?: return@forEach
 
+            val isSelected = profile?.selectedKit == kit.id
             val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
-            val totalLevels = kit.levels.size
-
-            // Find the next level the player can buy
-            val nextUnownedLevel = kit.levels.entries
-                .sortedBy { it.key }
-                .firstOrNull { profile?.hasKit(kit.id, it.key) != true }
 
             buttons[slot.value] = runCatching {
                 ItemBuilder.copyOf(kit.icon)
@@ -68,30 +61,38 @@ class HungerGamesSelectKitMenu : Menu("Kit Shop")
             }
                 .name("${CC.GREEN}${kit.displayName}")
                 .addToLore(
-                    "${CC.GRAY}Levels Owned: ${CC.WHITE}$highestOwned${CC.GRAY}/${CC.WHITE}$totalLevels",
+                    "${CC.GRAY}Your Level: ${CC.WHITE}$highestOwned",
                 )
                 .apply {
-                    if (nextUnownedLevel != null)
+                    if (isSelected)
                     {
                         addToLore(
                             "",
-                            "${CC.GRAY}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
-                            "${CC.GRAY}Cost: ${CC.GOLD}${Numbers.format(nextUnownedLevel.value.price)} Coins"
-                        )
-                    } else
-                    {
-                        addToLore(
-                            "",
-                            "${CC.GREEN}✔ All levels unlocked!"
+                            "${CC.GREEN}✔ Currently Selected",
+                            "${CC.GRAY}Level: ${CC.WHITE}${profile?.selectedKitLevel ?: 1}"
                         )
                     }
                 }
                 .addToLore(
                     "",
-                    "${CC.YELLOW}Click to view levels!"
+                    if (isSelected) "${CC.GREEN}Currently selected!"
+                    else "${CC.YELLOW}Click to select!"
                 )
                 .toButton { _, _ ->
-                    ViewKitContentsMenu(kit).openMenu(player)
+                    val prof = HungerGamesProfileService.find(player)
+                        ?: return@toButton
+
+                    Button.playNeutral(player)
+
+                    val selectLevel = prof.highestOwnedLevel(kit.id, kit.maxLevel())
+                    prof.selectedKit = kit.id
+                    prof.selectedKitLevel = selectLevel
+                    prof.save()
+
+                    player.sendMessage(
+                        "${CC.GREEN}You selected the ${CC.GOLD}${kit.displayName}${CC.GREEN} kit at level ${CC.GOLD}$selectLevel${CC.GREEN}!"
+                    )
+                    player.closeInventory()
                 }
         }
 

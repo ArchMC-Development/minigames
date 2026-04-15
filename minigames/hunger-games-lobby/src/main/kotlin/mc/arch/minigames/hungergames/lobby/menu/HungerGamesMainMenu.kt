@@ -53,12 +53,12 @@ class HungerGamesMainMenu : Menu("Survival Games Menu")
             },
         15 to ItemBuilder
             .of(XMaterial.CHEST)
-            .name("${CC.GOLD}Kits")
+            .name("${CC.GOLD}Kit Shop")
             .addToLore(
-                "${CC.GRAY}View and select kits",
-                "${CC.GRAY}for Survival Games.",
+                "${CC.GRAY}View and purchase kit",
+                "${CC.GRAY}levels for Survival Games.",
                 "",
-                "${CC.GREEN}Click to view!"
+                "${CC.GREEN}Click to browse!"
             )
             .toButton { _, _ ->
                 HungerGamesSelectKitMenu().openMenu(player)
