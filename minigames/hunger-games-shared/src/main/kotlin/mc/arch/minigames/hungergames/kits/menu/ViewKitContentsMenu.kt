@@ -43,8 +43,6 @@ class ViewKitContentsMenu(
     {
         val buttons = mutableMapOf<Int, Button>()
         val profile = HungerGamesProfileService.find(player)
-        val isSelected = profile?.selectedKit == kit.id
-
         // Get economy info for balance display
         val economy = EconomyDataSync.cached().economies[ECONOMY_ID]
         val economyProfile = EconomyProfileService.find(player)
@@ -64,19 +62,9 @@ class ViewKitContentsMenu(
                     economy?.format(balance) ?: "${CC.GOLD}${Numbers.format(balance)} Coins"
                 }",
             )
-            .apply {
-                if (isSelected)
-                {
-                    addToLore(
-                        "",
-                        "${CC.GREEN}✔ Currently Selected"
-                    )
-                }
-            }
             .addToLore(
                 "",
-                "${CC.I_WHITE}Click a level to select or",
-                "${CC.I_WHITE}purchase it!"
+                "${CC.I_WHITE}Click a level to purchase it!"
             )
             .toButton()
 
@@ -88,7 +76,6 @@ class ViewKitContentsMenu(
             if (index >= slots.size) return@forEachIndexed
 
             val isOwned = profile?.hasKit(kit.id, level) ?: (level <= 1)
-            val isSelectedLevel = isSelected && profile?.selectedKitLevel == level
             val price = kitLevel.price
 
             buttons[slots[index]] = runCatching {
@@ -104,12 +91,8 @@ class ViewKitContentsMenu(
                 .apply {
                     val loreLines = mutableListOf<String>()
 
-                    // Show ownership/selection status
-                    if (isSelectedLevel)
-                    {
-                        loreLines.add("${CC.GREEN}✔ Selected")
-                        loreLines.add("")
-                    } else if (isOwned)
+                    // Show ownership status
+                    if (isOwned)
                     {
                         loreLines.add("${CC.GREEN}✔ Owned")
                         loreLines.add("")
@@ -171,13 +154,7 @@ class ViewKitContentsMenu(
                     }
 
                     // Click action lore
-                    if (isSelectedLevel)
-                    {
-                        loreLines.add("${CC.GREEN}Currently selected!")
-                    } else if (isOwned)
-                    {
-                        loreLines.add("${CC.YELLOW}Click to select this level!")
-                    } else
+                    if (!isOwned)
                     {
                         loreLines.add("${CC.GOLD}Click to purchase for ${CC.YELLOW}${Numbers.format(price)} Coins${CC.GOLD}!")
                     }
@@ -190,82 +167,67 @@ class ViewKitContentsMenu(
 
                     if (prof.hasKit(kit.id, level))
                     {
-                        // Already owned — select it
-                        Button.playNeutral(player)
+                        // Already owned — nothing to do here
+                        return@toButton
+                    }
 
-                        prof.selectedKit = kit.id
-                        prof.selectedKitLevel = level
+                    // Need to purchase
+                    val currentBalance = EconomyProfileService.find(player)
+                        ?.balance(ECONOMY_ID) ?: 0L
+
+                    if (currentBalance < price)
+                    {
+                        Button.playFail(player)
+                        player.sendMessage(
+                            "${CC.RED}You don't have enough coins! You need ${CC.GOLD}${
+                                Numbers.format(price - currentBalance)
+                            }${CC.RED} more coins."
+                        )
+                        return@toButton
+                    }
+
+                    // Check previous levels are owned
+                    val previousLevel = level - 1
+                    if (previousLevel > 1 && !prof.hasKit(kit.id, previousLevel))
+                    {
+                        Button.playFail(player)
+                        player.sendMessage(
+                            "${CC.RED}You must purchase level ${CC.GOLD}$previousLevel${CC.RED} first!"
+                        )
+                        return@toButton
+                    }
+
+                    // Submit purchase transaction
+                    TransactionService.submit(
+                        Transaction(
+                            sender = player.uniqueId,
+                            receiver = Accounts.SERVER,
+                            type = TransactionType.Purchase,
+                            economy = ECONOMY_ID,
+                            amount = price
+                        )
+                    ).thenAccept { result ->
+                        if (result != TransactionResult.Success)
+                        {
+                            player.sendMessage("${CC.RED}Transaction failed! Please try again.")
+                            return@thenAccept
+                        }
+
+                        // Unlock the kit level
+                        prof.unlockKit(kit.id, level)
                         prof.save()
 
+                        Button.playNeutral(player)
                         player.sendMessage(
-                            "${CC.GREEN}You selected ${CC.GOLD}${kit.displayName}${CC.GREEN} at level ${CC.GOLD}$level${CC.GREEN}!"
+                            "${CC.GREEN}You purchased ${CC.GOLD}${kit.displayName} Level $level${CC.GREEN} for ${CC.GOLD}${
+                                Numbers.format(price)
+                            } Coins${CC.GREEN}!"
                         )
 
+                        // Refresh menu
                         Schedulers.sync().runLater({
                             ViewKitContentsMenu(kit).openMenu(player)
                         }, 1L)
-                    } else
-                    {
-                        // Need to purchase
-                        val currentBalance = EconomyProfileService.find(player)
-                            ?.balance(ECONOMY_ID) ?: 0L
-
-                        if (currentBalance < price)
-                        {
-                            Button.playFail(player)
-                            player.sendMessage(
-                                "${CC.RED}You don't have enough coins! You need ${CC.GOLD}${
-                                    Numbers.format(price - currentBalance)
-                                }${CC.RED} more coins."
-                            )
-                            return@toButton
-                        }
-
-                        // Check previous levels are owned
-                        val previousLevel = level - 1
-                        if (previousLevel > 1 && !prof.hasKit(kit.id, previousLevel))
-                        {
-                            Button.playFail(player)
-                            player.sendMessage(
-                                "${CC.RED}You must purchase level ${CC.GOLD}$previousLevel${CC.RED} first!"
-                            )
-                            return@toButton
-                        }
-
-                        // Submit purchase transaction
-                        TransactionService.submit(
-                            Transaction(
-                                sender = player.uniqueId,
-                                receiver = Accounts.SERVER,
-                                type = TransactionType.Purchase,
-                                economy = ECONOMY_ID,
-                                amount = price
-                            )
-                        ).thenAccept { result ->
-                            if (result != TransactionResult.Success)
-                            {
-                                player.sendMessage("${CC.RED}Transaction failed! Please try again.")
-                                return@thenAccept
-                            }
-
-                            // Unlock the kit level
-                            prof.unlockKit(kit.id, level)
-                            prof.selectedKit = kit.id
-                            prof.selectedKitLevel = level
-                            prof.save()
-
-                            Button.playNeutral(player)
-                            player.sendMessage(
-                                "${CC.GREEN}You purchased ${CC.GOLD}${kit.displayName} Level $level${CC.GREEN} for ${CC.GOLD}${
-                                    Numbers.format(price)
-                                } Coins${CC.GREEN}!"
-                            )
-
-                            // Refresh menu
-                            Schedulers.sync().runLater({
-                                ViewKitContentsMenu(kit).openMenu(player)
-                            }, 1L)
-                        }
                     }
                 }
         }

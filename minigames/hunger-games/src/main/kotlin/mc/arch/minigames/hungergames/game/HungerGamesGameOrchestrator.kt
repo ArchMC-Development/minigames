@@ -31,7 +31,7 @@ import gg.tropic.practice.statistics.StatisticService
 import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import mc.arch.minigames.hungergames.HungerGamesGameConfiguration
 import mc.arch.minigames.hungergames.HungerGamesTypeMetadata
-import mc.arch.minigames.hungergames.kits.menu.HungerGamesSelectKitMenu
+import mc.arch.minigames.hungergames.kits.menu.InGameKitSelectMenu
 import mc.arch.minigames.hungergames.statistics.CoreHungerGamesStatistic
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -164,7 +164,7 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
 
                 if (game.state(GameState.Starting) || game.state(GameState.Waiting))
                 {
-                    HungerGamesSelectKitMenu().openMenu(it.player)
+                    InGameKitSelectMenu().openMenu(it.player)
                 }
             }
             .bindWith(plugin)
