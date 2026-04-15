@@ -165,16 +165,16 @@ class HungerGamesLifecycle(
                         ?: continue
 
                     audiences.player(player)
-                        .sendActionBar(Component.text {
-                            it.append(
+                        .sendActionBar(Component.text { builder ->
+                            builder.append(
                                 Component
                                     .text("Selected kit: ")
                                     .color(NamedTextColor.YELLOW)
                             )
 
-                            it.append(
+                            builder.append(
                                 Component
-                                    .text(profile.selectedKit ?: "None")
+                                    .text(profile.selectedKit?.replaceFirstChar { it.uppercase() } ?: "None")
                                     .color(NamedTextColor.GREEN)
                             )
                         })

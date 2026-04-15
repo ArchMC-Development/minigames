@@ -19,7 +19,6 @@ import gg.tropic.practice.games.GameState
 import gg.tropic.practice.games.damage.DeathMessageStrategy
 import gg.tropic.practice.games.damage.EliminationCause
 import gg.tropic.practice.games.event.GameCompleteEvent
-import gg.tropic.practice.games.event.GameStartEvent
 import gg.tropic.practice.games.event.PlayerJoinGameEvent
 import gg.tropic.practice.games.event.PlayerSelectSpawnLocationEvent
 import gg.tropic.practice.minigame.AbstractMiniGameGameImpl
@@ -32,17 +31,15 @@ import gg.tropic.practice.statistics.StatisticService
 import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import mc.arch.minigames.hungergames.HungerGamesGameConfiguration
 import mc.arch.minigames.hungergames.HungerGamesTypeMetadata
-import mc.arch.minigames.hungergames.kits.menu.SelectKitMenu
+import mc.arch.minigames.hungergames.kits.menu.HungerGamesSelectKitMenu
 import mc.arch.minigames.hungergames.statistics.CoreHungerGamesStatistic
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBurnEvent
@@ -78,6 +75,9 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
     {
         val selectAKitItem = ItemBuilder.of(XMaterial.BOW)
             .name("${CC.GREEN}Select a Kit ${CC.GRAY}(Right Click)")
+            .addToLore(
+                "${CC.GRAY}Use this bow to select a hunger games kit!"
+            )
             .build()
 
         // Countdown tick
@@ -164,7 +164,7 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
 
                 if (game.state(GameState.Starting) || game.state(GameState.Waiting))
                 {
-                    SelectKitMenu().openMenu(it.player)
+                    HungerGamesSelectKitMenu().openMenu(it.player)
                 }
             }
             .bindWith(plugin)

@@ -280,7 +280,7 @@ class ViewKitContentsMenu(
             Schedulers
                 .sync()
                 .run {
-                    SelectKitMenu().openMenu(player)
+                    HungerGamesSelectKitMenu().openMenu(player)
                 }
         }
     }
