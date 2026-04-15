@@ -131,11 +131,11 @@ object DefaultHungerGamesKits
      */
     private val DEFAULT_LEVEL_PRICES = mapOf(
         1 to 0L,
-        2 to 500L,
-        3 to 1_000L,
-        4 to 2_500L,
-        5 to 5_000L,
-        6 to 10_000L
+        2 to 25_000L,
+        3 to 100_000L,
+        4 to 250_000L,
+        5 to 1_000_000L,
+        6 to 2_000_000L
     )
 
     private fun level(
@@ -816,7 +816,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.GOLDEN_HORSE_ARMOR),
                         item(XMaterial.SADDLE),
                         item(XMaterial.APPLE, 3)
-                    )
+                    ),
+                    price = 150_000L
                 ),
                 level(2,
                     armor(
@@ -924,7 +925,8 @@ object DefaultHungerGamesKits
                     inv(
                         item(XMaterial.STONE_AXE),
                         resistPotion(2, 240)
-                    )
+                    ),
+                    price = 30_000L
                 ),
                 level(2,
                     armor(
@@ -1020,7 +1022,8 @@ object DefaultHungerGamesKits
                     inv(
                         item(XMaterial.WOODEN_SWORD, 1, mapOf(UNBREAKING to 10)),
                         warlockPotion(2)
-                    )
+                    ),
+                    price = 20_000L
                 ),
                 level(2,
                     armor(
@@ -1114,7 +1117,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.STONE_AXE, 1, mapOf(KNOCKBACK to 1)),
                         spawnEgg(ENTITY_SLIME, 2),
                         slownessSplash(2)
-                    )
+                    ),
+                    price = 20_000L
                 ),
                 level(2,
                     armor(
@@ -1212,7 +1216,8 @@ object DefaultHungerGamesKits
                     inv(
                         item(XMaterial.WOODEN_SWORD),
                         blindnessSplash(1)
-                    )
+                    ),
+                    price = 15_000L
                 ),
                 level(2,
                     armor(
@@ -1306,7 +1311,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.GOLDEN_SWORD, 1, mapOf(SHARPNESS to 1, UNBREAKING to 10)),
                         spawnEgg(ENTITY_PIG_ZOMBIE, 1),
                         harmingSplash(2)
-                    )
+                    ),
+                    price = 10_000L
                 ),
                 level(2,
                     armor(
@@ -1400,7 +1406,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.STONE_AXE),
                         spawnEgg(ENTITY_WOLF, 3),
                         item(XMaterial.ROTTEN_FLESH, 14)
-                    )
+                    ),
+                    price = 40_000L
                 ),
                 level(2,
                     armor(
@@ -1494,7 +1501,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.STONE_SWORD, 1, mapOf(UNBREAKING to 1)),
                         item(XMaterial.STONE_AXE, 1, mapOf(FIRE_ASPECT to 1)),
                         spawnEgg(ENTITY_BLAZE, 2)
-                    )
+                    ),
+                    price = 20_000L
                 ),
                 level(2,
                     armor(
@@ -1588,7 +1596,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.WOODEN_SWORD),
                         item(XMaterial.TNT, 6),
                         spawnEgg(ENTITY_CREEPER, 4)
-                    )
+                    ),
+                    price = 30_000L
                 ),
                 level(2,
                     armor(
@@ -1683,7 +1692,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.SNOWBALL, 16),
                         spawnEgg(ENTITY_WOLF, 2),
                         item(XMaterial.CARROT, 6)
-                    )
+                    ),
+                    price = 385_000L
                 ),
                 level(2,
                     armor(

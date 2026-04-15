@@ -25,19 +25,25 @@ object HungerGamesKitDataSync : DataSyncService<HungerGamesKitContainer>()
     override fun postReload()
     {
         val container = cached()
-        if (container.kits.isEmpty())
-        {
-            logger.info("No kits found in DataSync, populating with ${DefaultHungerGamesKits.buildDefaultKits().size} default kits...")
 
-            try
+        try
+        {
+            val defaults = DefaultHungerGamesKits.buildDefaultKits()
+            val missing = defaults.filterKeys { it !in container.kits }
+
+            if (missing.isEmpty())
             {
-                container.kits.putAll(DefaultHungerGamesKits.buildDefaultKits())
-                sync(container)
-                logger.info("Successfully loaded default HG kits.")
-            } catch (e: Exception)
-            {
-                logger.log(Level.SEVERE, "Failed to load default HG kits", e)
+                return
             }
+
+            logger.info("Found ${container.kits.size} existing kits, adding ${missing.size} missing default kits: ${missing.keys}")
+
+            container.kits.putAll(missing)
+            sync(container)
+            logger.info("Successfully loaded missing default HG kits.")
+        } catch (e: Exception)
+        {
+            logger.log(Level.SEVERE, "Failed to load default HG kits", e)
         }
     }
 
