@@ -2,6 +2,7 @@ package mc.arch.minigames.hungergames.kits.menu
 
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.hungergames.kits.HungerGamesKitDataSync
+import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -55,6 +56,8 @@ class HungerGamesSelectKitMenu : Menu("Kit Shop")
 
             val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
             val totalLevels = kit.levels.size
+            val killReq = HungerGamesProfile.killRequirement(kit.id)
+            val meetsKillReq = profile?.meetsKillRequirement(kit.id) ?: (killReq <= 0L)
 
             // Find the next level the player can buy
             val nextUnownedLevel = kit.levels.entries
@@ -66,24 +69,39 @@ class HungerGamesSelectKitMenu : Menu("Kit Shop")
             }.getOrElse {
                 ItemBuilder.of(XMaterial.BARRIER)
             }
-                .name("${CC.GREEN}${kit.displayName}")
+                .name(
+                    if (killReq > 0L && !meetsKillReq) "${CC.RED}${kit.displayName} ${CC.GRAY}(Locked)"
+                    else "${CC.GREEN}${kit.displayName}"
+                )
                 .addToLore(
                     "${CC.GRAY}Levels Owned: ${CC.WHITE}$highestOwned${CC.GRAY}/${CC.WHITE}$totalLevels",
                 )
                 .apply {
-                    if (nextUnownedLevel != null)
+                    if (killReq > 0L)
                     {
                         addToLore(
                             "",
-                            "${CC.GRAY}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
-                            "${CC.GRAY}Cost: ${CC.GOLD}${Numbers.format(nextUnownedLevel.value.price)} Coins"
+                            if (meetsKillReq) "${CC.GREEN}✔ Kill requirement met!"
+                            else "${CC.RED}✖ Requires ${CC.YELLOW}${Numbers.format(killReq)} kills"
                         )
-                    } else
+                    }
+
+                    if (meetsKillReq || killReq <= 0L)
                     {
-                        addToLore(
-                            "",
-                            "${CC.GREEN}✔ All levels unlocked!"
-                        )
+                        if (nextUnownedLevel != null)
+                        {
+                            addToLore(
+                                "",
+                                "${CC.GRAY}Next Level: ${CC.WHITE}Lv.${nextUnownedLevel.key}",
+                                "${CC.GRAY}Cost: ${CC.GOLD}${Numbers.format(nextUnownedLevel.value.price)} Coins"
+                            )
+                        } else
+                        {
+                            addToLore(
+                                "",
+                                "${CC.GREEN}✔ All levels unlocked!"
+                            )
+                        }
                     }
                 }
                 .addToLore(

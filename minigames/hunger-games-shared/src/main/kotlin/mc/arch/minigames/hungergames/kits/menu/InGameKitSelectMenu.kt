@@ -2,11 +2,13 @@ package mc.arch.minigames.hungergames.kits.menu
 
 import com.cryptomorin.xseries.XMaterial
 import mc.arch.minigames.hungergames.kits.HungerGamesKitDataSync
+import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.entity.Player
 
 /**
@@ -53,18 +55,31 @@ class InGameKitSelectMenu : Menu("Select a Kit...")
 
             val isSelected = profile?.selectedKit == kit.id
             val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
+            val killReq = HungerGamesProfile.killRequirement(kit.id)
+            val meetsKillReq = profile?.meetsKillRequirement(kit.id) ?: (killReq <= 0L)
+            val isLocked = killReq > 0L && !meetsKillReq
 
             buttons[slot.value] = runCatching {
                 ItemBuilder.copyOf(kit.icon)
             }.getOrElse {
                 ItemBuilder.of(XMaterial.BARRIER)
             }
-                .name("${CC.GREEN}${kit.displayName}")
+                .name(
+                    if (isLocked) "${CC.RED}${kit.displayName} ${CC.GRAY}(Locked)"
+                    else "${CC.GREEN}${kit.displayName}"
+                )
                 .addToLore(
                     "${CC.GRAY}Your Level: ${CC.WHITE}$highestOwned",
                 )
                 .apply {
-                    if (isSelected)
+                    if (isLocked)
+                    {
+                        addToLore(
+                            "",
+                            "${CC.RED}✖ Requires ${CC.YELLOW}${Numbers.format(killReq)} kills",
+                            "${CC.GRAY}Your Kills: ${CC.WHITE}${Numbers.format(profile?.totalKills ?: 0L)}"
+                        )
+                    } else if (isSelected)
                     {
                         addToLore(
                             "",
@@ -75,12 +90,24 @@ class InGameKitSelectMenu : Menu("Select a Kit...")
                 }
                 .addToLore(
                     "",
-                    if (isSelected) "${CC.GREEN}Currently selected!"
-                    else "${CC.YELLOW}Click to select!"
+                    when {
+                        isLocked -> "${CC.RED}Locked!"
+                        isSelected -> "${CC.GREEN}Currently selected!"
+                        else -> "${CC.YELLOW}Click to select!"
+                    }
                 )
                 .toButton { _, _ ->
                     val prof = HungerGamesProfileService.find(player)
                         ?: return@toButton
+
+                    if (!prof.meetsKillRequirement(kit.id))
+                    {
+                        Button.playFail(player)
+                        player.sendMessage(
+                            "${CC.RED}You need ${CC.GOLD}${Numbers.format(killReq)} kills${CC.RED} to unlock this kit!"
+                        )
+                        return@toButton
+                    }
 
                     Button.playNeutral(player)
 

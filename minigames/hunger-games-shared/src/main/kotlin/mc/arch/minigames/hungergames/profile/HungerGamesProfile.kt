@@ -8,13 +8,71 @@ import java.util.*
 /**
  * @author ArchMC
  */
+data class HungerGamesKitStats(
+    var damageDealt: Double = 0.0,
+    var damageTaken: Double = 0.0,
+    var kills: Long = 0L,
+    var deaths: Long = 0L,
+    var gamesPlayed: Long = 0L
+)
+
 data class HungerGamesProfile(
     override val identifier: UUID,
     var selectedKit: String? = null,
     var selectedKitLevel: Int = 1,
-    val purchasedKits: MutableMap<String, MutableSet<Int>> = mutableMapOf()
+    val purchasedKits: MutableMap<String, MutableSet<Int>> = mutableMapOf(),
+    var totalKills: Long = 0L,
+    var totalDeaths: Long = 0L,
+    val kitStats: MutableMap<String, HungerGamesKitStats> = mutableMapOf()
 ) : IDataStoreObject
 {
+    companion object
+    {
+        /**
+         * Kits that are free by default (no kill requirement).
+         */
+        val DEFAULT_KITS = setOf(
+            "baker", "knight", "archer", "meatmaster", "scout", "armorer"
+        )
+
+        /**
+         * Kill requirements for kits. Kits not listed here and not in DEFAULT_KITS
+         * have no kill requirement (level 1 is still free).
+         */
+        val KIT_KILL_REQUIREMENTS: Map<String, Long> = mapOf(
+            "shadow" to 500L,
+            "pigman" to 500L,
+            "creeper" to 500L,
+            "wolftamer" to 1000L,
+            "blaze" to 1000L,
+            "slime" to 1000L,
+            "astronaut" to 2500L,
+            "horsetamer" to 2500L,
+            "warlock" to 2500L,
+            "snowman" to 5000L
+        )
+
+        /**
+         * Get the kill requirement for a kit, or 0 if none.
+         */
+        fun killRequirement(kitId: String): Long = KIT_KILL_REQUIREMENTS[kitId] ?: 0L
+    }
+
+    /**
+     * Get per-kit statistics, creating a fresh entry if none exists.
+     */
+    fun getStatsFor(kitId: String): HungerGamesKitStats =
+        kitStats.getOrPut(kitId) { HungerGamesKitStats() }
+
+    /**
+     * Check if the player meets the kill requirement to use/purchase a kit.
+     */
+    fun meetsKillRequirement(kitId: String): Boolean
+    {
+        val required = killRequirement(kitId)
+        return required <= 0L || totalKills >= required
+    }
+
     /**
      * Check if the player owns a specific kit level.
      * Level 1 of every kit is free by default.
