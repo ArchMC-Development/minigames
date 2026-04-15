@@ -19,6 +19,7 @@ import gg.tropic.practice.games.GameState
 import gg.tropic.practice.games.damage.DeathMessageStrategy
 import gg.tropic.practice.games.damage.EliminationCause
 import gg.tropic.practice.games.event.GameCompleteEvent
+import gg.tropic.practice.games.event.GameStartEvent
 import gg.tropic.practice.games.event.PlayerJoinGameEvent
 import gg.tropic.practice.games.event.PlayerSelectSpawnLocationEvent
 import gg.tropic.practice.minigame.AbstractMiniGameGameImpl
@@ -32,6 +33,7 @@ import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import mc.arch.minigames.hungergames.HungerGamesGameConfiguration
 import mc.arch.minigames.hungergames.HungerGamesTypeMetadata
 import mc.arch.minigames.hungergames.kits.menu.InGameKitSelectMenu
+import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
 import mc.arch.minigames.hungergames.statistics.CoreHungerGamesStatistic
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -44,6 +46,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockFadeEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -257,6 +260,60 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
             }
             .handler { it.isCancelled = true }
 
+        // Track games played per kit on game start
+        Events
+            .subscribe(GameStartEvent::class.java)
+            .filter { it.game.miniGameLifecycle is HungerGamesLifecycle }
+            .handler { event ->
+                for (player in event.game.allNonSpectators())
+                {
+                    val profile = HungerGamesProfileService.find(player) ?: continue
+                    val kitId = profile.selectedKit ?: continue
+                    profile.getStatsFor(kitId).gamesPlayed += 1
+                    profile.save()
+                }
+            }
+
+        // Track PvP damage dealt/taken per kit
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
+            .filter {
+                it.entity is Player && it.damager is Player &&
+                    GameService.byPlayer(it.entity as Player)
+                        ?.miniGameLifecycle is HungerGamesLifecycle
+            }
+            .filter {
+                val game = GameService.byPlayer(it.entity as Player) ?: return@filter false
+                game.state(GameState.Playing)
+            }
+            .handler {
+                val victim = it.entity as Player
+                val attacker = it.damager as Player
+                val damage = it.finalDamage
+
+                val attackerProfile = HungerGamesProfileService.find(attacker)
+                if (attackerProfile != null)
+                {
+                    val kit = attackerProfile.selectedKit
+                    if (kit != null)
+                    {
+                        attackerProfile.getStatsFor(kit).damageDealt += damage
+                        attackerProfile.save()
+                    }
+                }
+
+                val victimProfile = HungerGamesProfileService.find(victim)
+                if (victimProfile != null)
+                {
+                    val kit = victimProfile.selectedKit
+                    if (kit != null)
+                    {
+                        victimProfile.getStatsFor(kit).damageTaken += damage
+                        victimProfile.save()
+                    }
+                }
+            }
+
         // Game complete - report, stats, rewards
         Events
             .subscribe(GameCompleteEvent::class.java)
@@ -462,10 +519,36 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
                 val playerResources = hgGame.playerResourcesOf(event.player)
                 playerResources.deaths += 1
 
+                // Track death on persistent profile
+                val victimProfile = HungerGamesProfileService.find(event.player)
+                if (victimProfile != null)
+                {
+                    victimProfile.totalDeaths += 1
+                    val victimKit = victimProfile.selectedKit
+                    if (victimKit != null)
+                    {
+                        victimProfile.getStatsFor(victimKit).deaths += 1
+                    }
+                    victimProfile.save()
+                }
+
                 if (killer != null)
                 {
                     val resources = hgGame.playerResourcesOf(killer)
                     resources.kills += 1
+
+                    // Track kill on persistent profile
+                    val killerProfile = HungerGamesProfileService.find(killer)
+                    if (killerProfile != null)
+                    {
+                        killerProfile.totalKills += 1
+                        val killerKit = killerProfile.selectedKit
+                        if (killerKit != null)
+                        {
+                            killerProfile.getStatsFor(killerKit).kills += 1
+                        }
+                        killerProfile.save()
+                    }
 
                     // Kill reward
                     TransactionService

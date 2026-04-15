@@ -9,6 +9,7 @@ import gg.tropic.game.extensions.economy.TransactionResult
 import gg.tropic.game.extensions.economy.TransactionService
 import gg.tropic.game.extensions.economy.TransactionType
 import mc.arch.minigames.hungergames.kits.HungerGamesKit
+import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.menu.Button
@@ -43,6 +44,9 @@ class ViewKitContentsMenu(
     {
         val buttons = mutableMapOf<Int, Button>()
         val profile = HungerGamesProfileService.find(player)
+        val killRequirement = HungerGamesProfile.killRequirement(kit.id)
+        val meetsKillReq = profile?.meetsKillRequirement(kit.id) ?: (killRequirement <= 0L)
+
         // Get economy info for balance display
         val economy = EconomyDataSync.cached().economies[ECONOMY_ID]
         val economyProfile = EconomyProfileService.find(player)
@@ -62,6 +66,17 @@ class ViewKitContentsMenu(
                     economy?.format(balance) ?: "${CC.GOLD}${Numbers.format(balance)} Coins"
                 }",
             )
+            .apply {
+                if (killRequirement > 0L)
+                {
+                    addToLore(
+                        "",
+                        if (meetsKillReq) "${CC.GREEN}✔ Kill requirement met!"
+                        else "${CC.RED}✖ Requires ${CC.YELLOW}${Numbers.format(killRequirement)} kills ${CC.RED}to unlock",
+                        "${CC.GRAY}Your Kills: ${CC.WHITE}${Numbers.format(profile?.totalKills ?: 0L)}"
+                    )
+                }
+            }
             .addToLore(
                 "",
                 "${CC.I_WHITE}Click a level to purchase it!"
@@ -168,6 +183,17 @@ class ViewKitContentsMenu(
                     if (prof.hasKit(kit.id, level))
                     {
                         // Already owned — nothing to do here
+                        return@toButton
+                    }
+
+                    // Check kill requirement
+                    if (!prof.meetsKillRequirement(kit.id))
+                    {
+                        val required = HungerGamesProfile.killRequirement(kit.id)
+                        Button.playFail(player)
+                        player.sendMessage(
+                            "${CC.RED}You need ${CC.GOLD}${Numbers.format(required)} kills${CC.RED} to unlock this kit! You have ${CC.GOLD}${Numbers.format(prof.totalKills)}${CC.RED}."
+                        )
                         return@toButton
                     }
 
