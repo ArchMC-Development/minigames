@@ -10,9 +10,10 @@ dependencies {
     compileOnly(project(":minigames:skywars-shared"))
     compileOnly(project(":minigames:bedwars-shared"))
     compileOnly(project(":microgames:events-api"))
+    implementation(project(":minigames:hunger-games-shared"))
 
     implementation("net.md-5:bungeecord-chat:1.20-R0.1")
-    
+
     // Sentry for distributed tracing
     compileOnly("io.sentry:sentry:7.22.0")
 }

@@ -28,6 +28,7 @@ import gg.tropic.practice.provider.MiniProviderType
 import gg.tropic.practice.provider.MiniProviderVersion
 import gg.tropic.practice.queue.variants.BedWarsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.EventsSubscribableMinigamePlayerQueue
+import gg.tropic.practice.queue.variants.HungerGamesSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.MiniWallsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.SkyWarsSubscribableMinigamePlayerQueue
 import gg.tropic.practice.queue.variants.robot.SubscribableDuoRobotPlayerQueue
@@ -43,6 +44,7 @@ import io.sentry.SpanStatus
 import mc.arch.commons.communications.rpc.CommunicationGateway
 import mc.arch.minigame.bedwars.neo.BedWarsMode
 import mc.arch.minigame.miniwalls.MiniWallsMode
+import mc.arch.minigames.hungergames.HungerGamesMode
 import mc.arch.minigames.microgames.events.EventType
 import mc.arch.minigames.skywars.SkyWarsMode
 import net.evilblock.cubed.serializers.Serializers
@@ -698,6 +700,22 @@ object GameQueueManager
             {
                 println("tracked mini walls queue")
                 queueHolder.trackPlayerQueue(MiniWallsSubscribableMinigamePlayerQueue(miniWallsKit, pair.first))
+            } else
+            {
+                queueHolder.forgetPlayerQueue(pair.second)
+            }
+        }
+
+        val sgKitId = listOf(
+            HungerGamesMode.SOLO_NORMAL to "sg_solo_normal",
+        )
+
+        sgKitId.forEach { pair ->
+            val sgKit = KitDataSync.cached().kits[pair.second]
+            if (sgKit != null)
+            {
+                println("tracked SG queue")
+                queueHolder.trackPlayerQueue(HungerGamesSubscribableMinigamePlayerQueue(sgKit, pair.first))
             } else
             {
                 queueHolder.forgetPlayerQueue(pair.second)
