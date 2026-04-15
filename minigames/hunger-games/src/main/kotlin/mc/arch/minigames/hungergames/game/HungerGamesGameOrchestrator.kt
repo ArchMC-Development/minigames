@@ -169,18 +169,29 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
             }
             .bindWith(plugin)
 
-        // Spawn location handling
+        // Spawn location handling - assign players to random glass cages
         Events
             .subscribe(PlayerSelectSpawnLocationEvent::class.java)
             .filter { it.game.miniGameLifecycle is HungerGamesLifecycle }
             .filter { !it.spectator }
             .filter { it.game.state(GameState.Waiting) || it.game.state(GameState.Starting) }
             .handler {
-                // SG doesn't use cages, players just stand on the pedestals
-                it.player.teleport(it.location)
+                val hgLifecycle = it.game.miniGameLifecycle as HungerGamesLifecycle
+
+                // Find a random unoccupied cage
+                val availableCage = hgLifecycle.glassCages
+                    .filter { cage -> !cage.isOccupied() }
+                    .randomOrNull()
+
+                if (availableCage != null)
+                {
+                    availableCage.assign(it.player.uniqueId)
+                    hgLifecycle.playerCageAssignments[it.player.uniqueId] = availableCage
+                    it.location = availableCage.spawnLocation
+                }
             }
 
-        // Player quit - handle pre-game
+        // Player quit - free up their glass cage during pre-game
         Events
             .subscribe(PlayerQuitEvent::class.java)
             .handler {
@@ -190,6 +201,13 @@ object HungerGamesGameOrchestrator : BasicMiniGameOrchestrator<HungerGamesGameCo
                 if (game.miniGameLifecycle !is HungerGamesLifecycle)
                 {
                     return@handler
+                }
+
+                val hgLifecycle = game.miniGameLifecycle as HungerGamesLifecycle
+                if (game.state(GameState.Waiting) || game.state(GameState.Starting))
+                {
+                    val cage = hgLifecycle.playerCageAssignments.remove(it.player.uniqueId)
+                    cage?.release()
                 }
             }
 

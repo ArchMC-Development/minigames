@@ -68,6 +68,10 @@ class HungerGamesLifecycle(
     var deathmatchGracePeriod = 0
     var blitzStarInChest = false
 
+    // Glass cage spawn system
+    val glassCages = mutableListOf<GlassCage>()
+    val playerCageAssignments = ConcurrentHashMap<UUID, GlassCage>()
+
     override val events = listOf(
         ApplyKitsGameEvent(this@HungerGamesLifecycle),
         ReleaseBlitzStarGameEvent(this@HungerGamesLifecycle),
@@ -86,6 +90,16 @@ class HungerGamesLifecycle(
         game.shouldAllowCrafting = true
         game.shouldContainIdentifiableTeams = false
         game.shouldBeMinMaxEligible = true
+
+        // Build glass cages at all spawn locations
+        game.map.findSpawnLocations()
+            .filter { it.id != "spec" }
+            .forEach { spawnMeta ->
+                val location = spawnMeta.position.toLocation(world)
+                val cage = GlassCage(location)
+                cage.build()
+                glassCages.add(cage)
+            }
 
         // Win condition check + compass tracking
         Schedulers
@@ -188,6 +202,11 @@ class HungerGamesLifecycle(
             .filter { it.game.expectation == game.expectation }
             .handler {
                 updateHotBarTerminable.closeAndReportException()
+
+                // Destroy all glass cages
+                glassCages.forEach { it.destroy() }
+                glassCages.clear()
+                playerCageAssignments.clear()
 
                 // Fall damage protection
                 val fallInvincibilityTerminable = CompositeTerminable.create()
