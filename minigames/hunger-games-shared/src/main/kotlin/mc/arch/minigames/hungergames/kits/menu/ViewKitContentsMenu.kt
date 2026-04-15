@@ -8,6 +8,7 @@ import gg.tropic.game.extensions.economy.Transaction
 import gg.tropic.game.extensions.economy.TransactionResult
 import gg.tropic.game.extensions.economy.TransactionService
 import gg.tropic.game.extensions.economy.TransactionType
+import gg.tropic.practice.menu.BukkitInventoryCallback
 import mc.arch.minigames.hungergames.kits.HungerGamesKit
 import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
@@ -257,6 +258,51 @@ class ViewKitContentsMenu(
                     }
                 }
         }
+
+        // Edit Loadout button
+        val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
+        val hasCustomLoadout = profile?.customLoadouts?.containsKey(kit.id) == true
+
+        buttons[31] = ItemBuilder
+            .of(XMaterial.ANVIL)
+            .name("${CC.AQUA}Edit Loadout")
+            .addToLore(
+                "${CC.GRAY}Rearrange your kit's inventory",
+                "${CC.GRAY}items to your liking!",
+                "",
+                "${CC.GRAY}Armor cannot be changed.",
+                "",
+                if (hasCustomLoadout) "${CC.GREEN}✔ Custom loadout saved!"
+                else "${CC.GRAY}Using default layout.",
+                "",
+                "${CC.YELLOW}Click to edit!"
+            )
+            .toButton { _, _ ->
+                val prof = HungerGamesProfileService.find(player)
+                    ?: return@toButton
+
+                val kitLevel = kit.levels[highestOwned] ?: return@toButton
+
+                // Use existing custom loadout or default inventory
+                val currentLoadout = prof.customLoadouts[kit.id]
+                    ?: kitLevel.inventory.map { it?.clone() }.toTypedArray()
+
+                // 36-slot inventory callback (no armor)
+                BukkitInventoryCallback(
+                    contentsToSet = currentLoadout,
+                    immutableSlots = emptyList(),
+                    title = "${kit.displayName} - Edit Loadout",
+                    size = 36,
+                    callback = { contents ->
+                        prof.customLoadouts[kit.id] = contents
+                        prof.save()
+
+                        player.sendMessage(
+                            "${CC.GREEN}Your custom loadout for ${CC.GOLD}${kit.displayName}${CC.GREEN} has been saved!"
+                        )
+                    }
+                ).openMenu(player)
+            }
 
         return buttons
     }
