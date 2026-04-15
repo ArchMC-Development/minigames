@@ -29,18 +29,40 @@ object HungerGamesKitDataSync : DataSyncService<HungerGamesKitContainer>()
         try
         {
             val defaults = DefaultHungerGamesKits.buildDefaultKits()
-            val missing = defaults.filterKeys { it !in container.kits }
+            var changed = false
 
-            if (missing.isEmpty())
+            // Add missing default kits
+            val missing = defaults.filterKeys { it !in container.kits }
+            if (missing.isNotEmpty())
             {
-                return
+                logger.info("Found ${container.kits.size} existing kits, adding ${missing.size} missing default kits: ${missing.keys}")
+                container.kits.putAll(missing)
+                changed = true
             }
 
-            logger.info("Found ${container.kits.size} existing kits, adding ${missing.size} missing default kits: ${missing.keys}")
+            // Sync prices from defaults for existing kits
+            for ((kitId, defaultKit) in defaults)
+            {
+                val existingKit = container.kits[kitId] ?: continue
 
-            container.kits.putAll(missing)
-            sync(container)
-            logger.info("Successfully loaded missing default HG kits.")
+                for ((level, defaultLevel) in defaultKit.levels)
+                {
+                    val existingLevel = existingKit.levels[level] ?: continue
+
+                    if (existingLevel.price != defaultLevel.price)
+                    {
+                        logger.info("Updating price for $kitId level $level: ${existingLevel.price} -> ${defaultLevel.price}")
+                        existingLevel.price = defaultLevel.price
+                        changed = true
+                    }
+                }
+            }
+
+            if (changed)
+            {
+                sync(container)
+                logger.info("Successfully synced default HG kit data.")
+            }
         } catch (e: Exception)
         {
             logger.log(Level.SEVERE, "Failed to load default HG kits", e)
