@@ -3,6 +3,7 @@ package mc.arch.minigames.hungergames.profile
 import gg.scala.store.controller.DataStoreObjectControllerCache
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.scala.store.storage.type.DataStoreStorageType
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
 /**
@@ -23,7 +24,8 @@ data class HungerGamesProfile(
     val purchasedKits: MutableMap<String, MutableSet<Int>> = mutableMapOf(),
     var totalKills: Long = 0L,
     var totalDeaths: Long = 0L,
-    val kitStats: MutableMap<String, HungerGamesKitStats> = mutableMapOf()
+    val kitStats: MutableMap<String, HungerGamesKitStats> = mutableMapOf(),
+    val customLoadouts: MutableMap<String, Array<ItemStack?>> = mutableMapOf()
 ) : IDataStoreObject
 {
     companion object
