@@ -37,15 +37,16 @@ class GlassCage(
 
     /**
      * Builds the glass cage around the spawn location.
-     * The spawn location is where the player's feet are (on top of the 2-high platform).
+     * The spawn location is where the player's feet are.
      *
-     * Layout (looking down, player at center):
+     * Layout (top-down view, player at P):
      * ```
-     *   G
+     *  GGG
      *  GPG
-     *   G
+     *  GGG
      * ```
-     * At both Y (feet) and Y+1 (head) levels, plus a ceiling at Y+2.
+     * Built at Y (feet) and Y+1 (head) levels, with a floor
+     * at Y-1 and a ceiling at Y+2.
      */
     fun build()
     {
@@ -54,24 +55,28 @@ class GlassCage(
         val y = spawnLocation.blockY
         val z = spawnLocation.blockZ
 
-        // Offsets for the 4 surrounding walls (N/S/E/W)
-        val wallOffsets = listOf(
-            intArrayOf(1, 0),
-            intArrayOf(-1, 0),
-            intArrayOf(0, 1),
-            intArrayOf(0, -1)
+        // All 8 surrounding offsets (cardinal + diagonal)
+        val surroundingOffsets = listOf(
+            intArrayOf(-1, -1), intArrayOf(0, -1), intArrayOf(1, -1),
+            intArrayOf(-1, 0),                      intArrayOf(1, 0),
+            intArrayOf(-1, 1),  intArrayOf(0, 1),  intArrayOf(1, 1)
         )
 
         // Walls at feet level (Y) and head level (Y+1)
         for (dy in 0..1)
         {
-            for (offset in wallOffsets)
+            for (offset in surroundingOffsets)
             {
                 val block = world.getBlockAt(x + offset[0], y + dy, z + offset[1])
                 block.type = Material.GLASS
                 cageBlocks.add(block)
             }
         }
+
+        // Floor at Y-1
+        val floor = world.getBlockAt(x, y - 1, z)
+        floor.type = Material.GLASS
+        cageBlocks.add(floor)
 
         // Ceiling at Y+2
         val ceiling = world.getBlockAt(x, y + 2, z)
