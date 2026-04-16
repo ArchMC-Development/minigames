@@ -25,7 +25,8 @@ data class HungerGamesProfile(
     var totalKills: Long = 0L,
     var totalDeaths: Long = 0L,
     val kitStats: MutableMap<String, HungerGamesKitStats> = mutableMapOf(),
-    val customLoadouts: MutableMap<String, Array<ItemStack?>> = mutableMapOf()
+    val customLoadouts: MutableMap<String, Array<ItemStack?>> = mutableMapOf(),
+    val kitPrestiges: MutableMap<String, Int> = mutableMapOf()
 ) : IDataStoreObject
 {
     companion object
@@ -58,6 +59,16 @@ data class HungerGamesProfile(
          * Get the kill requirement for a kit, or 0 if none.
          */
         fun killRequirement(kitId: String): Long = KIT_KILL_REQUIREMENTS[kitId] ?: 0L
+
+        /**
+         * Kit kills required to prestige.
+         */
+        const val PRESTIGE_KILL_REQUIREMENT = 2500L
+
+        /**
+         * Coins required to prestige.
+         */
+        const val PRESTIGE_COIN_REQUIREMENT = 100_000L
     }
 
     /**
@@ -65,6 +76,21 @@ data class HungerGamesProfile(
      */
     fun getStatsFor(kitId: String): HungerGamesKitStats =
         kitStats.getOrPut(kitId) { HungerGamesKitStats() }
+
+    /**
+     * Get the prestige level for a kit (0 if never prestiged).
+     */
+    fun getPrestige(kitId: String): Int = kitPrestiges[kitId] ?: 0
+
+    /**
+     * Check if the player can prestige a kit.
+     * Requires 2,500 kit kills and has not already prestiged.
+     */
+    fun canPrestige(kitId: String): Boolean
+    {
+        if (getPrestige(kitId) >= 1) return false
+        return getStatsFor(kitId).kills >= PRESTIGE_KILL_REQUIREMENT
+    }
 
     /**
      * Check if the player meets the kill requirement to use/purchase a kit.

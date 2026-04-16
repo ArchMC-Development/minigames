@@ -459,6 +459,157 @@ class ViewKitContentsMenu(
                 ).openMenu(player)
             }
 
+        // Prestige button
+        val kitStats = profile?.getStatsFor(kit.id)
+        val kitKills = kitStats?.kills ?: 0L
+        val prestigeLevel = profile?.getPrestige(kit.id) ?: 0
+        val alreadyPrestiged = prestigeLevel >= 1
+        val meetsPrestigeKills = kitKills >= HungerGamesProfile.PRESTIGE_KILL_REQUIREMENT
+        val meetsPrestigeCoins = balance >= HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT
+        val canPrestige = !alreadyPrestiged && meetsPrestigeKills && meetsPrestigeCoins
+        val coinReward = kitKills * 10
+
+        buttons[35] = ItemBuilder
+            .of(
+                when {
+                    alreadyPrestiged -> XMaterial.YELLOW_STAINED_GLASS
+                    canPrestige -> XMaterial.LIME_STAINED_GLASS
+                    else -> XMaterial.RED_STAINED_GLASS
+                }
+            )
+            .name(
+                when {
+                    alreadyPrestiged -> "${CC.GOLD}✦ Prestiged!"
+                    canPrestige -> "${CC.GREEN}✦ Prestige Available!"
+                    else -> "${CC.RED}✦ Prestige"
+                }
+            )
+            .addToLore(
+                "${CC.GRAY}Prestige resets your kit levels",
+                "${CC.GRAY}but grants exclusive rewards!",
+                ""
+            )
+            .apply {
+                if (alreadyPrestiged)
+                {
+                    addToLore(
+                        "${CC.GOLD}You have already prestiged",
+                        "${CC.GOLD}this kit!"
+                    )
+                } else
+                {
+                    addToLore(
+                        "${CC.GRAY}Requirements:",
+                        "${if (meetsPrestigeKills) CC.GREEN else CC.RED} ✦ ${CC.WHITE}${
+                            Numbers.format(HungerGamesProfile.PRESTIGE_KILL_REQUIREMENT)
+                        } Kit Kills ${CC.GRAY}(${Numbers.format(kitKills)}/${
+                            Numbers.format(HungerGamesProfile.PRESTIGE_KILL_REQUIREMENT)
+                        })",
+                        "${if (meetsPrestigeCoins) CC.GREEN else CC.RED} ✦ ${CC.WHITE}${
+                            Numbers.format(HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT)
+                        } Coins ${CC.GRAY}(${Numbers.format(balance)}/${
+                            Numbers.format(HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT)
+                        })",
+                        "",
+                        "${CC.GRAY}Rewards:",
+                        "${CC.GOLD} ✦ ${CC.WHITE}${Numbers.format(coinReward)} Coins",
+                        "${CC.LIGHT_PURPLE} ✦ ${CC.WHITE}${kit.displayName} Kill Effect",
+                        "",
+                        if (canPrestige) "${CC.GREEN}Click to prestige!"
+                        else "${CC.RED}You do not meet the requirements."
+                    )
+                }
+            }
+            .toButton { _, _ ->
+                if (alreadyPrestiged)
+                {
+                    Button.playFail(player)
+                    player.sendMessage("${CC.RED}You have already prestiged this kit!")
+                    return@toButton
+                }
+
+                val prof = HungerGamesProfileService.find(player)
+                    ?: return@toButton
+
+                val currentKitKills = prof.getStatsFor(kit.id).kills
+                if (currentKitKills < HungerGamesProfile.PRESTIGE_KILL_REQUIREMENT)
+                {
+                    Button.playFail(player)
+                    player.sendMessage(
+                        "${CC.RED}You need ${CC.GOLD}${Numbers.format(HungerGamesProfile.PRESTIGE_KILL_REQUIREMENT)} kit kills${CC.RED}! You have ${CC.GOLD}${Numbers.format(currentKitKills)}${CC.RED}."
+                    )
+                    return@toButton
+                }
+
+                val currentBalance = EconomyProfileService.find(player)
+                    ?.balance(ECONOMY_ID) ?: 0L
+
+                if (currentBalance < HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT)
+                {
+                    Button.playFail(player)
+                    player.sendMessage(
+                        "${CC.RED}You need ${CC.GOLD}${Numbers.format(HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT)} coins${CC.RED}! You have ${CC.GOLD}${Numbers.format(currentBalance)}${CC.RED}."
+                    )
+                    return@toButton
+                }
+
+                // Charge the prestige cost
+                TransactionService.submit(
+                    Transaction(
+                        sender = player.uniqueId,
+                        receiver = Accounts.SERVER,
+                        type = TransactionType.Purchase,
+                        economy = ECONOMY_ID,
+                        amount = HungerGamesProfile.PRESTIGE_COIN_REQUIREMENT
+                    )
+                ).thenAccept { result ->
+                    if (result != TransactionResult.Success)
+                    {
+                        player.sendMessage("${CC.RED}Transaction failed! Please try again.")
+                        return@thenAccept
+                    }
+
+                    val reward = prof.getStatsFor(kit.id).kills * 10
+
+                    // Reset kit levels
+                    prof.purchasedKits.remove(kit.id)
+                    if (prof.selectedKit == kit.id)
+                    {
+                        prof.selectedKitLevel = 1
+                    }
+
+                    // Set prestige
+                    prof.kitPrestiges[kit.id] = (prof.getPrestige(kit.id)) + 1
+                    prof.save()
+
+                    // Deposit coin reward
+                    TransactionService.submit(
+                        Transaction(
+                            sender = Accounts.SERVER,
+                            receiver = player.uniqueId,
+                            type = TransactionType.Deposit,
+                            economy = ECONOMY_ID,
+                            amount = reward
+                        )
+                    )
+
+                    Button.playNeutral(player)
+                    player.sendMessage("")
+                    player.sendMessage("${CC.GOLD}${CC.BOLD}✦ KIT PRESTIGED! ✦")
+                    player.sendMessage("${CC.GRAY}You prestiged the ${CC.GOLD}${kit.displayName}${CC.GRAY} kit!")
+                    player.sendMessage("")
+                    player.sendMessage("${CC.GRAY}Rewards received:")
+                    player.sendMessage("${CC.GOLD} ✦ ${CC.WHITE}${Numbers.format(reward)} Coins")
+                    player.sendMessage("${CC.LIGHT_PURPLE} ✦ ${CC.WHITE}${kit.displayName} Kill Effect")
+                    player.sendMessage("")
+
+                    // Refresh menu
+                    Schedulers.sync().runLater({
+                        ViewKitContentsMenu(kit).openMenu(player)
+                    }, 1L)
+                }
+            }
+
         return buttons
     }
 
