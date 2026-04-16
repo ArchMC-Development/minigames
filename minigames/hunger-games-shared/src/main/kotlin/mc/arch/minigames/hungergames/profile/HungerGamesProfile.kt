@@ -65,7 +65,7 @@ data class HungerGamesProfile(
         /**
          * Coins required to prestige.
          */
-        const val PRESTIGE_COIN_REQUIREMENT = 100_000L
+        const val PRESTIGE_COIN_REQUIREMENT = 1_000_000L
     }
 
     /**
