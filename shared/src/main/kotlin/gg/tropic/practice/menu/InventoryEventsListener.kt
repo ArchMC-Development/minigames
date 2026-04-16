@@ -25,6 +25,18 @@ object InventoryEventsListener
                 val callback = inventoryMap[event.whoClicked.uniqueId]
                     ?: return@handler
 
+                val player = event.whoClicked as Player
+
+                // Check if this is a button click
+                val button = callback.buttons[event.rawSlot]
+                if (button != null)
+                {
+                    event.isCancelled = true
+                    button.onClick(player)
+                    return@handler
+                }
+
+                // Block clicks on immutable slots
                 if (event.rawSlot in callback.immutableSlots)
                 {
                     event.isCancelled = true
@@ -39,7 +51,10 @@ object InventoryEventsListener
                 val callback = inventoryMap.remove(event.player.uniqueId)
                     ?: return@handler
 
-                callback.callback(event.inventory.contents)
+                if (!callback.skipCloseCallback)
+                {
+                    callback.callback?.invoke(event.inventory.contents)
+                }
             }
     }
 }

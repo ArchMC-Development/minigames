@@ -9,6 +9,8 @@ import gg.tropic.game.extensions.economy.TransactionResult
 import gg.tropic.game.extensions.economy.TransactionService
 import gg.tropic.game.extensions.economy.TransactionType
 import gg.tropic.practice.menu.BukkitInventoryCallback
+import gg.tropic.practice.menu.CallbackButton
+import gg.tropic.practice.menu.InventoryEventsListener
 import mc.arch.minigames.hungergames.kits.HungerGamesKit
 import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
@@ -282,20 +284,173 @@ class ViewKitContentsMenu(
                     ?: return@toButton
 
                 val kitLevel = kit.levels[highestOwned] ?: return@toButton
+                val defaultInventory = kitLevel.inventory.map { it?.clone() }.toTypedArray()
 
                 // Use existing custom loadout or default inventory
                 val currentLoadout = prof.customLoadouts[kit.id]
-                    ?: kitLevel.inventory.map { it?.clone() }.toTypedArray()
+                    ?: defaultInventory
 
-                // 36-slot inventory callback (no armor)
+                val isSelected = prof.selectedKit == kit.id
+
+                // Bottom row slots (36-44) are all immutable
+                val bottomRowSlots = (36..44).toList()
+
+                // Build action buttons on the bottom row
+                val actionButtons = mutableMapOf<Int, CallbackButton>()
+
+                // Slot 36: Select / Deselect Kit
+                actionButtons[36] = CallbackButton(
+                    item = ItemBuilder
+                        .of(if (isSelected) XMaterial.RED_DYE else XMaterial.LIME_DYE)
+                        .name(
+                            if (isSelected) "${CC.RED}Deselect Kit"
+                            else "${CC.GREEN}Select Kit"
+                        )
+                        .addToLore(
+                            if (isSelected) "${CC.GRAY}Click to deselect this kit."
+                            else "${CC.GRAY}Click to select this kit."
+                        )
+                        .build(),
+                    onClick = { p ->
+                        val pr = HungerGamesProfileService.find(p) ?: return@CallbackButton
+
+                        if (pr.selectedKit == kit.id)
+                        {
+                            pr.selectedKit = null
+                            pr.selectedKitLevel = 1
+                            pr.save()
+                            p.sendMessage("${CC.RED}You deselected the ${CC.GOLD}${kit.displayName}${CC.RED} kit.")
+                        } else
+                        {
+                            val selectLevel = pr.highestOwnedLevel(kit.id, kit.maxLevel())
+                            pr.selectedKit = kit.id
+                            pr.selectedKitLevel = selectLevel
+                            pr.save()
+                            p.sendMessage("${CC.GREEN}You selected the ${CC.GOLD}${kit.displayName}${CC.GREEN} kit at level ${CC.GOLD}$selectLevel${CC.GREEN}!")
+                        }
+
+                        // Skip the close callback so it doesn't save, then reopen
+                        val cb = InventoryEventsListener.inventoryMap[p.uniqueId]
+                        cb?.skipCloseCallback = true
+                        p.closeInventory()
+
+                        Schedulers.sync().runLater({
+                            ViewKitContentsMenu(kit).openMenu(p)
+                        }, 1L)
+                    }
+                )
+
+                // Slot 38: Save Layout
+                actionButtons[38] = CallbackButton(
+                    item = ItemBuilder
+                        .of(XMaterial.WRITABLE_BOOK)
+                        .name("${CC.GREEN}Save Layout")
+                        .addToLore(
+                            "${CC.GRAY}Click to save your custom",
+                            "${CC.GRAY}loadout and close the editor."
+                        )
+                        .build(),
+                    onClick = { p ->
+                        val pr = HungerGamesProfileService.find(p) ?: return@CallbackButton
+
+                        // Grab the current inventory contents (only the 36 item slots)
+                        val cb = InventoryEventsListener.inventoryMap[p.uniqueId]
+                        val inv = p.openInventory.topInventory
+                        val contents = Array<ItemStack?>(36) { i -> inv.getItem(i) }
+
+                        pr.customLoadouts[kit.id] = contents
+                        pr.save()
+
+                        p.sendMessage("${CC.GREEN}Your custom loadout for ${CC.GOLD}${kit.displayName}${CC.GREEN} has been saved!")
+
+                        cb?.skipCloseCallback = true
+                        p.closeInventory()
+
+                        Schedulers.sync().runLater({
+                            ViewKitContentsMenu(kit).openMenu(p)
+                        }, 1L)
+                    }
+                )
+
+                // Slot 40: Reset Layout
+                actionButtons[40] = CallbackButton(
+                    item = ItemBuilder
+                        .of(XMaterial.BARRIER)
+                        .name("${CC.RED}Reset Layout")
+                        .addToLore(
+                            "${CC.GRAY}Click to reset your loadout",
+                            "${CC.GRAY}to the default kit items."
+                        )
+                        .build(),
+                    onClick = { p ->
+                        val pr = HungerGamesProfileService.find(p) ?: return@CallbackButton
+
+                        pr.customLoadouts.remove(kit.id)
+                        pr.save()
+
+                        p.sendMessage("${CC.YELLOW}Your loadout for ${CC.GOLD}${kit.displayName}${CC.YELLOW} has been reset to default!")
+
+                        val cb = InventoryEventsListener.inventoryMap[p.uniqueId]
+                        cb?.skipCloseCallback = true
+                        p.closeInventory()
+
+                        Schedulers.sync().runLater({
+                            ViewKitContentsMenu(kit).openMenu(p)
+                        }, 1L)
+                    }
+                )
+
+                // Slot 44: Back (no save)
+                actionButtons[44] = CallbackButton(
+                    item = ItemBuilder
+                        .of(XMaterial.ARROW)
+                        .name("${CC.RED}Back")
+                        .addToLore(
+                            "${CC.GRAY}Click to go back without",
+                            "${CC.GRAY}saving your changes."
+                        )
+                        .build(),
+                    onClick = { p ->
+                        val cb = InventoryEventsListener.inventoryMap[p.uniqueId]
+                        cb?.skipCloseCallback = true
+                        p.closeInventory()
+
+                        Schedulers.sync().runLater({
+                            ViewKitContentsMenu(kit).openMenu(p)
+                        }, 1L)
+                    }
+                )
+
+                // Fill remaining bottom row slots with glass pane placeholders
+                val placeholderItem = ItemBuilder
+                    .of(XMaterial.GRAY_STAINED_GLASS_PANE)
+                    .name(" ")
+                    .build()
+
+                for (slot in bottomRowSlots)
+                {
+                    if (slot !in actionButtons)
+                    {
+                        actionButtons[slot] = CallbackButton(
+                            item = placeholderItem,
+                            onClick = { }
+                        )
+                    }
+                }
+
+                // 45-slot menu: 36 editable item slots + 9 bottom action row
                 BukkitInventoryCallback(
-                    contentsToSet = currentLoadout,
-                    immutableSlots = emptyList(),
+                    contentsToSet = currentLoadout.copyOf(45),
+                    immutableSlots = bottomRowSlots,
                     title = "${kit.displayName} - Edit Loadout",
-                    size = 36,
+                    size = 45,
+                    buttons = actionButtons,
                     callback = { contents ->
-                        prof.customLoadouts[kit.id] = contents
-                        prof.save()
+                        // Default close = save
+                        val pr = HungerGamesProfileService.find(player) ?: return@BukkitInventoryCallback
+                        val itemContents = Array<ItemStack?>(36) { i -> contents[i] }
+                        pr.customLoadouts[kit.id] = itemContents
+                        pr.save()
 
                         player.sendMessage(
                             "${CC.GREEN}Your custom loadout for ${CC.GOLD}${kit.displayName}${CC.GREEN} has been saved!"
