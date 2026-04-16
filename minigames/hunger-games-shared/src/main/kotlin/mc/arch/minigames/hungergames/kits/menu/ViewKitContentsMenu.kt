@@ -271,7 +271,7 @@ class ViewKitContentsMenu(
 
         buttons[29] = ItemBuilder
             .of(XMaterial.SKULL_BANNER_PATTERN)
-            .name("${CC.B_LIGHT_PURPLE}Kit Statistics")
+            .name("${CC.B_GREEN}Kit Statistics")
             .addToLore(
                 "${CC.GRAY}Your stats with ${CC.WHITE}${kit.displayName}${CC.GRAY}:",
                 "",

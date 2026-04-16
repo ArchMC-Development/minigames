@@ -1,17 +1,14 @@
 package gg.tropic.practice.menu.manage.lobbynpc
 
 import com.cryptomorin.xseries.XMaterial
-import gg.scala.commons.configurable.editBoolean
-import gg.scala.commons.configurable.editEnum
-import gg.scala.commons.configurable.editItemStack
-import gg.scala.commons.configurable.editPosition
-import gg.scala.commons.configurable.editString
+import gg.scala.commons.configurable.*
 import gg.tropic.practice.configuration.PracticeConfigurationService
 import gg.tropic.practice.configuration.minigame.type.LobbyNPCSkinType
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.RemoveButton
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import org.bukkit.entity.Player
 
@@ -88,7 +85,7 @@ class ManageMinigameLobbyNPCMenu(
             PracticeConfigurationService,
             title = "Held Item",
             getter = {
-                local().minigameLobbyNPCs[index].heldItem
+                local().minigameLobbyNPCs[index].heldItem ?: ItemBuilder.of(XMaterial.RED_BED).build()
             },
             setter = {
                 local().minigameLobbyNPCs[index].heldItem = it

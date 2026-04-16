@@ -63,7 +63,7 @@ class ViewMinigameLobbyNPCsMenu : PaginatedMenu()
                         "${CC.YELLOW}Gamemode Name: ${CC.WHITE}${npc.gamemodeName}",
                         "${CC.YELLOW}Player Count Replacement: ${CC.WHITE}${npc.replacement}",
                         "${CC.YELLOW}Skin Type: ${CC.WHITE}${npc.skinType}",
-                        "${CC.YELLOW}Held Item Type: ${CC.WHITE}${npc.heldItem.type}",
+                        "${CC.YELLOW}Held Item Type: ${CC.WHITE}${npc.heldItem.type ?: "Unknown"}",
                         "",
                         "${CC.GREEN}Click to configure!"
                     )
