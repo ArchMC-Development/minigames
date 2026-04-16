@@ -144,7 +144,7 @@ class ManageKitMenu(
             Schedulers
                 .sync()
                 .run {
-                    ViewKitsMenu().openMenu(player)
+                    ListManageableKitsMenu().openMenu(player)
                 }
         }
     }

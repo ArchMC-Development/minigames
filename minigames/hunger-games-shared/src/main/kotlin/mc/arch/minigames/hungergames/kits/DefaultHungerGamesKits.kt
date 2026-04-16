@@ -2,7 +2,6 @@
 
 package mc.arch.minigames.hungergames.kits
 
-import com.cryptomorin.xseries.XEnchantment
 import com.cryptomorin.xseries.XMaterial
 import org.bukkit.Color
 import org.bukkit.Material
@@ -209,7 +208,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Wooden Sword, Leather armor (dyed), Boots w/ Prot I, Bread x12, Cake x3, Baker's Potion x2
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BAKER_COLOR, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -224,7 +224,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 2: Stone Sword w/ Unbreaking I, Leather armor, Boots w/ Prot II, Bread x16, Cake x3, Potion x2
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BAKER_COLOR, mapOf(PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -239,7 +240,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 3: Stone Sword w/ Unbreaking I, Leather armor, Iron Boots, Bread x20, Cake x4, Potion x3
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -254,7 +256,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 4: Stone Sword w/ Unbreaking I, Leather armor, Iron Boots w/ Prot I, Bread x24, Cake x5, Golden Apple, Potion x3
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -270,7 +273,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 5: Iron Sword w/ Unbreaking I, Leather armor, Iron Boots w/ Prot I, Bread x32, Cake x5, Golden Apple, Potion x3
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -286,7 +290,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 6: Iron Sword w/ Unbreaking I, Leather armor w/ Prot II, Iron Boots w/ Prot II, Bread x32, Cake x5, Golden Apple, Potion x3 (0:08)
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BAKER_COLOR),
@@ -318,7 +323,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Stone Sword w/ Unbreaking I, Full Golden armor
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS),
@@ -328,7 +334,8 @@ object DefaultHungerGamesKits
                     inv(item(XMaterial.STONE_SWORD, 1, mapOf(UNBREAKING to 1)))
                 ),
                 // Level 2: Stone Sword, Full Golden armor
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS),
@@ -338,7 +345,8 @@ object DefaultHungerGamesKits
                     inv(item(XMaterial.STONE_SWORD))
                 ),
                 // Level 3: Stone Sword, Full Golden armor w/ Prot I, Golden Carrot
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS, 1, mapOf(PROT to 1)),
@@ -351,7 +359,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 4: Stone Sword, Golden armor (varied Protection I-II), Golden Carrot x2, Golden Apple
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS, 1, mapOf(PROT to 1)),
@@ -365,7 +374,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 5: Iron Sword w/ Unbreaking I, Golden armor (Prot I-II), Golden Carrot x2, Golden Apple
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS, 1, mapOf(PROT to 2)),
@@ -379,7 +389,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 6: Iron Sword w/ Unbreaking I, Golden armor (Prot II-III), Golden Carrot x2, Golden Apple
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.GOLDEN_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = item(XMaterial.GOLDEN_LEGGINGS, 1, mapOf(PROT to 2)),
@@ -409,7 +420,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Bow w/ Power I, Diamond Helmet, Leather Leggings, Leather Boots, Arrow x28
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -422,7 +434,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 2: Bow w/ Power I, Diamond Helmet w/ Prot I, Leather Leggings, Leather Boots, Arrow x32
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -435,7 +448,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 3: Bow w/ Power I, Diamond Helmet w/ Prot II, Leather Chestplate, Leather Leggings, Leather Boots, Arrow x36
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -448,7 +462,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 4: Bow w/ Power I, Diamond Helmet w/ Prot III, Leather Chestplate, Leggings, Boots, Arrow x40
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -461,7 +476,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 5: Bow w/ Power II, Diamond Helmet w/ Prot III, Leather Chestplate, Leggings, Boots, Arrow x40
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -474,7 +490,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 6: Wooden Sword, Bow w/ Power II, Diamond Helmet w/ Prot III, Leather full, Arrow x44
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARCHER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARCHER_COLOR),
@@ -504,7 +521,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Wooden Sword w/ Looting II, Diamond Helmet, Iron Boots, Cow Egg x3, Steak x12
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = null,
@@ -518,7 +536,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 2: Stone Sword w/ Looting II, Diamond Helmet w/ Prot I, Iron Boots, Cow Egg x4, Steak x16
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = null,
@@ -532,7 +551,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 3: Stone Sword w/ Looting II, Diamond Helmet w/ Prot II, Iron Boots, Cow Egg x4, Steak x20
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = null,
@@ -546,7 +566,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 4: Stone Sword w/ Looting III, Diamond Helmet w/ Prot III, Iron Boots, Cow Egg x5, Steak x24
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = null,
@@ -560,7 +581,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 5: Iron Sword w/ Looting III, Diamond Helmet w/ Prot IV, Iron Boots, Cow Egg x5, Pig Egg x1, Saddle, Carrot on a Stick, Steak x28
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = null,
@@ -577,7 +599,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 6: Iron Sword w/ Looting III, Diamond Helmet w/ Prot IV, Leather Leggings (Butcher's Pants), Iron Boots w/ Prot I, Cow Egg x5, Pig Egg x1, Saddle, Carrot on a Stick, Steak x28
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, Color.fromRGB(255, 85, 85)),
@@ -625,7 +648,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Full Leather armor (dyed), Speed II x3 (0:16), Slowness splash x2
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -638,7 +662,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 2: Leather Helmet w/ Respiration II, rest leather, Speed II x3 (0:17), Slowness x2, Regen x1
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -652,7 +677,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 3: Same as 2 but Speed x3 (0:18)
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -666,7 +692,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 4: Speed x4 (0:20), Slowness x3, Regen x1
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -680,7 +707,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 5: Speed x5 (0:20), Slowness x3, Regen x2
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -694,7 +722,8 @@ object DefaultHungerGamesKits
                     )
                 ),
                 // Level 6: Wooden Axe, Speed x5 (0:23), Slowness x3, Regen x2
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SCOUT_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SCOUT_COLOR),
@@ -725,7 +754,8 @@ object DefaultHungerGamesKits
             icon = icon,
             levels = mutableMapOf(
                 // Level 1: Full leather w/ heavy enchants, Cookie x6
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 1, FEATHER to 3)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 2, FIRE_PROT to 3)),
@@ -735,52 +765,117 @@ object DefaultHungerGamesKits
                     inv(item(XMaterial.COOKIE, 6))
                 ),
                 // Level 2: Same but stronger, Cookie x7
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 2, FEATHER to 3, UNBREAKING to 1)),
-                        leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 3, FIRE_PROT to 4, UNBREAKING to 1)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, ARMORER_GREEN, mapOf(PROT to 3, BLAST_PROT to 4, UNBREAKING to 1)),
-                        helmet = leatherArmor(XMaterial.LEATHER_HELMET, Color.fromRGB(255, 165, 0), mapOf(PROT to 2, PROJ_PROT to 3, UNBREAKING to 1))
+                        leggings = leatherArmor(
+                            XMaterial.LEATHER_LEGGINGS,
+                            ARMORER_LEGS,
+                            mapOf(PROT to 3, FIRE_PROT to 4, UNBREAKING to 1)
+                        ),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            ARMORER_GREEN,
+                            mapOf(PROT to 3, BLAST_PROT to 4, UNBREAKING to 1)
+                        ),
+                        helmet = leatherArmor(
+                            XMaterial.LEATHER_HELMET,
+                            Color.fromRGB(255, 165, 0),
+                            mapOf(PROT to 2, PROJ_PROT to 3, UNBREAKING to 1)
+                        )
                     ),
                     inv(item(XMaterial.COOKIE, 7))
                 ),
                 // Level 3
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 2, FEATHER to 3, UNBREAKING to 1)),
-                        leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 3, FIRE_PROT to 5, UNBREAKING to 1)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, ARMORER_GREEN, mapOf(PROT to 3, BLAST_PROT to 5, UNBREAKING to 1)),
-                        helmet = leatherArmor(XMaterial.LEATHER_HELMET, Color.fromRGB(255, 165, 0), mapOf(PROT to 2, PROJ_PROT to 4, UNBREAKING to 1))
+                        leggings = leatherArmor(
+                            XMaterial.LEATHER_LEGGINGS,
+                            ARMORER_LEGS,
+                            mapOf(PROT to 3, FIRE_PROT to 5, UNBREAKING to 1)
+                        ),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            ARMORER_GREEN,
+                            mapOf(PROT to 3, BLAST_PROT to 5, UNBREAKING to 1)
+                        ),
+                        helmet = leatherArmor(
+                            XMaterial.LEATHER_HELMET,
+                            Color.fromRGB(255, 165, 0),
+                            mapOf(PROT to 2, PROJ_PROT to 4, UNBREAKING to 1)
+                        )
                     ),
                     inv(item(XMaterial.COOKIE, 8))
                 ),
                 // Level 4
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 2, FEATHER to 3, UNBREAKING to 2)),
-                        leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 4, FIRE_PROT to 5, UNBREAKING to 2)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, ARMORER_GREEN, mapOf(PROT to 4, BLAST_PROT to 5, UNBREAKING to 2)),
-                        helmet = leatherArmor(XMaterial.LEATHER_HELMET, Color.fromRGB(255, 165, 0), mapOf(PROT to 2, PROJ_PROT to 5, UNBREAKING to 2))
+                        leggings = leatherArmor(
+                            XMaterial.LEATHER_LEGGINGS,
+                            ARMORER_LEGS,
+                            mapOf(PROT to 4, FIRE_PROT to 5, UNBREAKING to 2)
+                        ),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            ARMORER_GREEN,
+                            mapOf(PROT to 4, BLAST_PROT to 5, UNBREAKING to 2)
+                        ),
+                        helmet = leatherArmor(
+                            XMaterial.LEATHER_HELMET,
+                            Color.fromRGB(255, 165, 0),
+                            mapOf(PROT to 2, PROJ_PROT to 5, UNBREAKING to 2)
+                        )
                     ),
                     inv(item(XMaterial.COOKIE, 9))
                 ),
                 // Level 5
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 2, FEATHER to 4, UNBREAKING to 2)),
-                        leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 4, FIRE_PROT to 10, UNBREAKING to 2)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, ARMORER_GREEN, mapOf(PROT to 4, BLAST_PROT to 10, UNBREAKING to 2)),
-                        helmet = leatherArmor(XMaterial.LEATHER_HELMET, Color.fromRGB(255, 165, 0), mapOf(PROT to 2, PROJ_PROT to 10, UNBREAKING to 2))
+                        leggings = leatherArmor(
+                            XMaterial.LEATHER_LEGGINGS,
+                            ARMORER_LEGS,
+                            mapOf(PROT to 4, FIRE_PROT to 10, UNBREAKING to 2)
+                        ),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            ARMORER_GREEN,
+                            mapOf(PROT to 4, BLAST_PROT to 10, UNBREAKING to 2)
+                        ),
+                        helmet = leatherArmor(
+                            XMaterial.LEATHER_HELMET,
+                            Color.fromRGB(255, 165, 0),
+                            mapOf(PROT to 2, PROJ_PROT to 10, UNBREAKING to 2)
+                        )
                     ),
                     inv(item(XMaterial.COOKIE, 10))
                 ),
                 // Level 6: Wooden Sword w/ Unbreaking III + all armor w/ Unbreaking III
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, ARMORER_BOOTS, mapOf(PROT to 2, FEATHER to 10, UNBREAKING to 3)),
-                        leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ARMORER_LEGS, mapOf(PROT to 4, FIRE_PROT to 10, UNBREAKING to 3)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, ARMORER_GREEN, mapOf(PROT to 4, BLAST_PROT to 10, UNBREAKING to 3)),
-                        helmet = leatherArmor(XMaterial.LEATHER_HELMET, Color.fromRGB(255, 165, 0), mapOf(PROT to 2, PROJ_PROT to 10, UNBREAKING to 3))
+                        leggings = leatherArmor(
+                            XMaterial.LEATHER_LEGGINGS,
+                            ARMORER_LEGS,
+                            mapOf(PROT to 4, FIRE_PROT to 10, UNBREAKING to 3)
+                        ),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            ARMORER_GREEN,
+                            mapOf(PROT to 4, BLAST_PROT to 10, UNBREAKING to 3)
+                        ),
+                        helmet = leatherArmor(
+                            XMaterial.LEATHER_HELMET,
+                            Color.fromRGB(255, 165, 0),
+                            mapOf(PROT to 2, PROJ_PROT to 10, UNBREAKING to 3)
+                        )
                     ),
                     inv(
                         item(XMaterial.WOODEN_SWORD, 1, mapOf(UNBREAKING to 3)),
@@ -803,7 +898,8 @@ object DefaultHungerGamesKits
             displayName = "Horsetamer",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, HORSETAMER_COLOR),
@@ -819,7 +915,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 150_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, HORSETAMER_COLOR),
@@ -834,7 +931,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.APPLE, 4)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, HORSETAMER_COLOR),
@@ -849,7 +947,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.APPLE, 4)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, HORSETAMER_COLOR),
@@ -864,7 +963,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.APPLE, 6)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, HORSETAMER_COLOR),
@@ -879,7 +979,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.APPLE, 8)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -915,7 +1016,8 @@ object DefaultHungerGamesKits
             displayName = "Astronaut",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.CHAINMAIL_BOOTS, 1, mapOf(FEATHER to 5)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ASTRONAUT_COLOR),
@@ -928,7 +1030,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 30_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.CHAINMAIL_BOOTS, 1, mapOf(FEATHER to 5)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ASTRONAUT_COLOR),
@@ -940,7 +1043,8 @@ object DefaultHungerGamesKits
                         resistPotion(2, 240)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(FEATHER to 6)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ASTRONAUT_COLOR),
@@ -952,7 +1056,8 @@ object DefaultHungerGamesKits
                         resistPotion(2, 240)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(FEATHER to 6, PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ASTRONAUT_COLOR),
@@ -964,7 +1069,8 @@ object DefaultHungerGamesKits
                         resistPotion(3, 260)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(FEATHER to 10, PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, ASTRONAUT_COLOR),
@@ -976,7 +1082,8 @@ object DefaultHungerGamesKits
                         resistPotion(4, 280)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(FEATHER to 10, PROT to 2)),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS, 1, mapOf(PROT to 1)),
@@ -1012,7 +1119,8 @@ object DefaultHungerGamesKits
             displayName = "Warlock",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, WARLOCK_COLOR, mapOf(PROT to 1)),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS, 1, mapOf(PROT to 2, UNBREAKING to 10)),
@@ -1025,7 +1133,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 20_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, WARLOCK_COLOR, mapOf(PROT to 2)),
                         leggings = item(XMaterial.IRON_LEGGINGS, 1, mapOf(UNBREAKING to 10)),
@@ -1037,7 +1146,8 @@ object DefaultHungerGamesKits
                         warlockPotion(2)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = item(XMaterial.IRON_LEGGINGS, 1, mapOf(PROT to 1, UNBREAKING to 10)),
@@ -1049,7 +1159,8 @@ object DefaultHungerGamesKits
                         warlockPotion(2)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = item(XMaterial.IRON_LEGGINGS, 1, mapOf(PROT to 2, UNBREAKING to 10)),
@@ -1061,7 +1172,8 @@ object DefaultHungerGamesKits
                         warlockPotion(2)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = item(XMaterial.DIAMOND_LEGGINGS, 1, mapOf(UNBREAKING to 10)),
@@ -1073,7 +1185,8 @@ object DefaultHungerGamesKits
                         warlockPotion(3)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = item(XMaterial.DIAMOND_LEGGINGS, 1, mapOf(PROT to 1, UNBREAKING to 10)),
@@ -1106,7 +1219,8 @@ object DefaultHungerGamesKits
             displayName = "SlimeySlime",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 4)),
                         leggings = null,
@@ -1120,7 +1234,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 20_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 4)),
                         leggings = null,
@@ -1133,7 +1248,8 @@ object DefaultHungerGamesKits
                         slownessSplash(2)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 4)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SLIME_COLOR),
@@ -1146,7 +1262,8 @@ object DefaultHungerGamesKits
                         slownessSplash(3)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 4, FEATHER to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SLIME_COLOR),
@@ -1159,7 +1276,8 @@ object DefaultHungerGamesKits
                         slownessSplash(4)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 4, FEATHER to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SLIME_COLOR),
@@ -1172,7 +1290,8 @@ object DefaultHungerGamesKits
                         slownessSplash(4)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 10, FEATHER to 4)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SLIME_COLOR),
@@ -1206,7 +1325,8 @@ object DefaultHungerGamesKits
             displayName = "Shadow Knight",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1219,7 +1339,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 15_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1231,7 +1352,8 @@ object DefaultHungerGamesKits
                         blindnessSplash(2)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1243,7 +1365,8 @@ object DefaultHungerGamesKits
                         blindnessSplash(3)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1255,7 +1378,8 @@ object DefaultHungerGamesKits
                         blindnessSplash(3)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1267,7 +1391,8 @@ object DefaultHungerGamesKits
                         blindnessSplash(3)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, SHADOW_COLOR),
                         leggings = item(XMaterial.CHAINMAIL_LEGGINGS),
@@ -1300,7 +1425,8 @@ object DefaultHungerGamesKits
             displayName = "Pigman",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
@@ -1314,7 +1440,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 10_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
@@ -1327,11 +1454,16 @@ object DefaultHungerGamesKits
                         harmingSplash(2)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
-                        chestplate = leatherArmor(XMaterial.LEATHER_CHESTPLATE, PIGMAN_COLOR, mapOf(PROT to 1, FIRE_PROT to 1, UNBREAKING to 1)),
+                        chestplate = leatherArmor(
+                            XMaterial.LEATHER_CHESTPLATE,
+                            PIGMAN_COLOR,
+                            mapOf(PROT to 1, FIRE_PROT to 1, UNBREAKING to 1)
+                        ),
                         helmet = item(XMaterial.GOLDEN_HELMET, 1, mapOf(PROT to 1, UNBREAKING to 1))
                     ),
                     inv(
@@ -1340,7 +1472,8 @@ object DefaultHungerGamesKits
                         harmingSplash(2)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
@@ -1353,7 +1486,8 @@ object DefaultHungerGamesKits
                         harmingSplash(3)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
@@ -1366,7 +1500,8 @@ object DefaultHungerGamesKits
                         harmingSplash(3)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, PIGMAN_COLOR, mapOf(PROT to 1, UNBREAKING to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, PIGMAN_COLOR, mapOf(PROT to 2, UNBREAKING to 1)),
@@ -1395,7 +1530,8 @@ object DefaultHungerGamesKits
             displayName = "Wolftamer",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR),
@@ -1409,7 +1545,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 40_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR),
@@ -1422,7 +1559,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.ROTTEN_FLESH, 16)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR),
@@ -1435,7 +1573,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.ROTTEN_FLESH, 18)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 3)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR),
@@ -1448,7 +1587,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.ROTTEN_FLESH, 18)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 4)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR),
@@ -1461,7 +1601,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.ROTTEN_FLESH, 20)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.DIAMOND_BOOTS, 1, mapOf(PROT to 4)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, WOLFTAMER_COLOR, mapOf(PROT to 1)),
@@ -1490,7 +1631,8 @@ object DefaultHungerGamesKits
             displayName = "Blaze",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1504,7 +1646,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 20_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1517,7 +1660,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_BLAZE, 2)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1530,7 +1674,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_BLAZE, 3)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1543,7 +1688,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_BLAZE, 3)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1556,7 +1702,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_BLAZE, 3)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, BLAZE_COLOR, mapOf(FIRE_PROT to 2)),
@@ -1585,7 +1732,8 @@ object DefaultHungerGamesKits
             displayName = "Creeper",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = null,
                         leggings = null,
@@ -1599,7 +1747,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 30_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = null,
                         leggings = null,
@@ -1612,7 +1761,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_CREEPER, 4)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, CREEPER_COLOR),
                         leggings = null,
@@ -1625,7 +1775,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_CREEPER, 4)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, CREEPER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, CREEPER_COLOR),
@@ -1638,7 +1789,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_CREEPER, 4)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, CREEPER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, CREEPER_COLOR),
@@ -1651,7 +1803,8 @@ object DefaultHungerGamesKits
                         spawnEgg(ENTITY_CREEPER, 5)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = leatherArmor(XMaterial.LEATHER_BOOTS, CREEPER_COLOR),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, CREEPER_COLOR),
@@ -1680,7 +1833,8 @@ object DefaultHungerGamesKits
             displayName = "Snowman",
             icon = icon,
             levels = mutableMapOf(
-                level(1,
+                level(
+                    1,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),
@@ -1695,7 +1849,8 @@ object DefaultHungerGamesKits
                     ),
                     price = 385_000L
                 ),
-                level(2,
+                level(
+                    2,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),
@@ -1709,7 +1864,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.CARROT, 6)
                     )
                 ),
-                level(3,
+                level(
+                    3,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),
@@ -1723,7 +1879,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.CARROT, 6)
                     )
                 ),
-                level(4,
+                level(
+                    4,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 1)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),
@@ -1737,7 +1894,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.CARROT, 6)
                     )
                 ),
-                level(5,
+                level(
+                    5,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 2)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),
@@ -1751,7 +1909,8 @@ object DefaultHungerGamesKits
                         item(XMaterial.CARROT, 10)
                     )
                 ),
-                level(6,
+                level(
+                    6,
                     armor(
                         boots = item(XMaterial.IRON_BOOTS, 1, mapOf(PROJ_PROT to 3)),
                         leggings = leatherArmor(XMaterial.LEATHER_LEGGINGS, SNOWMAN_COLOR),

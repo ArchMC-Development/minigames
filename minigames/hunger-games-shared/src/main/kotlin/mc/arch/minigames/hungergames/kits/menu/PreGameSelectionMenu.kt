@@ -11,13 +11,7 @@ import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.entity.Player
 
-/**
- * In-game kit selection menu shown during pre-game waiting/starting phases.
- * Players can only select from kits they already own.
- *
- * @author ArchMC
- */
-class InGameKitSelectMenu : Menu("Select a Kit...")
+class PreGameSelectionMenu : Menu("Select a Kit...")
 {
     override fun size(buttons: Map<Int, Button>) = 54
 

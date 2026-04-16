@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 /**
  * @author ArchMC
  */
-class ViewKitsMenu : PaginatedMenu()
+class ListManageableKitsMenu : PaginatedMenu()
 {
     init
     {

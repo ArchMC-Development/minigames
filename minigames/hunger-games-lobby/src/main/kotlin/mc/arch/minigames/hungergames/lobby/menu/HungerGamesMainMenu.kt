@@ -3,7 +3,7 @@ package mc.arch.minigames.hungergames.lobby.menu
 import com.cryptomorin.xseries.XMaterial
 import gg.tropic.practice.menu.StatisticsMenu
 import gg.tropic.practice.profile.PracticeProfileService
-import mc.arch.minigames.hungergames.kits.menu.HungerGamesSelectKitMenu
+import mc.arch.minigames.hungergames.kits.menu.MainHungerGamesKitMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -61,7 +61,7 @@ class HungerGamesMainMenu : Menu("Survival Games Menu")
                 "${CC.GREEN}Click to browse!"
             )
             .toButton { _, _ ->
-                HungerGamesSelectKitMenu().openMenu(player)
+                MainHungerGamesKitMenu().openMenu(player)
             },
     )
 }

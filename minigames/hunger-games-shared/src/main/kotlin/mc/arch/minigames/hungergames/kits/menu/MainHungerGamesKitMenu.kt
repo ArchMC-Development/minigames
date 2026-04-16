@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
  *
  * @author ArchMC
  */
-class HungerGamesSelectKitMenu : Menu("Kit Shop")
+class MainHungerGamesKitMenu : Menu("Kit Shop")
 {
     override fun size(buttons: Map<Int, Button>) = 54
 

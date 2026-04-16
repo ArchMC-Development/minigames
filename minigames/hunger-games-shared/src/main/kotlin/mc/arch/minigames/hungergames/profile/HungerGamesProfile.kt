@@ -6,9 +6,6 @@ import gg.scala.store.storage.type.DataStoreStorageType
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-/**
- * @author ArchMC
- */
 data class HungerGamesKitStats(
     var damageDealt: Double = 0.0,
     var damageTaken: Double = 0.0,

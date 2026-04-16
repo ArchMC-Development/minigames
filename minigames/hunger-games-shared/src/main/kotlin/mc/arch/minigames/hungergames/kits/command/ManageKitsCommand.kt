@@ -8,7 +8,7 @@ import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import mc.arch.minigames.hungergames.kits.HungerGamesKit
 import mc.arch.minigames.hungergames.kits.HungerGamesKitDataSync
-import mc.arch.minigames.hungergames.kits.menu.ViewKitsMenu
+import mc.arch.minigames.hungergames.kits.menu.ListManageableKitsMenu
 import net.evilblock.cubed.util.CC
 
 /**
@@ -19,7 +19,7 @@ object ManageKitsCommand : ScalaCommand()
 {
     @CommandAlias("managehgkits")
     @CommandPermission("op")
-    fun onManageKits(player: ScalaPlayer) = ViewKitsMenu().openMenu(player)
+    fun onManageKits(player: ScalaPlayer) = ListManageableKitsMenu().openMenu(player)
 
     @CommandAlias("createhgkit")
     @CommandPermission("op")
