@@ -1,6 +1,7 @@
 package mc.arch.minigames.hungergames.kits.menu
 
 import com.cryptomorin.xseries.XMaterial
+import mc.arch.minigames.hungergames.kits.HungerGamesKit
 import mc.arch.minigames.hungergames.kits.HungerGamesKitDataSync
 import mc.arch.minigames.hungergames.profile.HungerGamesProfile
 import mc.arch.minigames.hungergames.profile.HungerGamesProfileService
@@ -54,13 +55,14 @@ class MainHungerGamesKitMenu : Menu("Kit Shop")
             val kit = kits.getOrNull(slot.index)
                 ?: return@forEach
 
-            val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
-            val totalLevels = kit.levels.size
+            val highestOwned = profile?.highestOwnedLevel(kit.id, kit.purchasableMaxLevel()) ?: 1
+            val totalLevels = kit.levels.keys.count { it <= HungerGamesKit.PURCHASABLE_MAX_LEVEL }
             val killReq = HungerGamesProfile.killRequirement(kit.id)
             val meetsKillReq = profile?.meetsKillRequirement(kit.id) ?: (killReq <= 0L)
 
-            // Find the next level the player can buy
+            // Find the next level the player can buy (excluding prestige level)
             val nextUnownedLevel = kit.levels.entries
+                .filter { it.key <= HungerGamesKit.PURCHASABLE_MAX_LEVEL }
                 .sortedBy { it.key }
                 .firstOrNull { profile?.hasKit(kit.id, it.key) != true }
 

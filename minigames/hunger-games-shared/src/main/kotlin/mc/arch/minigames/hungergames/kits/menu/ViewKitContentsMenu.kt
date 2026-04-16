@@ -63,7 +63,7 @@ class ViewKitContentsMenu(
                 "${CC.GRAY}Viewing kit contents for",
                 "${CC.GRAY}each level of this kit.",
                 "",
-                "${CC.GRAY}Levels: ${CC.WHITE}${kit.levels.size}",
+                "${CC.GRAY}Levels: ${CC.WHITE}${kit.levels.keys.count { it <= HungerGamesKit.PURCHASABLE_MAX_LEVEL }}",
                 "",
                 "${CC.GRAY}Your Balance: ${
                     economy?.format(balance) ?: "${CC.GOLD}${Numbers.format(balance)} Coins"
@@ -86,9 +86,11 @@ class ViewKitContentsMenu(
             )
             .toButton()
 
-        // Level buttons
+        // Level buttons (only purchasable levels — prestige level is reserved)
         val slots = (10..16) + (19..25) + (28..34)
-        val sortedLevels = kit.levels.entries.sortedBy { it.key }
+        val sortedLevels = kit.levels.entries
+            .filter { it.key <= HungerGamesKit.PURCHASABLE_MAX_LEVEL }
+            .sortedBy { it.key }
 
         sortedLevels.forEachIndexed { index, (level, kitLevel) ->
             if (index >= slots.size) return@forEachIndexed
@@ -285,7 +287,7 @@ class ViewKitContentsMenu(
             .toButton()
 
         // Edit Loadout button
-        val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
+        val highestOwned = profile?.highestOwnedLevel(kit.id, kit.purchasableMaxLevel()) ?: 1
         val hasCustomLoadout = profile?.customLoadouts?.containsKey(kit.id) == true
 
         buttons[31] = ItemBuilder
@@ -345,7 +347,7 @@ class ViewKitContentsMenu(
                             p.sendMessage("${CC.RED}You deselected the ${CC.GOLD}${kit.displayName}${CC.RED} kit.")
                         } else
                         {
-                            val selectLevel = pr.highestOwnedLevel(kit.id, kit.maxLevel())
+                            val selectLevel = pr.highestOwnedLevel(kit.id, kit.purchasableMaxLevel())
                             pr.selectedKit = kit.id
                             pr.selectedKitLevel = selectLevel
                             pr.save()
@@ -509,7 +511,8 @@ class ViewKitContentsMenu(
             )
             .addToLore(
                 "${CC.GRAY}Prestige resets your kit levels",
-                "${CC.GRAY}but grants exclusive rewards!",
+                "${CC.GRAY}but unlocks the exclusive",
+                "${CC.GRAY}prestige loadout!",
                 ""
             )
             .apply {
@@ -536,6 +539,7 @@ class ViewKitContentsMenu(
                         "",
                         "${CC.GRAY}Rewards:",
                         "${CC.GOLD} ✦ ${CC.WHITE}${Numbers.format(coinReward)} Coins",
+                        "${CC.AQUA} ✦ ${CC.WHITE}${kit.displayName} Prestige Loadout",
                         "${CC.LIGHT_PURPLE} ✦ ${CC.WHITE}${kit.displayName} Kill Effect",
                         "",
                         if (canPrestige) "${CC.GREEN}Click to prestige!"
@@ -623,6 +627,7 @@ class ViewKitContentsMenu(
                     player.sendMessage("")
                     player.sendMessage("${CC.GRAY}Rewards received:")
                     player.sendMessage("${CC.GOLD} ✦ ${CC.WHITE}${Numbers.format(reward)} Coins")
+                    player.sendMessage("${CC.AQUA} ✦ ${CC.WHITE}${kit.displayName} Prestige Loadout Unlocked!")
                     player.sendMessage("${CC.LIGHT_PURPLE} ✦ ${CC.WHITE}${kit.displayName} Kill Effect")
                     player.sendMessage("")
 

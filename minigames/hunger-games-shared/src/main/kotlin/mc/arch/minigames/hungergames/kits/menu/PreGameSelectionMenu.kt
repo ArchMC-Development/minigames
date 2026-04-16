@@ -48,7 +48,8 @@ class PreGameSelectionMenu : Menu("Select a Kit...")
                 ?: return@forEach
 
             val isSelected = profile?.selectedKit == kit.id
-            val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
+            val highestOwned = profile?.highestOwnedLevel(kit.id, kit.purchasableMaxLevel()) ?: 1
+            val isPrestiged = (profile?.getPrestige(kit.id) ?: 0) >= 1
             val killReq = HungerGamesProfile.killRequirement(kit.id)
             val meetsKillReq = profile?.meetsKillRequirement(kit.id) ?: (killReq <= 0L)
             val isLocked = killReq > 0L && !meetsKillReq
@@ -63,7 +64,8 @@ class PreGameSelectionMenu : Menu("Select a Kit...")
                     else "${CC.GREEN}${kit.displayName}"
                 )
                 .addToLore(
-                    "${CC.GRAY}Your Level: ${CC.WHITE}$highestOwned",
+                    if (isPrestiged) "${CC.GRAY}Your Level: ${CC.GOLD}✦ Prestige"
+                    else "${CC.GRAY}Your Level: ${CC.WHITE}$highestOwned",
                 )
                 .apply {
                     if (isLocked)
@@ -105,7 +107,7 @@ class PreGameSelectionMenu : Menu("Select a Kit...")
 
                     Button.playNeutral(player)
 
-                    val selectLevel = prof.highestOwnedLevel(kit.id, kit.maxLevel())
+                    val selectLevel = prof.highestOwnedLevel(kit.id, kit.purchasableMaxLevel())
                     prof.selectedKit = kit.id
                     prof.selectedKitLevel = selectLevel
                     prof.save()
