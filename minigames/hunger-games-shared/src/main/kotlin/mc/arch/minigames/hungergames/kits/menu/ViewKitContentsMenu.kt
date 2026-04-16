@@ -469,7 +469,7 @@ class ViewKitContentsMenu(
         val canPrestige = !alreadyPrestiged && meetsPrestigeKills && meetsPrestigeCoins
         val coinReward = kitKills * 10
 
-        buttons[35] = ItemBuilder
+        buttons[33] = ItemBuilder
             .of(
                 when {
                     alreadyPrestiged -> XMaterial.YELLOW_STAINED_GLASS
