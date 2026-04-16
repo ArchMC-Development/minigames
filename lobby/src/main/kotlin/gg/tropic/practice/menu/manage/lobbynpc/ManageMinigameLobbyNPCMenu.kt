@@ -85,7 +85,7 @@ class ManageMinigameLobbyNPCMenu(
             PracticeConfigurationService,
             title = "Held Item",
             getter = {
-                local().minigameLobbyNPCs[index].heldItem ?: ItemBuilder.of(XMaterial.RED_BED).build()
+                local().minigameLobbyNPCs[index]?.heldItem ?: ItemBuilder.of(XMaterial.RED_BED).build()
             },
             setter = {
                 local().minigameLobbyNPCs[index].heldItem = it
