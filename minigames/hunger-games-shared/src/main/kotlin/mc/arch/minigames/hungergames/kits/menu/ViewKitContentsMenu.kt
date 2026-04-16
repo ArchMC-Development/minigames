@@ -261,6 +261,29 @@ class ViewKitContentsMenu(
                 }
         }
 
+        // Kit Stats button
+        val stats = profile?.getStatsFor(kit.id)
+        val kdr = if ((stats?.deaths ?: 0L) > 0)
+            String.format("%.2f", (stats?.kills?.toDouble() ?: 0.0) / stats!!.deaths)
+        else if ((stats?.kills ?: 0L) > 0) "∞" else "N/A"
+
+        buttons[29] = ItemBuilder
+            .of(XMaterial.SKULL_BANNER_PATTERN)
+            .name("${CC.B_LIGHT_PURPLE}Kit Statistics")
+            .addToLore(
+                "${CC.GRAY}Your stats with ${CC.WHITE}${kit.displayName}${CC.GRAY}:",
+                "",
+                "${CC.GRAY}Kills: ${CC.WHITE}${Numbers.format(stats?.kills ?: 0L)}",
+                "${CC.GRAY}Deaths: ${CC.WHITE}${Numbers.format(stats?.deaths ?: 0L)}",
+                "${CC.GRAY}K/D Ratio: ${CC.WHITE}$kdr",
+                "",
+                "${CC.GRAY}Games Played: ${CC.WHITE}${Numbers.format(stats?.gamesPlayed ?: 0L)}",
+                "",
+                "${CC.GRAY}Damage Dealt: ${CC.WHITE}${Numbers.format(stats?.damageDealt?.toLong() ?: 0L)}",
+                "${CC.GRAY}Damage Taken: ${CC.WHITE}${Numbers.format(stats?.damageTaken?.toLong() ?: 0L)}"
+            )
+            .toButton()
+
         // Edit Loadout button
         val highestOwned = profile?.highestOwnedLevel(kit.id, kit.maxLevel()) ?: 1
         val hasCustomLoadout = profile?.customLoadouts?.containsKey(kit.id) == true
