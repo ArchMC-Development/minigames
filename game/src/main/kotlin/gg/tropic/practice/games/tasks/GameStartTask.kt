@@ -11,6 +11,7 @@ import gg.tropic.practice.profile.PracticeProfileService
 import gg.tropic.practice.queue.QueueType
 import gg.tropic.practice.statistics.TrackedKitStatistic
 import gg.tropic.practice.statistics.statisticIdFrom
+import me.lucko.helper.Schedulers
 import me.lucko.helper.scheduler.Task
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.util.CC
@@ -40,12 +41,21 @@ class GameStartTask(
         // Safety guard: abort if any expected player disconnected during countdown.
         // Without this, the game can enter Playing state with missing players
         // (showing as "0 ms" on the scoreboard with the opponent invisible).
+        //
+        // We also require every team to have at least one connected Bukkit player.
+        // The total-count check alone can miss the "solo duel" case when the
+        // GameExpectation was somehow constructed with an imbalanced roster
+        // (e.g. one team has two UUIDs and the other has zero).
         if (game.miniGameLifecycle == null)
         {
             val presentCount = game.toBukkitPlayers().filterNotNull().size
             val expectedCount = game.toPlayers().size
-            if (presentCount != expectedCount)
+            if (presentCount != expectedCount || !game.eachTeamHasPresentPlayer())
             {
+                game.sendMessage(
+                    "${CC.RED}Your opponent failed to connect — this game has been cancelled and will not affect your stats."
+                )
+                game.invalidatedSolo = true
                 game.state = GameState.Completed
                 game.closeAndCleanup()
                 task.closeAndReportException()
@@ -288,6 +298,31 @@ class GameStartTask(
 
             this.game.state = GameState.Playing
             this.task.closeAndReportException()
+
+            // Post-start grace period: 2 seconds after the game enters Playing,
+            // verify every team still has at least one connected player. This
+            // catches the rare race where a player's join was processed late
+            // and slipped past the pre-countdown check. If solo is detected
+            // here we invalidate the game so no one loses kills/winstreaks/ELO.
+            if (game.miniGameLifecycle == null)
+            {
+                Schedulers.sync().runLater({
+                    if (game.state != GameState.Playing)
+                    {
+                        return@runLater
+                    }
+
+                    if (!game.eachTeamHasPresentPlayer())
+                    {
+                        game.invalidatedSolo = true
+                        game.sendMessage(
+                            "${CC.RED}Your opponent never connected — this game has been cancelled and will not affect your stats."
+                        )
+                        game.complete(null, "solo-invalidated")
+                    }
+                }, 40L)
+            }
+
             return
         }
 

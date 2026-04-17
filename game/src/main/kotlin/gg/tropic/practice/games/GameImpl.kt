@@ -165,6 +165,25 @@ open class GameImpl(
      */
     val readyPlayers: MutableSet<UUID> = ConcurrentHashMap.newKeySet()
 
+    /**
+     * Becomes true when the game is detected to have been effectively solo —
+     * i.e. one side had no actually-connected players at game start. When set,
+     * [complete] skips ALL statistic updates (Plays, Wins/Losses, WinStreak,
+     * ELO) and reward payouts. The goal is to never punish or reward a player
+     * for a "duel" their opponent never showed up for.
+     */
+    @Volatile
+    var invalidatedSolo: Boolean = false
+
+    /**
+     * Returns true only when every team has at least one currently-connected
+     * Bukkit player. Used as a safeguard against a game entering or remaining
+     * in the Playing state while one side is effectively empty.
+     */
+    fun eachTeamHasPresentPlayer(): Boolean = teams.all { team ->
+        team.toBukkitPlayers().any { it != null }
+    }
+
     fun loadout(player: Player) = selectedKitLoadouts[player.uniqueId] ?: defaultLoadout
 
     fun takeSnapshot(player: Player)
@@ -327,7 +346,7 @@ open class GameImpl(
                     }
             }
 
-            if (miniGameLifecycle == null)
+            if (miniGameLifecycle == null && !invalidatedSolo)
             {
                 this.toBukkitPlayers()
                     .filterNotNull()
@@ -354,7 +373,10 @@ open class GameImpl(
 
             val opponents = getAllOpponents(winner)
             val allOpponentPlayers = opponents.flatMap(GameTeam::players)
-            if (!robot() && !expectationModel.isPrivateGame && expectationModel.queueType != null)
+            // Skip ALL stat recording (plays/wins/losses/winstreak/ELO) when the game
+            // was flagged as effectively solo — no opponent ever showed up, so there
+            // is nothing to rank or streak against.
+            if (!robot() && !expectationModel.isPrivateGame && expectationModel.queueType != null && !invalidatedSolo)
             {
                 val trackedKitStatisticsUpdates = allOpponentPlayers.map {
                     StatisticService.update(it) {
