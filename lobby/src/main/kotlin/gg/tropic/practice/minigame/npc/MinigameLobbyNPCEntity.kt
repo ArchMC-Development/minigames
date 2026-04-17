@@ -7,6 +7,7 @@ import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 /**
  * @author Subham
@@ -61,7 +62,7 @@ class MinigameLobbyNPCEntity(
             configuration.skinType.value,
             configuration.skinType.signature
         )
-        updateItemInHand(configuration.heldItem)
+        (configuration.heldItem as ItemStack?)?.let { updateItemInHand(it) }
 
         updateForCurrentWatchers()
     }
