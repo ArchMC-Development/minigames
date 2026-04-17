@@ -18,6 +18,7 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.nms.MinecraftReflection
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -26,6 +27,17 @@ import java.util.concurrent.CompletableFuture
  */
 object QueueCommunications
 {
+    fun leaveQueue(playerId: UUID)
+    {
+        createMessage(
+            packet = "leave",
+            "leader" to playerId,
+        ).publish(
+            context = AwareThreadContext.ASYNC,
+            channel = "communications-gamequeue"
+        )
+    }
+
     fun joinQueue(kit: Kit, queueType: QueueType, teamSize: Int, player: Player,
                   miniGameQueueConfiguration: MiniGameQueueConfiguration? = null): CompletableFuture<*>
     {
