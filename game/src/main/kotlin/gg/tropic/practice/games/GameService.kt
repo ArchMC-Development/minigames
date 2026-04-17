@@ -1750,6 +1750,11 @@ object GameService
                 it.entity is Player
             }
             .handler {
+                if (it.isCancelled)
+                {
+                    return@handler
+                }
+
                 if (
                     (it.damager is Player && isSpectating(it.damager as Player)) ||
                     isSpectating(it.entity as Player)
