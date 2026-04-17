@@ -20,6 +20,7 @@ object CancelEventTask : Task(
         "playerDamageEvent",
         "playerDamageByPlayerEvent",
         "playerDropItemEvent",
+        "playerFoodChangeEvent",
         "playerInteractEvent",
         "playerMoveEvent",
         "playerPickupItemEvent",

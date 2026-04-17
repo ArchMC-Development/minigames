@@ -5,6 +5,7 @@ import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
+import net.evilblock.cubed.nametag.NametagHandler
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Bukkit
@@ -50,6 +51,11 @@ class PlayerRoleAssignMenu(val house: PlayerHouse, val targetUuid: UUID) : Pagin
                         }
 
                         house.save()
+
+                        Bukkit.getPlayer(targetUuid)?.let { target ->
+                            NametagHandler.reloadPlayer(target)
+                        }
+
                         player.sendMessage("${CC.GREEN}Successfully assigned ${role.coloredName()} ${CC.GREEN}to the player!")
                     }
 

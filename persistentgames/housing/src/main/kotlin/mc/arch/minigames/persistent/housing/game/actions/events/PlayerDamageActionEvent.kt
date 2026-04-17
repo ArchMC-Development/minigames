@@ -4,8 +4,8 @@ import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
 import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
-import net.evilblock.cubed.entity.living.event.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 
 @Service
 object PlayerDamageActionEvent: ActionEvent
