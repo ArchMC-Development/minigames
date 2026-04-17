@@ -74,6 +74,11 @@ object SpatialZoneService
                 val region = house.region
                     ?: return@handler
 
+                if (house.playerIsOrAboveAdministrator(player.uniqueId))
+                {
+                    return@handler
+                }
+
                 if (!region.contains(location))
                 {
                     if (house.allowsMutatingOutsideRegion != true)
@@ -91,6 +96,11 @@ object SpatialZoneService
                     ?: return@handler
                 val region = house.region
                     ?: return@handler
+
+                if (house.playerIsOrAboveAdministrator(player.uniqueId))
+                {
+                    return@handler
+                }
 
                 if (!region.contains(location))
                 {
