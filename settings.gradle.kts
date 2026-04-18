@@ -26,6 +26,10 @@ include(
     "persistentgames:housing-api",
     "persistentgames:housing-lobby",
 
+    "persistentgames:prison",
+    "persistentgames:prison-shared",
+    "persistentgames:prison-lobby",
+
     "versioned:generics",
     "versioned:legacy",
     "versioned:modern",

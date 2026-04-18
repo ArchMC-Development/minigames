@@ -46,3 +46,9 @@
 [submodule "persistentgames/housing-lobby"]
 	path = persistentgames/housing-lobby
 	url = https://github.com/ArchMC-Development/persistentgames-housing-lobby.git
+[submodule "persistentgames/prison-lobby"]
+	path = persistentgames/prison-lobby
+	url = https://github.com/ArchMC-Development/persistentgames-prison-lobby.git
+[submodule "persistentgames/prison-shared"]
+	path = persistentgames/prison-shared
+	url = https://github.com/ArchMC-Development/persistentgames-prison-shared.git
