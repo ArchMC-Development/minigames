@@ -75,6 +75,14 @@ class PracticeGame : ExtendedScalaPlugin()
 
                 val bukkitPlayer = Bukkit.getPlayer(player)
                 val game = GameService.byPlayerOrSpectator(viewer.uniqueId)
+                val viewerHostedWorld = viewer.toHostedWorld()
+                if (viewerHostedWorld != null)
+                {
+                    val senderHostedWorld = bukkitPlayer?.toHostedWorld()
+                    return@displayToPlayer senderHostedWorld != null &&
+                        senderHostedWorld.globalId == viewerHostedWorld.globalId
+                }
+
                 if (
                     bukkitPlayer != null &&
                     bukkitPlayer.toHostedWorld() != null ||
