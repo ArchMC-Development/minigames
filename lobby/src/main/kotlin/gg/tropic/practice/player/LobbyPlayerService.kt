@@ -86,6 +86,7 @@ object LobbyPlayerService
                 }
 
                 event.playerStatus.activityDescription = "in the $description Lobby"
+                event.playerStatus.returnToServerGroup = "hub"
             }
             .bindWith(plugin)
 
