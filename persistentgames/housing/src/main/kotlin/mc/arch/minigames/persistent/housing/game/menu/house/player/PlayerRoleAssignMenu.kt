@@ -56,7 +56,7 @@ class PlayerRoleAssignMenu(val house: PlayerHouse, val targetUuid: UUID) : Pagin
                             NametagHandler.reloadPlayer(target)
                         }
 
-                        player.sendMessage("${CC.GREEN}Successfully assigned ${role.coloredName()} ${CC.GREEN}to the player!")
+                        player.sendMessage("${CC.GREEN}Successfully assigned ${role.name} ${CC.GREEN}to the player!")
                     }
 
                     PlayerManagementMenu(house).openMenu(player)
