@@ -1,6 +1,7 @@
 package mc.arch.minigames.persistent.prison.game
 
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.annotations.ServiceablePackage
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.Plugin
 import gg.scala.commons.core.plugin.PluginAuthor
@@ -23,6 +24,7 @@ import mc.arch.minigames.persistent.prison.shared.PrisonPluginHolder
     PluginDependency("Lemon"),
     PluginDependency("Minigames"),
 )
+@ServiceablePackage("mc.arch.minigames.persistent.prison.shared")
 class PersistentGamePrison : ExtendedScalaPlugin()
 {
     companion object
