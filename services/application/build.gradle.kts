@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":minigames:miniwalls-shared"))
     implementation(project(":minigames:hunger-games-shared"))
     implementation(project(":persistentgames:housing-api"))
+    implementation(project(":persistentgames:prison-shared"))
     implementation(project(":minigames:bedwars-shared"))
     implementation(project(":microgames:bridging-api"))
     implementation(project(":microgames:events-api"))

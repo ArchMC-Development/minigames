@@ -52,3 +52,6 @@
 [submodule "persistentgames/prison-shared"]
 	path = persistentgames/prison-shared
 	url = https://github.com/ArchMC-Development/persistentgames-prison-shared.git
+[submodule "persistentgames/prison"]
+	path = persistentgames/prison
+	url = https://github.com/ArchMC-Development/persistentgames-prison-game.git

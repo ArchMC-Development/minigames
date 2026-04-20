@@ -69,7 +69,7 @@ object WorldComponentCommand : ScalaCommand()
                     openMenu(player)
                 },
 
-            0 to ItemBuilder
+            1 to ItemBuilder
                 .of(XMaterial.EMERALD)
                 .name("${CC.GREEN}Create from Clipboard")
                 .addToLore(
@@ -82,7 +82,7 @@ object WorldComponentCommand : ScalaCommand()
                     createSchematicFromClipboard(player)
                 },
 
-            8 to ItemBuilder
+            7 to ItemBuilder
                 .of(XMaterial.REDSTONE)
                 .name("${CC.RED}Refresh List")
                 .addToLore(
