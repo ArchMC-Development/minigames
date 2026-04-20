@@ -17,6 +17,7 @@ import gg.tropic.practice.settings.scoreboard.ScoreboardStyle
 import gg.tropic.practice.extensions.colorOf
 import gg.tropic.practice.extensions.toRBTeamSide
 import gg.tropic.practice.minigame.dateFormat
+import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.ugc.toHostedWorld
 import net.evilblock.cubed.scoreboard.ScoreboardAdapter
 import net.evilblock.cubed.scoreboard.ScoreboardAdapterRegister
@@ -45,6 +46,9 @@ object GameScoreboardAdapter : ScoreboardAdapter()
         {
             return
         }
+
+        // let prison handle this automatically
+        if (player.toHostedWorld()?.providerType == WorldInstanceProviderType.PRISON) return
 
         player.toHostedWorld()?.apply {
             board += "${CC.GRAY}${dateFormat.format(Date())} ${CC.D_GRAY}${getLocalGameServer()
