@@ -270,7 +270,7 @@ class ViewKitContentsMenu(
         else if ((stats?.kills ?: 0L) > 0) "∞" else "N/A"
 
         buttons[29] = ItemBuilder
-            .of(XMaterial.SKULL_BANNER_PATTERN)
+            .of(XMaterial.PAPER)
             .name("${CC.B_GREEN}Kit Statistics")
             .addToLore(
                 "${CC.GRAY}Your stats with ${CC.WHITE}${kit.displayName}${CC.GRAY}:",
