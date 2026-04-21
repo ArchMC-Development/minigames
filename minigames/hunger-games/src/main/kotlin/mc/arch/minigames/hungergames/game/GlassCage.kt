@@ -1,5 +1,7 @@
 package mc.arch.minigames.hungergames.game
 
+import me.lucko.helper.Schedulers
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -48,7 +50,9 @@ class GlassCage(
      * Built at Y (feet) and Y+1 (head) levels, with a floor
      * at Y-1 and a ceiling at Y+2.
      */
-    fun build()
+    fun build() = onMainThread { doBuild() }
+
+    private fun doBuild()
     {
         val world = spawnLocation.world
         val x = spawnLocation.blockX
@@ -88,8 +92,7 @@ class GlassCage(
      * Removes all glass blocks placed by this cage,
      * setting them back to AIR.
      */
-    fun destroy()
-    {
+    fun destroy() = onMainThread {
         for (block in cageBlocks)
         {
             if (block.type == Material.GLASS)
@@ -98,5 +101,16 @@ class GlassCage(
             }
         }
         cageBlocks.clear()
+    }
+
+    /**
+     * Run [block] on the Bukkit main thread. Block writes hit AsyncCatcher if
+     * called off-thread (e.g. from the world-load background thread that
+     * drives [HungerGamesLifecycle.configure]).
+     */
+    private inline fun onMainThread(crossinline block: () -> Unit)
+    {
+        if (Bukkit.isPrimaryThread()) block()
+        else Schedulers.sync().run { block() }
     }
 }
