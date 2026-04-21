@@ -37,7 +37,7 @@ object ServerSelectionStrategy
                 {
                     return@filter false
                 }
-                
+
                 // Filter out blacklisted/failing instances
                 if (it.id in blacklistedInstances)
                 {
@@ -45,7 +45,7 @@ object ServerSelectionStrategy
                 }
 
                 // if provider is minigame and server is housing, don't select
-                if (requiredType == MiniProviderType.MINIGAME && it.groups.contains("housing"))
+                if (requiredType == MiniProviderType.MINIGAME && (it.groups.contains("housing") || it.groups.contains("prison")))
                 {
                     return@filter false
                 }
