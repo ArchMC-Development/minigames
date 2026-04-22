@@ -47,9 +47,9 @@ object GameScoreboardAdapter : ScoreboardAdapter()
             return
         }
 
-        // let prison handle this automatically
-        if (player.toHostedWorld()?.providerType == WorldInstanceProviderType.PRISON) return
-
+        // Hosted worlds (housing, prison, etc.) fully own their scoreboard content
+        // via their HostedWorldInstance's generateScoreboardLines / generateScoreboardTitle
+        // overrides — no game-specific lines are appended on top.
         player.toHostedWorld()?.apply {
             board += "${CC.GRAY}${dateFormat.format(Date())} ${CC.D_GRAY}${getLocalGameServer()
                 .id
