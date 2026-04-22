@@ -2081,8 +2081,13 @@ object GameService
             }
         }
 
+        // Idk how you would work around this, you NEED polar to act on the event first
+        // don't set priority for now
         Events
-            .subscribe(BlockBreakEvent::class.java, EventPriority.LOWEST)
+            .subscribe(BlockBreakEvent::class.java)
+            .filter {
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.player))
                 {
