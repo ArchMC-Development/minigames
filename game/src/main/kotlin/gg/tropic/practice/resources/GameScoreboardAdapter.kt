@@ -16,7 +16,6 @@ import gg.tropic.practice.settings.layout
 import gg.tropic.practice.settings.scoreboard.ScoreboardStyle
 import gg.tropic.practice.extensions.colorOf
 import gg.tropic.practice.extensions.toRBTeamSide
-import gg.tropic.practice.minigame.dateFormat
 import gg.tropic.practice.ugc.WorldInstanceProviderType
 import gg.tropic.practice.ugc.toHostedWorld
 import net.evilblock.cubed.scoreboard.ScoreboardAdapter
@@ -49,17 +48,14 @@ object GameScoreboardAdapter : ScoreboardAdapter()
 
         // Hosted worlds (housing, prison, etc.) fully own their scoreboard content
         // via their HostedWorldInstance's generateScoreboardLines / generateScoreboardTitle
-        // overrides — no game-specific lines are appended on top.
-        player.toHostedWorld()?.apply {
-            board += "${CC.GRAY}${dateFormat.format(Date())} ${CC.D_GRAY}${getLocalGameServer()
-                .id
-                .split("-")
-                .lastOrNull() ?: "??"}"
-            board += ""
-            board += generateScoreboardLines(player)
-            board += ""
-            board += "${CC.DARK_GRAY}${LemonConstants.WEB_LINK}${CC.GRAY}      ${CC.PRI}"
-            return@apply
+        // overrides — render exactly what the hosted world provides, with no
+        // game-module wrapping (no date header, no website footer) so the layout
+        // matches the lobby adapter's output.
+        val hostedWorld = player.toHostedWorld()
+        if (hostedWorld != null)
+        {
+            board += hostedWorld.generateScoreboardLines(player)
+            return
         }
 
         val game = GameService
