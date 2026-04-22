@@ -46,13 +46,8 @@ object GameScoreboardAdapter : ScoreboardAdapter()
             return
         }
 
-        // Hosted worlds (housing, prison, etc.) fully own their scoreboard content
-        // via their HostedWorldInstance's generateScoreboardLines / generateScoreboardTitle
-        // overrides — render exactly what the hosted world provides, with no
-        // game-module wrapping (no date header, no website footer) so the layout
-        // matches the lobby adapter's output.
         val hostedWorld = player.toHostedWorld()
-        if (hostedWorld != null)
+        if (hostedWorld != null && hostedWorld.providerType != WorldInstanceProviderType.PRISON)
         {
             board += hostedWorld.generateScoreboardLines(player)
             return
