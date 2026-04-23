@@ -41,14 +41,17 @@ class GlassCage(
      * Builds the glass cage around the spawn location.
      * The spawn location is where the player's feet are.
      *
-     * Layout (top-down view, player at P):
+     * The player already stands on a platform, so we never touch the
+     * block under them. We only place the four cardinal walls (direct
+     * left/right/front/back) at feet and head level, plus a single
+     * ceiling block. No diagonal/corner blocks, no floor.
+     *
+     * Layout (top-down view, player at P, G = glass, . = untouched):
      * ```
-     *  GGG
+     *  .G.
      *  GPG
-     *  GGG
+     *  .G.
      * ```
-     * Built at Y (feet) and Y+1 (head) levels, with a floor
-     * at Y-1 and a ceiling at Y+2.
      */
     fun build() = onMainThread { doBuild() }
 
@@ -59,17 +62,18 @@ class GlassCage(
         val y = spawnLocation.blockY
         val z = spawnLocation.blockZ
 
-        // All 8 surrounding offsets (cardinal + diagonal)
-        val surroundingOffsets = listOf(
-            intArrayOf(-1, -1), intArrayOf(0, -1), intArrayOf(1, -1),
-            intArrayOf(-1, 0),                      intArrayOf(1, 0),
-            intArrayOf(-1, 1),  intArrayOf(0, 1),  intArrayOf(1, 1)
+        // Only the 4 cardinal offsets — no diagonals/corners.
+        val cardinalOffsets = listOf(
+            intArrayOf(0, -1), // front (or back, depending on facing)
+            intArrayOf(0, 1),
+            intArrayOf(-1, 0), // left
+            intArrayOf(1, 0)   // right
         )
 
         // Walls at feet level (Y) and head level (Y+1)
         for (dy in 0..1)
         {
-            for (offset in surroundingOffsets)
+            for (offset in cardinalOffsets)
             {
                 val block = world.getBlockAt(x + offset[0], y + dy, z + offset[1])
                 block.type = Material.GLASS
@@ -77,12 +81,7 @@ class GlassCage(
             }
         }
 
-        // Floor at Y-1
-        val floor = world.getBlockAt(x, y - 1, z)
-        floor.type = Material.GLASS
-        cageBlocks.add(floor)
-
-        // Ceiling at Y+2
+        // Ceiling at Y+2 (the "top" block)
         val ceiling = world.getBlockAt(x, y + 2, z)
         ceiling.type = Material.GLASS
         cageBlocks.add(ceiling)

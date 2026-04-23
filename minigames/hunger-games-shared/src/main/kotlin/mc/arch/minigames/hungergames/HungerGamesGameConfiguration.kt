@@ -17,9 +17,13 @@ class HungerGamesGameConfiguration(
     override val gameDescription: String = "Survival Games ${mode.displayName}"
 ) : MiniGameConfiguration
 {
-    override val minimumPlayersRequiredToEnterStarting = mode.maxPlayers()
+    // Start the countdown as soon as we have the minimum viable game:
+    // 2 players for solo (teamSize 1), 4 players for doubles (teamSize 2).
+    override val minimumPlayersRequiredToEnterStarting = mode.teamSize * 2
+    // Only fast-forward to the last 10s once the lobby is actually full.
     override val minimumPlayersRequiredToFastForward = mode.maxPlayers()
-    override val startGameCountDown = 30
+    // 3 minute countdown after hitting the minimum, hoping more players join.
+    override val startGameCountDown = 180
 
     override fun getAbstractType() = HungerGamesGameConfiguration::class.java
 }
