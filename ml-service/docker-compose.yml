@@ -1,0 +1,78 @@
+# Local-dev + reference layout for the distributed pipeline.
+#
+# In production each `stageN` service becomes its own Deployment with its
+# own HPA and its own GPU/CPU requests — stage 1 is the expensive one, 2 and
+# 3 are much lighter. The gateway is stateless and sits behind an LB.
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  gateway:
+    build: .
+    command: housing-ml-gateway
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      HOUSING_ML_BASE_MODEL: google/gemma-3-1b-it
+      HOUSING_ML_MOCK: ${HOUSING_ML_MOCK:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  stage1:
+    build: .
+    command: housing-ml-stage1
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      HOUSING_ML_BASE_MODEL: google/gemma-3-1b-it
+      HOUSING_ML_MOCK: ${HOUSING_ML_MOCK:-}
+      HOUSING_ML_INSIGHT_ADAPTER: /adapters/insight
+    volumes:
+      - ./adapters:/adapters:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  stage2:
+    build: .
+    command: housing-ml-stage2
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      HOUSING_ML_BASE_MODEL: google/gemma-3-1b-it
+      HOUSING_ML_MOCK: ${HOUSING_ML_MOCK:-}
+      HOUSING_ML_TOPIC_ADAPTER: /adapters/topic
+    volumes:
+      - ./adapters:/adapters:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  stage3:
+    build: .
+    command: housing-ml-stage3
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      HOUSING_ML_BASE_MODEL: google/gemma-3-1b-it
+      HOUSING_ML_MOCK: ${HOUSING_ML_MOCK:-}
+      HOUSING_ML_CLASSIFY_ADAPTER: /adapters/classify
+    volumes:
+      - ./adapters:/adapters:ro
+    depends_on:
+      redis:
+        condition: service_healthy

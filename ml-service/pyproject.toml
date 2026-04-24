@@ -1,0 +1,41 @@
+[project]
+name = "housing-ml"
+version = "0.1.0"
+description = "Self-hosted multi-stage LLM pipeline for auto-categorizing ArchMC realms/houses."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "pydantic>=2.9",
+  "redis>=5.2",
+  "transformers>=4.48",
+  "torch>=2.4",
+  "accelerate>=1.2",
+  "peft>=0.14",
+  "sentence-transformers>=3.3",
+  "numpy>=1.26",
+  "orjson>=3.10",
+  "tenacity>=9.0",
+  "prometheus-client>=0.21",
+]
+
+[project.optional-dependencies]
+training = [
+  "datasets>=3.2",
+  "trl>=0.12",
+  "bitsandbytes>=0.44",
+  "wandb>=0.18",
+]
+
+[project.scripts]
+housing-ml-gateway = "gateway.server:main"
+housing-ml-stage1 = "workers.stage1_worker:main"
+housing-ml-stage2 = "workers.stage2_worker:main"
+housing-ml-stage3 = "workers.stage3_worker:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["gateway*", "pipeline*", "models*", "workers*", "training*"]

@@ -5,6 +5,7 @@ import gg.scala.commons.annotations.Model
 import gg.scala.store.storage.storable.IDataStoreObject
 import gg.tropic.practice.ugc.HostedWorldAttribute
 import mc.arch.minigames.persistent.housing.api.action.HousingActionService
+import mc.arch.minigames.persistent.housing.api.categorization.model.CategorizationResult
 import mc.arch.minigames.persistent.housing.api.action.player.ActionEvent
 import mc.arch.minigames.persistent.housing.api.action.tasks.Task
 import mc.arch.minigames.persistent.housing.api.content.HousingGameMode
@@ -55,6 +56,7 @@ data class PlayerHouse(
     var region: Cuboid? = null,
     val houseNPCMap: MutableMap<String, HousingNPC> = mutableMapOf(),
     val houseHologramMap: MutableMap<String, HousingHologram> = mutableMapOf(),
+    var derivedCategories: CategorizationResult? = null,
     override val identifier: UUID = UUID.randomUUID(),
     override val description: MutableList<String> = mutableListOf()
 ) : IDataStoreObject, HostedWorldAttribute, Savable
