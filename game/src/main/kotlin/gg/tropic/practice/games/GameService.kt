@@ -1933,15 +1933,15 @@ object GameService
                             return@removeIf true
                         }
 
-                        // Only player-placed blocks should be breakable by explosions
-                        if (!block.hasMetadata("placed"))
-                        {
-                            return@removeIf true
-                        }
-
-                        // Use BlastProtectionUtil to check if block is protected by blast-proof glass
+                        // Handle other explosion types or fallback to original logic
                         if (game.miniGameLifecycle != null)
                         {
+                            if (!block.hasMetadata("placed"))
+                            {
+                                return@removeIf true
+                            }
+
+                            // Use BlastProtectionUtil to check if block is protected by blast-proof glass
                             if (BlastProtectionUtil.isProtected(it.location, block, 0.3))
                             {
                                 return@removeIf true
