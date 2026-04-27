@@ -42,6 +42,10 @@ import org.bukkit.Bukkit
     PluginDependency("cloudsync", soft = true),
     PluginDependency("Friends", soft = true),
     PluginDependency("ScStaff", soft = true),
+
+    // The goal of this dependency is to attempt to ensure that listeners here are registered after polar
+    // so if polar cancels an event the listeners can actually see it is cancelled
+    PluginDependency("PolarLoader", soft = true),
 )
 class PracticeGame : ExtendedScalaPlugin()
 {
