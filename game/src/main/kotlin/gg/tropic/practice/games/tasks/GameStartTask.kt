@@ -46,7 +46,7 @@ class GameStartTask(
         // The total-count check alone can miss the "solo duel" case when the
         // GameExpectation was somehow constructed with an imbalanced roster
         // (e.g. one team has two UUIDs and the other has zero).
-        if (game.miniGameLifecycle == null)
+        if (game.miniGameLifecycle == null && !game.robot())
         {
             val presentCount = game.toBukkitPlayers().filterNotNull().size
             val expectedCount = game.toPlayers().size
@@ -304,7 +304,7 @@ class GameStartTask(
             // catches the rare race where a player's join was processed late
             // and slipped past the pre-countdown check. If solo is detected
             // here we invalidate the game so no one loses kills/winstreaks/ELO.
-            if (game.miniGameLifecycle == null)
+            if (game.miniGameLifecycle == null && !game.robot())
             {
                 Schedulers.sync().runLater({
                     if (game.state != GameState.Playing)
