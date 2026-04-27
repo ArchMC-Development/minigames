@@ -13,7 +13,6 @@ import mc.arch.minigames.persistent.housing.game.menu.house.player.PlayerManagem
 import mc.arch.minigames.persistent.housing.game.menu.house.roles.RoleEditorMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.settings.HouseSettingsMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.visitation.HouseVisitationRuleMenu
-import mc.arch.minigames.persistent.housing.game.item.HousingItemService
 import mc.arch.minigames.persistent.housing.game.menu.house.music.HouseMusicSelectionMenu
 import mc.arch.minigames.persistent.housing.game.menu.house.tags.HouseTagsEditorMenu
 import mc.arch.minigames.persistent.housing.game.spatial.toWorldPosition
@@ -55,22 +54,6 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
 
         if (adminMenu)
         {
-            buttons[0] = ItemBuilder.of(XMaterial.STICK)
-                .name("${CC.GREEN}Advanced Tools")
-                .addToLore(
-                    "${CC.GRAY}These tools give you the ability",
-                    "${CC.GRAY}to do a lot of things at once such as",
-                    "${CC.GRAY}place or break blocks! Only for pros :)",
-                    "",
-                    "${CC.YELLOW}Click to view advanced tools!"
-                ).toButton { _, _ ->
-                    player.inventory.addItem(HousingItemService.powerToolsItem)
-                    Button.playSuccess(player)
-
-                    player.closeInventory()
-                    player.sendMessage("${CC.B_GREEN}SUCCESS! ${CC.GREEN}You now have a wand! Check the item lore to see commands.")
-                }
-
             buttons[2] = ItemBuilder.of(XMaterial.REPEATER)
                 .name("${CC.GREEN}Event Actions")
                 .addToLore(

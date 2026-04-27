@@ -43,6 +43,12 @@ class PlayerRoleAssignMenu(val house: PlayerHouse, val targetUuid: UUID) : Pagin
                     if (currentRole.id == role.id) "${CC.GREEN}They already have this role!" else "${CC.GREEN}Click to assign this role!"
                 )
                 .toButton { _, _ ->
+                    if (targetUuid == house.owner && player.uniqueId != house.owner) {
+                        player.sendMessage("${CC.RED}You cannot modify the role of the realm owner.")
+                        PlayerManagementMenu(house).openMenu(player)
+                        return@toButton
+                    }
+
                     if (currentRole.id != role.id) {
                         if (role.default) {
                             house.playerRoles.remove(targetUuid)

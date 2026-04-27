@@ -37,9 +37,9 @@ object HousingActionBukkitImplementation
     @Configure
     fun configure()
     {
-        // Block events — house admins bypass cancellation of these.
-        subscribePlayerEvent<BlockBreakEvent>(BlockBreakEvent::class.java, bypassForAdmins = true) { it.player }
-        subscribePlayerEvent<BlockPlaceEvent>(BlockPlaceEvent::class.java, bypassForAdmins = true) { it.player }
+        // Block events
+        subscribePlayerEvent<BlockBreakEvent>(BlockBreakEvent::class.java) { it.player }
+        subscribePlayerEvent<BlockPlaceEvent>(BlockPlaceEvent::class.java) { it.player }
 
         // Player movement/position events
         subscribePlayerEvent<PlayerMoveEvent>(PlayerMoveEvent::class.java) { it.player }
@@ -134,7 +134,6 @@ object HousingActionBukkitImplementation
      */
     private inline fun <reified T : org.bukkit.event.Event> subscribePlayerEvent(
         eventClass: Class<T>,
-        bypassForAdmins: Boolean = false,
         crossinline playerExtractor: (T) -> Player
     )
     {
@@ -143,11 +142,6 @@ object HousingActionBukkitImplementation
                 val player = playerExtractor(event)
                 val house = player.getPlayerHouseFromInstance()
                     ?: return@handler
-
-                if (bypassForAdmins && house.playerIsOrAboveAdministrator(player.uniqueId))
-                {
-                    return@handler
-                }
 
                 house.getAllActionEventsBy(eventClass)
                     .forEach { entry ->
