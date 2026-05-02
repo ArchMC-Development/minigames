@@ -658,7 +658,8 @@ object GameQueueManager
         }
 
         val mappings = listOf(
-            "sumoevent" to EventType.SUMO
+            "sumoevent" to EventType.SUMO,
+            "oitcevent" to EventType.OITC
         )
 
         mappings.forEach {
