@@ -125,7 +125,9 @@ object MapReplicationService
                     MapReplication(
                         associatedMapName = it.associatedMap.name,
                         name = it.world!!.name,
-                        inUse = it.inUse,
+                        // Treat scheduled-but-not-yet-started replications as in-use
+                        // so the queue's allocator path doesn't race against them.
+                        inUse = it.inUse || it.scheduledForExpectedGame != null,
                         server = ServerSync.local.id
                     )
                 }
