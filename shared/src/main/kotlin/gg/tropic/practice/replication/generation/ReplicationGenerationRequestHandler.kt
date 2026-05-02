@@ -63,6 +63,22 @@ class ReplicationGenerationRequestHandler(
             {
                 GenerationRequirement.GENERATE -> generator()(map, request.expectation)
                 GenerationRequirement.ALLOCATE -> allocator()(map, request.expectation)
+                    .thenCompose { allocateResult ->
+                        // Fallback: if allocate failed (no free pre-built replication),
+                        // generate a new one instead of erroring out.
+                        if (allocateResult == null)
+                        {
+                            Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                                category = "replication.fallback"
+                                message = "ALLOCATE returned null for ${map.name}, falling back to GENERATE"
+                                level = io.sentry.SentryLevel.INFO
+                            })
+                            generator()(map, request.expectation)
+                        } else
+                        {
+                            CompletableFuture.completedFuture(allocateResult)
+                        }
+                    }
             }
 
             replicationGenerationFuture
