@@ -25,6 +25,17 @@ object ManageHousingCommand : ScalaCommand()
         sender.sendMessage("${CC.YELLOW}House creation is now $status${CC.YELLOW}.")
     }
 
+    @Subcommand("toggle-featuring")
+    fun onToggleFeaturing(sender: CommandSender)
+    {
+        val config = HousingConfigurationDataSync.cached()
+        config.allowRentingSlots = !config.allowRentingSlots
+        HousingConfigurationDataSync.sync(config)
+
+        val status = if (config.allowRentingSlots) "${CC.GREEN}enabled" else "${CC.RED}disabled"
+        sender.sendMessage("${CC.YELLOW}Renting slots is now $status${CC.YELLOW}.")
+    }
+
     @Subcommand("toggle-visiting")
     fun onToggleVisiting(sender: CommandSender)
     {
@@ -62,6 +73,7 @@ object ManageHousingCommand : ScalaCommand()
         sender.sendMessage("")
         sender.sendMessage("${CC.YELLOW}House Creation: ${if (config.allowHouseCreation) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}")
         sender.sendMessage("${CC.YELLOW}Visiting: ${if (config.allowVisiting) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}")
+        sender.sendMessage("${CC.YELLOW}Renting Slots: ${if (config.allowRentingSlots) "${CC.GREEN}Enabled" else "${CC.RED}Disabled"}")
         sender.sendMessage("${CC.YELLOW}Feature Cost: ${CC.GOLD}${Numbers.format(config.featureHouseCostPerWeek)} Gems${CC.YELLOW}/week")
         sender.sendMessage("${CC.YELLOW}${CC.STRIKE_THROUGH}${"-".repeat(40)}")
     }
