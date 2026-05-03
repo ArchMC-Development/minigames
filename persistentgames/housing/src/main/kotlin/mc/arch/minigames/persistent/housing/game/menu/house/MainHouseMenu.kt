@@ -21,6 +21,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
 class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("Viewing ${house.displayName}")
@@ -185,6 +186,36 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                     Button.playNeutral(player)
                     player.sendMessage("${CC.YELLOW}Your building zone status has been updated to: ${if (house.allowsMutatingOutsideRegion == true) "${CC.GREEN}Allowed" else "${CC.RED}Disallowed"}")
                 }
+
+            if (house.owner == player.uniqueId)
+            {
+                val gamemodeOrder = listOf(GameMode.SURVIVAL, GameMode.CREATIVE, GameMode.ADVENTURE)
+                val gamemodeIcon = when (player.gameMode)
+                {
+                    GameMode.CREATIVE -> XMaterial.DIAMOND_PICKAXE
+                    GameMode.ADVENTURE -> XMaterial.MAP
+                    else -> XMaterial.GRASS_BLOCK
+                }
+
+                buttons[15] = ItemBuilder.of(gamemodeIcon)
+                    .name("${CC.GREEN}Personal Gamemode")
+                    .addToLore(
+                        "${CC.GRAY}Update your personal gamemode",
+                        "${CC.GRAY}while in your realm.",
+                        "",
+                        "${CC.WHITE}Currently ${player.gameMode.prettyName()}",
+                        "",
+                        "${CC.YELLOW}Click to cycle gamemode!"
+                    ).toButton { _, _ ->
+                        val currentIndex = gamemodeOrder.indexOf(player.gameMode)
+                        val next = gamemodeOrder.getOrElse(currentIndex + 1) { gamemodeOrder.first() }
+
+                        player.gameMode = next
+
+                        Button.playNeutral(player)
+                        player.sendMessage("${CC.YELLOW}Your gamemode has been updated to: ${next.prettyName()}")
+                    }
+            }
 
             buttons[14] = ItemBuilder.of(XMaterial.BEACON)
                 .name("${CC.GREEN}Spawn Point")
@@ -354,3 +385,6 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
         return buttons
     }
 }
+
+private fun GameMode.prettyName(): String =
+    name.lowercase().replaceFirstChar(Char::uppercase)
