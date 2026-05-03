@@ -169,9 +169,16 @@ class HousingHostedWorldInstance(
                 player.teleport(playerHouseReference!!.spawnPoint!!.toLocation(bukkitWorld))
             }
 
-            if (playerHouseReference?.owner == player.uniqueId)
+            val house = playerHouseReference
+            if (house != null)
             {
-                player.gameMode = GameMode.CREATIVE
+                player.gameMode = if (house.owner == player.uniqueId)
+                {
+                    GameMode.CREATIVE
+                } else
+                {
+                    GameMode.valueOf(house.defaultGamemode.name)
+                }
             }
 
             if (playerHouseReference?.music != null)
