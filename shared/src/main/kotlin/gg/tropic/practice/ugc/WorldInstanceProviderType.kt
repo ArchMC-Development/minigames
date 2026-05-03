@@ -17,7 +17,7 @@ enum class WorldInstanceProviderType(
         playerHeadValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA0ODMxZjdhN2Q4ZjYyNGM5NjMzOTk2ZTM3OThlZGFkNDlhNWQ5YmNkMThlY2Y3NWJmYWU2NmJlNDhhMGE2YiJ9fX0="
     ),
     REALM(
-        lobbyGroup = "hub",
+        lobbyGroup = "realmslobby",
         playerHeadValue = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdmODJhY2ViOThmZTA2OWU4YzE2NmNlZDAwMjQyYTc2NjYwYmJlMDcwOTFjOTJjZGRlNTRjNmVkMTBkY2ZmOSJ9fX0="
     ),
     TEMPORARY_WORLD(

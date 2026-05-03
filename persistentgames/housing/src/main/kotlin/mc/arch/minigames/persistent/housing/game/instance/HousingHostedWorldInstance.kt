@@ -29,6 +29,7 @@ import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -131,6 +132,7 @@ class HousingHostedWorldInstance(
 
     override fun generateScoreboardTitle(player: Player) = "${CC.BD_RED}REALMS"
     override fun generateScoreboardLines(player: Player) = listOf(
+        "",
         "${CC.D_RED}Realm Name:",
         "${CC.WHITE}${playerHouseReference?.displayName ?: "${CC.RED}Unavailable"}",
         "",
@@ -141,6 +143,8 @@ class HousingHostedWorldInstance(
         "${CC.WHITE}${
             playerHouseReference?.getRole(player.uniqueId)?.coloredName()?.translateCC() ?: "${CC.GRAY}Guest"
         }",
+        "",
+        "${CC.D_GRAY}arch.mc"
     )
 
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
@@ -163,6 +167,18 @@ class HousingHostedWorldInstance(
             if (playerHouseReference?.spawnPoint != null)
             {
                 player.teleport(playerHouseReference!!.spawnPoint!!.toLocation(bukkitWorld))
+            }
+
+            val house = playerHouseReference
+            if (house != null)
+            {
+                player.gameMode = if (house.owner == player.uniqueId)
+                {
+                    GameMode.CREATIVE
+                } else
+                {
+                    GameMode.valueOf(house.defaultGamemode.name)
+                }
             }
 
             if (playerHouseReference?.music != null)
