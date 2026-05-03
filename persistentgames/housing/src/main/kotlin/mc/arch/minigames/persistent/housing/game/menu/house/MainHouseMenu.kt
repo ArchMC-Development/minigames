@@ -1,6 +1,7 @@
 package mc.arch.minigames.persistent.housing.game.menu.house
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.lemon.filter.inexcusable.InexcusableTermsDataSync
 import gg.scala.lemon.util.CallbackInputPrompt
 import mc.arch.minigames.persistent.housing.api.content.HousingTime
 import mc.arch.minigames.persistent.housing.api.content.HousingWeather
@@ -300,6 +301,12 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                             return@CallbackInputPrompt
                         }
 
+                        if (InexcusableTermsDataSync.cached().terms.contains(it))
+                        {
+                            player.sendMessage("${CC.RED}This name is not allowed. Please make sure it is appropriate!")
+                            return@CallbackInputPrompt
+                        }
+
                         if (it.length > 16)
                         {
                             player.sendMessage("${CC.RED}Your realm name must be less than 16 characters!")
@@ -339,6 +346,12 @@ class MainHouseMenu(val house: PlayerHouse, val adminMenu: Boolean) : Menu("View
                         if (it.length > 16)
                         {
                             player.sendMessage("${CC.RED}Your realm name must be less than 16 characters!")
+                            return@CallbackInputPrompt
+                        }
+
+                        if (InexcusableTermsDataSync.cached().terms.contains(it))
+                        {
+                            player.sendMessage("${CC.RED}This name is not allowed. Please make sure it is appropriate!")
                             return@CallbackInputPrompt
                         }
 
