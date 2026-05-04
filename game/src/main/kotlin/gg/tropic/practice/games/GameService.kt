@@ -972,7 +972,7 @@ object GameService
 
         Events
             .subscribe(ProjectileHitEvent::class.java)
-            .filter { !it.isCancelled && it.entityType == EntityType.SNOWBALL && byWorld(it.entity.world) != null }
+            .filter { it.entityType == EntityType.SNOWBALL && byWorld(it.entity.world) != null }
             .handler { event ->
                 val location = event.entity.location.clone().add(0.0, -1.0, 0.0)
                 if (location.block.type === XMaterial.SNOW_BLOCK.parseMaterial())
