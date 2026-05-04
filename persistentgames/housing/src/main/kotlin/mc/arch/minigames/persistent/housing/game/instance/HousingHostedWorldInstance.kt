@@ -147,6 +147,10 @@ class HousingHostedWorldInstance(
         "${CC.D_GRAY}arch.mc"
     )
 
+    override fun playerSpawnLocation() = playerHouseReference?.spawnPoint
+        ?.toLocation(bukkitWorld)
+        ?: bukkitWorld.spawnLocation
+
     fun reconfigureWorld(firstSetup: Boolean = false) = CompletableFuture
         .supplyAsync {
             Tasks.sync {

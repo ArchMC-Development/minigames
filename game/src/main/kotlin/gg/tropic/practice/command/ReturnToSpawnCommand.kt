@@ -8,6 +8,7 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.lemon.redirection.aggregate.ServerAggregateHandler
 import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import gg.tropic.practice.games.GameService
+import gg.tropic.practice.ugc.toHostedWorld
 import net.evilblock.cubed.util.CC
 
 /**
@@ -23,6 +24,14 @@ object ReturnToSpawnCommand : ScalaCommand()
     @CommandAlias("leave|spawn|quit")
     fun onLeave(player: ScalaPlayer)
     {
+        val hostedWorld = player.bukkit().toHostedWorld()
+        if (hostedWorld != null)
+        {
+            player.bukkit().teleport(hostedWorld.playerSpawnLocation())
+            player.sendMessage("${CC.GREEN}You have been sent to the spawn.")
+            return
+        }
+
         player.sendMessage("${CC.GREEN}You are being sent to a lobby...")
 
         val game = GameService.byPlayerOrSpectator(player.uniqueId)
