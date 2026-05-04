@@ -562,7 +562,8 @@ object GameService
         Events
             .subscribe(EntityDamageByEntityEvent::class.java)
             .filter {
-                it.entity !is Player
+                !it.isCancelled &&
+                    it.entity !is Player
                     && it.damager is Player
                     && byPlayer(it.damager as Player) != null
             }
@@ -591,7 +592,8 @@ object GameService
         Events
             .subscribe(EntityTargetLivingEntityEvent::class.java)
             .filter { event ->
-                event.target is Player &&
+                !event.isCancelled && 
+                    event.target is Player &&
                     event.entityType != EntityType.PLAYER &&
                     byPlayer(event.target as Player) != null
             }
@@ -619,6 +621,9 @@ object GameService
 
         Events
             .subscribe(BlockFromToEvent::class.java)
+            .filter { 
+                !it.isCancelled
+            }
             .handler { event ->
                 val game = byWorld(event.block.world)
                     ?: return@handler
@@ -730,6 +735,9 @@ object GameService
 
         Events
             .subscribe(PlayerInteractEvent::class.java)
+            .filter { 
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.player))
                 {
@@ -777,7 +785,8 @@ object GameService
         Events
             .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                it.item.type == XMaterial.POTION.parseMaterial()
+                !it.isCancelled && 
+                    it.item.type == XMaterial.POTION.parseMaterial()
                     && byPlayer(it.player) != null
             }
             .handler {
@@ -793,7 +802,11 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(ProjectileLaunchEvent::class.java)
+        Events
+            .subscribe(ProjectileLaunchEvent::class.java)
+            .filter { 
+                !it.isCancelled
+            }
             .handler {
                 val fishingHook = it.entity
 
@@ -807,6 +820,9 @@ object GameService
 
         Events
             .subscribe(ProjectileLaunchEvent::class.java)
+            .filter { 
+                !it.isCancelled
+            }
             .handler {
                 if (it.entityType == EntityType.ARROW && it.entity.shooter is Player)
                 {
@@ -853,6 +869,9 @@ object GameService
 
         Events
             .subscribe(CraftItemEvent::class.java)
+            .filter { 
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.whoClicked as Player))
                 {
@@ -873,18 +892,20 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(PlayerItemConsumeEvent::class.java)
+        Events
+            .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Heal Apple")
+                !it.isCancelled && it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Heal Apple")
             }
             .handler {
                 it.player.health = it.player.maxHealth
             }
             .bindWith(plugin)
 
-        Events.subscribe(PlayerItemConsumeEvent::class.java)
+        Events
+            .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Golden Head")
+                !it.isCancelled && it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Golden Head")
             }
             .handler {
                 it.player.playSound(
@@ -961,8 +982,11 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(PlayerItemConsumeEvent::class.java)
+        Events
+            .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
+                if (it.isCancelled) return@filter false
+                
                 val game = byPlayer(it.player)
                 it.item.type == Material.GOLDEN_APPLE &&
                     game != null &&
@@ -981,6 +1005,9 @@ object GameService
 
         Events
             .subscribe(PlayerDropItemEvent::class.java)
+            .filter {
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.player))
                 {
@@ -1034,7 +1061,11 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(PlayerPickupItemEvent::class.java)
+        Events
+            .subscribe(PlayerPickupItemEvent::class.java)
+            .filter {
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.player))
                 {
@@ -1284,7 +1315,8 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(FoodLevelChangeEvent::class.java)
+        Events
+            .subscribe(FoodLevelChangeEvent::class.java)
             .handler {
                 val game = byPlayer(it.entity as Player)
                     ?: return@handler
@@ -1302,7 +1334,8 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(PlayerDeathEvent::class.java)
+        Events
+            .subscribe(PlayerDeathEvent::class.java)
             .filter { byPlayer(it.entity) != null }
             .handler {
                 it.deathMessage = null
@@ -1599,6 +1632,9 @@ object GameService
 
         Events
             .subscribe(EntityDamageEvent::class.java)
+            .filter {
+                !it.isCancelled
+            }
             .filter { it.entity is Player }
             .handler {
                 if (isSpectating(it.entity as Player))
@@ -1626,8 +1662,9 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(EntityDamageByEntityEvent::class.java)
-            .filter { it.damager is FishHook && ((it.damager as FishHook).shooter) is Player && it.entity is Player }
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
+            .filter { !it.isCancelled && it.damager is FishHook && ((it.damager as FishHook).shooter) is Player && it.entity is Player }
             .handler { event ->
                 val game = byPlayer(
                     event.entity as Player
@@ -1656,6 +1693,7 @@ object GameService
 
                 // Prevent fishing rod hits from degrading armor durability.
                 // Snapshot each armor piece's durability and restore it on the next tick.
+                // TODO: ensure this doesn't cancel actual armor durability from rod trick
                 val victim = event.entity as Player
                 val armorDurabilities = victim.inventory.armorContents
                     .map { it?.durability }
@@ -1675,8 +1713,9 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(EntityDamageByEntityEvent::class.java)
-            .filter { it.damager is Arrow && ((it.damager as Arrow).shooter) is Player && it.entity is Player }
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
+            .filter { !it.isCancelled && it.damager is Arrow && ((it.damager as Arrow).shooter) is Player && it.entity is Player }
             .handler { event ->
                 val game = byPlayer(
                     event.entity as Player
@@ -1745,16 +1784,12 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(EntityDamageByEntityEvent::class.java)
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
             .filter {
-                it.entity is Player
+                !it.isCancelled && it.entity is Player
             }
             .handler {
-                if (it.isCancelled)
-                {
-                    return@handler
-                }
-
                 if (
                     (it.damager is Player && isSpectating(it.damager as Player)) ||
                     isSpectating(it.entity as Player)
@@ -2054,7 +2089,8 @@ object GameService
             }
             .bindWith(plugin)
 
-        Events.subscribe(ItemSpawnEvent::class.java)
+        Events
+            .subscribe(ItemSpawnEvent::class.java)
             .filter {
                 it.entity.itemStack.type.name.endsWith("BED") &&
                     byWorld(it.entity.world) != null
@@ -2281,7 +2317,13 @@ object GameService
                 deathEvent.deathMessage = null
             }
 
-        Events.subscribe(BlockPlaceEvent::class.java, EventPriority.LOWEST)
+        // same issue as with the blockbreakevent, we need to ensure polar handles event first
+        // don't set priority for now
+        Events
+            .subscribe(BlockPlaceEvent::class.java)
+            .filter {
+                !it.isCancelled
+            }
             .handler {
                 if (isSpectating(it.player))
                 {
