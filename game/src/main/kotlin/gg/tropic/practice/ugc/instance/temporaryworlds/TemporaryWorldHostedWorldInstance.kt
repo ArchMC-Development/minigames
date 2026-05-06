@@ -11,6 +11,7 @@ import gg.tropic.practice.ugc.generation.visits.VisitWorldRequest
 import gg.tropic.practice.ugc.instance.BaseHostedWorldInstance
 import gg.tropic.practice.ugc.temporaryworlds.TemporaryWorldPlayerResourcesWorld
 import gg.tropic.practice.ugc.temporaryworlds.TemporaryWorldVisitConfiguration
+import gg.tropic.practice.versioned.Versioned
 import mc.arch.minigames.versioned.generics.worlds.LoadedSlimeWorld
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
@@ -43,7 +44,7 @@ class TemporaryWorldHostedWorldInstance(
 
         // Little programmatically generated spawn location for the players lol
         // Disable lighting to save >90ms/tick during game starts
-        bukkitWorld.custom().worldConfig.FEATURES_LIGHTING_ENABLED = false
+        Versioned.toProvider().getWorldProvider().setFeatureLightingEnabled(bukkitWorld, false)
 
         CompletableFuture
             .supplyAsync {
@@ -75,7 +76,7 @@ class TemporaryWorldHostedWorldInstance(
                 BlockChanger.setBlocksAsync(bukkitWorld, locations)
             }
             .thenRun {
-                bukkitWorld.custom().worldConfig.FEATURES_LIGHTING_ENABLED = true
+                Versioned.toProvider().getWorldProvider().setFeatureLightingEnabled(bukkitWorld, true)
             }
             .exceptionally { throwable ->
                 throwable.printStackTrace()

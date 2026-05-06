@@ -11,7 +11,9 @@ import gg.tropic.practice.profile.PracticeProfileService
 import gg.tropic.practice.queue.QueueType
 import gg.tropic.practice.statistics.TrackedKitStatistic
 import gg.tropic.practice.statistics.statisticIdFrom
+import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Schedulers
+import org.bukkit.Bukkit
 import me.lucko.helper.scheduler.Task
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.util.CC
@@ -22,7 +24,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.TitlePart
-import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.metadata.FixedMetadataValue
 
@@ -95,11 +96,8 @@ class GameStartTask(
 
                     if (profile != null && ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
                     {
-                        val customProfile = Bukkit.custom()
-                            .knockbackManager.profileManager
-                            .getProfile("default", profile)
-
-                        customProfile?.setKnockback(player)
+                        Versioned.toProvider().getKnockbackProvider()
+                            .applyProfile(player, "default", profile)
                     }
                 }
 

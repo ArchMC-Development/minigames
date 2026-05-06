@@ -2,6 +2,7 @@ repositories {
     maven("https://repo.infernalsuite.com/repository/maven-snapshots/")
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://repo.lunarclient.dev")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
@@ -12,7 +13,7 @@ dependencies {
     api(project(":versioned:modern"))
 
     compileOnly(project(":parties"))
-    compileOnly(fileTree("spigot"))
+    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
 

@@ -824,9 +824,13 @@ public class BlockChanger {
         }
 
         public BlockSnapshot(Location location, Material material, byte data) {
-            this.blockDataNMS = net.minecraft.server.v1_8_R3.Block
-                    .getById(material.getId())
-                    .fromLegacyData(data);
+            Object dataNMS = null;
+            try {
+                dataNMS = GET_COMBINED_ID.invoke(material.getId() + (data << 12));
+            } catch (Throwable throwable) {
+                debug("Error initializing blockDataNMS: " + throwable.getMessage());
+            }
+            this.blockDataNMS = dataNMS != null ? dataNMS : new Object();
             this.location = BlockLocation.fromLocation(location);
         }
 

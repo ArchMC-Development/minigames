@@ -11,4 +11,7 @@ object LegacyVersionedProviders : VersionedProviders
     override fun getSlimeProvider() = LegacySlimeProvider
     override fun getPotionProvider() = LegacyPotionProvider
     override fun getPlayerProvider() = LegacyPlayerProvider
+    override fun getServerProvider() = LegacyServerProvider
+    override fun getKnockbackProvider() = LegacyKnockbackProvider
+    override fun getWorldProvider() = LegacyWorldProvider
 }

@@ -27,6 +27,7 @@ import gg.tropic.practice.games.tasks.lifecycle.PlayerRespawnTask
 import gg.tropic.practice.strategies.MarkSpectatorStrategy
 import gg.tropic.practice.ugc.HostedWorldInstanceService
 import gg.tropic.practice.ugc.toHostedWorld
+import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.serializers.Serializers
@@ -34,9 +35,7 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.ServerVersion
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.minecraft.server.v1_8_R3.WorldSettings
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
@@ -324,8 +323,7 @@ object ExpectationService
                 // We only really need this on 1.8... I hope
                 if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
                 {
-                    (it.player as CraftPlayer).handle.playerInteractManager
-                        .gameMode = WorldSettings.EnumGamemode.SURVIVAL
+                    Versioned.toProvider().getPlayerProvider().setSurvivalGameMode(it.player)
                 }
 
                 if (pendingHostedWorldLogin != null)

@@ -3,7 +3,6 @@ package gg.tropic.practice.map
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.agnostic.sync.ServerSync
-import gg.scala.commons.modern.ModernAccess
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Close
 import gg.scala.flavor.service.Configure
@@ -32,7 +31,6 @@ import gg.tropic.practice.replication.generation.rpc.GenerationResult
 import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.ServerVersion
-import net.minecraft.server.v1_8_R3.MinecraftServer
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.metadata.FixedMetadataValue
@@ -427,13 +425,8 @@ object MapReplicationService
         }
     }
 
-    private fun versionedCurrentTickProvider() = if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
-    {
-        MinecraftServer.currentTick
-    } else
-    {
-        ModernAccess.currentTick()
-    }
+    private fun versionedCurrentTickProvider() =
+        Versioned.toProvider().getServerProvider().currentTick()
 
     fun startWorldRequestThread() = thread(isDaemon = true) {
         var lastRecordedTick = versionedCurrentTickProvider()

@@ -8,8 +8,8 @@ import gg.tropic.practice.games.GameImpl
 import gg.tropic.practice.games.GameState
 import gg.tropic.practice.kit.Kit
 import gg.tropic.practice.schematics.manipulation.BlockChanger
+import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Schedulers
-import net.evilblock.cubed.util.ServerVersion
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -102,10 +102,7 @@ abstract class AbstractMiniGameGameImpl<T : MiniGameConfiguration>(
         if (spectatorLocation != null)
         {
             // Disable lighting to save >90ms/tick during game starts
-            if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
-            {
-                arenaWorld.custom().worldConfig.FEATURES_LIGHTING_ENABLED = false
-            }
+            Versioned.toProvider().getWorldProvider().setFeatureLightingEnabled(arenaWorld, false)
 
             CompletableFuture
                 .supplyAsync {
@@ -124,10 +121,7 @@ abstract class AbstractMiniGameGameImpl<T : MiniGameConfiguration>(
                     )
                 }
                 .thenRun {
-                    if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
-                    {
-                        arenaWorld.custom().worldConfig.FEATURES_LIGHTING_ENABLED = true
-                    }
+                    Versioned.toProvider().getWorldProvider().setFeatureLightingEnabled(arenaWorld, true)
                 }
                 .exceptionally { throwable ->
                     throwable.printStackTrace()

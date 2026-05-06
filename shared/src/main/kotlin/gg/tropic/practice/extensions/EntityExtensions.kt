@@ -1,10 +1,10 @@
 package gg.tropic.practice.extensions
 
 import gg.tropic.practice.games.team.TeamIdentifier
+import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Helper
 import net.evilblock.cubed.util.ServerVersion
 import org.bukkit.GameMode
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.metadata.Metadatable
@@ -52,7 +52,7 @@ fun Player.resetAttributes(editFlightAttributes: Boolean = true)
 
     if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_19))
     {
-        (this as CraftLivingEntity).handle.dataWatcher.watch<Byte>(9, -1)
+        Versioned.toProvider().getPlayerProvider().hideNametag(this)
     }
 
     for (potionEffect in this.activePotionEffects)

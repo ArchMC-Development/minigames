@@ -72,15 +72,12 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
-import net.minecraft.server.v1_8_R3.EntityTNTPrimed
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed
 import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
@@ -94,7 +91,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import java.lang.reflect.Field
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -2557,16 +2553,6 @@ object GameService
 
     fun setSource(tnt: TNTPrimed, owner: Player)
     {
-        val nmsEntityLiving = ((owner as CraftLivingEntity).handle)
-        val nmsTNT = ((tnt as CraftTNTPrimed).handle)
-        try
-        {
-            val sourceField: Field = EntityTNTPrimed::class.java.getDeclaredField("source")
-            sourceField.setAccessible(true)
-            sourceField.set(nmsTNT, nmsEntityLiving)
-        } catch (ex: Exception)
-        {
-            ex.printStackTrace()
-        }
+        Versioned.toProvider().getPlayerProvider().setTntSource(tnt, owner)
     }
 }

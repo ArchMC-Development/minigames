@@ -31,12 +31,14 @@ object ModernPotionProvider : PotionProvider
             .build()
 
         val meta = potion.itemMeta as PotionMeta
-        meta.displayName = "${CC.WHITE}$name"
+        meta.setDisplayName("${CC.WHITE}$name")
 
         if (customEffects.isEmpty())
         {
+            val effectType = type.effectType
+                ?: error("PotionType $type has no associated PotionEffectType on this server version")
             meta.addCustomEffect(
-                PotionEffect(type.effectType, duration, level),
+                PotionEffect(effectType, duration, level),
                 true
             )
         } else

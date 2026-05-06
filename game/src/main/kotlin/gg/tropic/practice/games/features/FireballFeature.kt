@@ -4,9 +4,8 @@ import com.cryptomorin.xseries.XMaterial
 import gg.tropic.practice.games.GameService
 import gg.tropic.practice.games.GameState
 import gg.tropic.practice.extensions.PlayerVelocityUtilities
+import gg.tropic.practice.versioned.Versioned
 import net.evilblock.cubed.util.CC
-import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball
 import org.bukkit.entity.Fireball
 import org.bukkit.entity.Player
 import org.bukkit.entity.TNTPrimed
@@ -86,14 +85,8 @@ class FireballFeature : Listener
         p.updateInventory()
     }
 
-    fun setFireballDirection(fireball: Fireball, vector: Vector): Fireball
-    {
-        val fb = (fireball as CraftFireball).handle
-        fb.dirX = vector.x * 0.1
-        fb.dirY = vector.y * 0.1
-        fb.dirZ = vector.z * 0.1
-        return fb.bukkitEntity as Fireball
-    }
+    fun setFireballDirection(fireball: Fireball, vector: Vector): Fireball =
+        Versioned.toProvider().getPlayerProvider().setFireballDirection(fireball, vector)
 
     @EventHandler
     fun EntityDamageByEntityEvent.onTNTDirectHit()
