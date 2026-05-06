@@ -27,7 +27,6 @@ import java.util.*
  * @author GrowlyX
  * @since 9/17/2023
  */
-@AutoRegister
 @CommandAlias("kit")
 @CommandPermission("practice.command.kit")
 object KitCommands : ScalaCommand()
@@ -549,7 +548,7 @@ object KitCommands : ScalaCommand()
         player.sendMessage("${CC.GREEN}You have added the potion effect ${CC.YELLOW}${
             potionEffectType.name.lowercase()
                 .replaceFirstChar {
-                    it.titlecase(Locale.getDefault()) 
+                    it.titlecase(Locale.getDefault())
                 }
         } ${CC.GREEN}with an amplifier of ${CC.YELLOW}$amplifier${CC.GREEN}.")
     }
@@ -573,8 +572,8 @@ object KitCommands : ScalaCommand()
                 val listComponents = FancyMessage()
                     .withMessage(
                         "${CC.GRAY}${
-                            entry.key.lowercase().replaceFirstChar { 
-                                it.titlecase(Locale.getDefault()) 
+                            entry.key.lowercase().replaceFirstChar {
+                                it.titlecase(Locale.getDefault())
                             }
                         } (Amplifier ${entry.value})${
                             if (index != effects.size - 1) ", " else ""

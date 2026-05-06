@@ -1,11 +1,13 @@
 package mc.arch.minigames.agent
 
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.annotations.ServiceablePackage
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.*
 import gg.tropic.practice.MinigamesAgentPlugin
 import gg.tropic.practice.PracticeShared
+import gg.tropic.practice.commands.KitCommands
 import gg.tropic.practice.devProvider
 import gg.tropic.practice.minigame.MiniGameSerializers
 
@@ -46,5 +48,11 @@ class MinigamesAgent : ExtendedScalaPlugin(), MinigamesAgentPlugin
     {
         devProvider = { false }
         MiniGameSerializers.configure()
+
+        // this should really be lobby-specific to duels only, but who cares atp
+        if (ServerSync.local.id != "survival" && ServerSync.local.id != "lifesteal")
+        {
+            this.commandManager.registerCommand(KitCommands)
+        }
     }
 }
