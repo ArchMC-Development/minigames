@@ -169,6 +169,13 @@ object NetworkPartyService : PartyService
                 bukkitPlayer.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}")
                 bukkitPlayer.sendMessage("${CC.GREEN}Your party is being warped to ${CC.GOLD}${server}${CC.GREEN}!")
                 bukkitPlayer.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${" ".repeat(53)}")
+
+                if (ServerSync.local.id.equals(server, ignoreCase = true))
+                {
+                    continue
+                }
+
+                VelocityRedirectSystem.redirect(bukkitPlayer, server)
             }
         }
 
