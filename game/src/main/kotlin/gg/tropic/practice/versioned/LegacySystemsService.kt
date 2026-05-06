@@ -1,6 +1,7 @@
 package gg.tropic.practice.versioned
 
 import gg.tropic.practice.games.event.GameStartEvent
+import gg.tropic.practice.kit.feature.FeatureFlag
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.ServerVersion
@@ -19,11 +20,16 @@ class LegacySystemsService
             .handler { event ->
                 val knockback = Versioned.toProvider().getKnockbackProvider()
 
+                val profile = event.game.flagMetaData(
+                    FeatureFlag.KnockbackProfile,
+                    "profile"
+                ) ?: "minigames"
+
                 Schedulers
                     .async()
                     .runLater({
                         event.game.allNonSpectators().forEach { player ->
-                            knockback.applyProfile(player, "default", "minigames")
+                            knockback.applyProfile(player, "default", profile)
                         }
                     }, 10L)
             }
