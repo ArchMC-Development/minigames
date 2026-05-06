@@ -1,15 +1,11 @@
 repositories {
     maven("https://repo.glaremasters.me/repository/concuncan/")
     maven("https://repo.dmulloy2.net/repository/public/")
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.infernalsuite.com/repository/maven-snapshots/")
 }
 
 dependencies {
     api(project(":services:metadata"))
     compileOnly(project(":parties"))
-
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 
     compileOnly(project(":versioned:generics"))
     compileOnly(project(":versioned:legacy"))
