@@ -368,7 +368,7 @@ object MinigameLobby
 
                     return@context ItemBuilder
                         .of(XMaterial.GRAY_DYE)
-                        .name("${CC.GRAY}Players: ${CC.RED}Disabled ${CC.WHITE}(Right Click)")
+                        .name("${CC.GRAY}Players: ${CC.RED}Disabled ${CC.GRAY}(Right Click)")
                         .build()
                 }
 
@@ -493,13 +493,13 @@ object MinigameLobby
                     {
                         return@context ItemBuilder
                             .of(XMaterial.LIME_DYE)
-                            .name("${CC.GRAY}Players: ${CC.GREEN}Enabled ${CC.WHITE}(Right Click)")
+                            .name("${CC.GRAY}Players: ${CC.GREEN}Enabled ${CC.GRAY}(Right Click)")
                             .build()
                     }
 
                     return@context ItemBuilder
                         .of(XMaterial.GRAY_DYE)
-                        .name("${CC.GRAY}Players: ${CC.RED}Disabled ${CC.WHITE}(Right Click)")
+                        .name("${CC.GRAY}Players: ${CC.RED}Disabled ${CC.GRAY}(Right Click)")
                         .build()
                 }
 

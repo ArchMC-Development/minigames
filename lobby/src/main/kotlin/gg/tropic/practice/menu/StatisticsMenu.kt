@@ -30,11 +30,6 @@ class StatisticsMenu(
 {
     private var resetTokens = 0
 
-    init
-    {
-        async = true
-    }
-
     override fun getButtons(player: Player): MutableMap<Int, Button>
     {
         if (MinigameLobby.isMinigameLobby() && MinigameLobby.customizer() is MinigameCompetitiveCustomizer)
