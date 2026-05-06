@@ -143,5 +143,6 @@ gradle-app.setting
 *.hprof
 
 build
+bedwars/spigot
 
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,jetbrains+all,gradle

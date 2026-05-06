@@ -74,7 +74,7 @@ class NPCEditorMenu(val house: PlayerHouse) : PaginatedMenu()
                     button.addToLore(
                         "",
                         "${CC.GREEN}Left-Click to edit NPC",
-                        "${CC.RED}Right-CLick to delete NPC"
+                        "${CC.RED}Right-Click to delete NPC"
                     )
                 }.toButton { _, click ->
                     if (click!!.isLeftClick) {
