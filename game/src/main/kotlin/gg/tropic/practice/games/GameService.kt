@@ -1723,10 +1723,13 @@ object GameService
                 )
                     ?: return@handler
 
-                if (damagerGame.expectation == game.expectation)
+                val arrowShooter = (event.damager as Arrow).shooter as Player
+                val isSelfShot = arrowShooter.uniqueId == (event.entity as Player).uniqueId
+
+                if (!isSelfShot && damagerGame.expectation == game.expectation)
                 {
                     val damagerTeam = game
-                        .getTeamOf(((event.damager as Arrow).shooter) as Player)
+                        .getTeamOf(arrowShooter)
 
                     val team = game
                         .getTeamOf(event.entity as Player)
