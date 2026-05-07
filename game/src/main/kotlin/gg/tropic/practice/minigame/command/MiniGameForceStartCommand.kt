@@ -9,6 +9,7 @@ import gg.scala.commons.issuer.ScalaPlayer
 import gg.tropic.practice.games.GameService
 import gg.tropic.practice.games.GameState
 import gg.tropic.practice.games.event.GameStartEvent
+import gg.tropic.practice.minigame.AbstractMiniGameGameImpl
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -27,15 +28,18 @@ object MiniGameForceStartCommand : ScalaCommand()
         val game = GameService.byPlayer(player)
             ?: throw ConditionFailedException("You are not in a game!")
 
-        if (!game.state(GameState.Waiting))
+        if (!game.state(GameState.Waiting) && !game.state(GameState.Starting))
         {
             throw ConditionFailedException("You cannot do this right now!")
         }
 
-        if (game.miniGameLifecycle == null)
+        if (game.miniGameLifecycle == null || game !is AbstractMiniGameGameImpl<*>)
         {
             throw ConditionFailedException("This game is not a candidate for Force Start!")
         }
+
+        game.fastTracked = true
+        game.startCountDown = 0
 
         val event = GameStartEvent(game)
         Bukkit.getPluginManager().callEvent(event)
