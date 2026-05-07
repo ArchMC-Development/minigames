@@ -2546,10 +2546,16 @@ object GameService
         playerToGameMappings[player]
             ?: spectatorToGameMappings[player]
 
-    fun iterativeByPlayerOrSpectator(player: UUID) = gameMappings.values
-        .find {
-            player in it.toPlayers() || player in it.expectedSpectators
+    fun iterativeByPlayerOrSpectator(player: UUID): GameImpl?
+    {
+        var spectatorMatch: GameImpl? = null
+        for (game in gameMappings.values)
+        {
+            if (player in game.toPlayers()) return game
+            if (spectatorMatch == null && player in game.expectedSpectators) spectatorMatch = game
         }
+        return spectatorMatch
+    }
 
     fun setSource(tnt: TNTPrimed, owner: Player)
     {
