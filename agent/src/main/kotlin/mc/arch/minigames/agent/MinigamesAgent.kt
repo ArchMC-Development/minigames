@@ -50,9 +50,9 @@ class MinigamesAgent : ExtendedScalaPlugin(), MinigamesAgentPlugin
         MiniGameSerializers.configure()
 
         // this should really be lobby-specific to duels only, but who cares atp
-        if (ServerSync.local.id != "survival" && ServerSync.local.id != "lifesteal")
+        if (ServerSync.local.id == "survival" || ServerSync.local.id == "lifesteal")
         {
-            this.commandManager.registerCommand(KitCommands)
+            this.commandManager.unregisterCommand(KitCommands)
         }
     }
 }

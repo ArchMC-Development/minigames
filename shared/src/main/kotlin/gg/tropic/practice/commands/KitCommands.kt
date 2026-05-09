@@ -27,6 +27,7 @@ import java.util.*
  * @author GrowlyX
  * @since 9/17/2023
  */
+@AutoRegister
 @CommandAlias("kit")
 @CommandPermission("practice.command.kit")
 object KitCommands : ScalaCommand()

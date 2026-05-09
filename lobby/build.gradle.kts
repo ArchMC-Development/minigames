@@ -11,7 +11,7 @@ dependencies {
     compileOnly(project(":parties"))
     compileOnly(fileTree("spigot"))
     api(project(":microgames:bridging-api"))
-    
+
     api(project(":versioned:generics"))
     api(project(":versioned:legacy"))
     api(project(":versioned:modern"))
