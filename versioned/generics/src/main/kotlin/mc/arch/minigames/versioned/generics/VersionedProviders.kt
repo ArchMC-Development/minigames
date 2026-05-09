@@ -13,4 +13,5 @@ interface VersionedProviders
     fun getKnockbackProvider(): KnockbackProvider
     fun getWorldProvider(): WorldProvider
     fun getSchematicProvider(): SchematicProvider
+    fun getItemStackProvider(): ItemStackProvider
 }

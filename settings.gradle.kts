@@ -62,5 +62,7 @@ include(
     "minigames:hunger-games-lobby",
     "minigames:hunger-games-shared",
 
+    "minigames:duels-modern-lobby",
+
     "spigot-integration"
 )

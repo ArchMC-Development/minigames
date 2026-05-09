@@ -11,6 +11,10 @@ dependencies {
     compileOnly(project(":parties"))
     compileOnly(fileTree("spigot"))
     api(project(":microgames:bridging-api"))
+    
+    api(project(":versioned:generics"))
+    api(project(":versioned:legacy"))
+    api(project(":versioned:modern"))
 
     compileOnly("gg.scala.queue:spigot:1.0.2")
     compileOnly("me.clip:placeholderapi:2.11.6")

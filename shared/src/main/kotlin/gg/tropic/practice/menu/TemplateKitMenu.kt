@@ -1,5 +1,6 @@
 package gg.tropic.practice.menu
 
+import gg.tropic.practice.extensions.ensureItemMeta
 import gg.tropic.practice.kit.Kit
 import gg.tropic.practice.kit.KitService
 import gg.tropic.practice.kit.feature.FeatureFlag
@@ -89,7 +90,11 @@ abstract class TemplateKitMenu(private val viewer: Player, private val dynamic: 
             }
             .forEach {
                 buttons[buttons.size] = ItemBuilder
-                    .copyOf(it.displayIcon)
+                    // Guard against kits whose displayIcon is a material that
+                    // returns null itemMeta on modern Paper (e.g. AIR) — without
+                    // this, scala-commons' ItemBuilder.name() NPEs and tears
+                    // down the whole menu.
+                    .copyOf(it.displayIcon.ensureItemMeta())
                     .amount(getItemAmount(player, it))
                     .name(
                         itemTitleFor(player, it)

@@ -1,5 +1,6 @@
 package mc.arch.minigames.versioned.legacy
 
+import mc.arch.minigames.versioned.generics.ItemStackProvider
 import mc.arch.minigames.versioned.generics.VersionedProviders
 
 /**
@@ -15,4 +16,5 @@ object LegacyVersionedProviders : VersionedProviders
     override fun getKnockbackProvider() = LegacyKnockbackProvider
     override fun getWorldProvider() = LegacyWorldProvider
     override fun getSchematicProvider() = LegacySchematicProvider
+    override fun getItemStackProvider() = LegacyItemstackProvider
 }

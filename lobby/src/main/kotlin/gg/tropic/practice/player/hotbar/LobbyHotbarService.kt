@@ -18,6 +18,7 @@ import gg.scala.queue.spigot.command.LeaveQueueCommand
 import gg.tropic.practice.Globals
 import gg.tropic.practice.PracticeLobby
 import gg.tropic.practice.configuration.PracticeConfigurationService
+import gg.tropic.practice.extensions.unbreakable
 import gg.tropic.practice.kit.KitService
 import gg.tropic.practice.menu.JoinQueueMenu
 import gg.tropic.practice.menu.LeaderboardsMenu
@@ -332,7 +333,7 @@ object LobbyHotbarService
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.IRON_SWORD)
                     .name("${CC.GREEN}Play Casual ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     if (player.hasMetadata("frozen"))
@@ -351,7 +352,7 @@ object LobbyHotbarService
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.GOLD_SWORD)
                     .name("${CC.GOLD}Play Bot Fights ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     if (player.hasMetadata("frozen"))
@@ -375,7 +376,7 @@ object LobbyHotbarService
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.DIAMOND_SWORD)
                     .name("${CC.AQUA}Play Ranked ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     openRankedQueueMenu(player)

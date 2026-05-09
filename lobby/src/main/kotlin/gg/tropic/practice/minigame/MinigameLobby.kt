@@ -21,6 +21,7 @@ import gg.tropic.practice.category.visibility.SpawnPlayerVisibility
 import gg.tropic.practice.commands.*
 import gg.tropic.practice.configuration.MinigameLobbyConfiguration
 import gg.tropic.practice.configuration.PracticeConfigurationService
+import gg.tropic.practice.extensions.unbreakable
 import gg.tropic.practice.minigame.hologram.MinigameLeaderboardHologramEntity
 import gg.tropic.practice.minigame.holographicstats.CoreHolographicStatsHologramEntity
 import gg.tropic.practice.minigame.levitationportals.LevitationPortal
@@ -273,7 +274,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.COMPASS)
                     .name("${CC.GREEN}Play ${typeProvider.provide().displayName} ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     customizer.playProvider(player)
@@ -286,7 +287,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(typeProvider.provide().item)
                     .name("${CC.GREEN}${typeProvider.provide().displayName} Menu ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     customizer.mainMenuProvider(player)
@@ -345,7 +346,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.CHEST)
                     .name("${CC.GREEN}Cosmetics ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     CosmeticCategoryMenu().openMenu(player)
@@ -390,7 +391,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.NETHER_STAR)
                     .name("${CC.GREEN}Switch ${typeProvider.provide().displayName} Lobby ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     SwitchLobbyServerCommand.SwitchLobbyServerMenu().openMenu(player)
@@ -411,7 +412,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.COMPASS)
                     .name("${CC.GREEN}Game Selector ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     Button.playNeutral(player)
@@ -429,7 +430,7 @@ object MinigameLobby
                         .data(3.toShort())
                         .name("${CC.GREEN}Profile Menu ${CC.GRAY}(Right Click)")
                         .owner(player.name)
-                        .setUnbreakable(true)
+                        .unbreakable()
                         .build()
                 }
 
@@ -475,7 +476,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.CHEST)
                     .name("${CC.GREEN}Cosmetics ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     Button.playNeutral(player)
@@ -522,7 +523,7 @@ object MinigameLobby
             StaticHotbarPresetEntry(
                 ItemBuilder(Material.NETHER_STAR)
                     .name("${CC.GREEN}Switch Main Lobby ${CC.GRAY}(Right Click)")
-                    .setUnbreakable(true)
+                    .unbreakable()
             ).also {
                 it.onClick = context@{ player ->
                     Button.playNeutral(player)

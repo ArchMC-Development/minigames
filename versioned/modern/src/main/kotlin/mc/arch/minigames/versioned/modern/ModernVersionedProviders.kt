@@ -1,5 +1,6 @@
 package mc.arch.minigames.versioned.modern
 
+import mc.arch.minigames.versioned.generics.ItemStackProvider
 import mc.arch.minigames.versioned.generics.VersionedProviders
 
 /**
@@ -15,4 +16,5 @@ object ModernVersionedProviders : VersionedProviders
     override fun getKnockbackProvider() = ModernKnockbackProvider
     override fun getWorldProvider() = ModernWorldProvider
     override fun getSchematicProvider() = ModernSchematicProvider
+    override fun getItemStackProvider() = ModernItemStackProvider
 }
