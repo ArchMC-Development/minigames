@@ -228,7 +228,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
         val map = targetEntry.data.miniGameQueueConfiguration?.requiredMapID
             ?.let { MapDataSync.cached().maps[it] }
             ?: MapDataSync
-                .selectRandomMapCompatibleWith(kit)
+                .selectRandomMapCompatibleWith(kit, miniProvider)
             ?: return run {
                 RedisShared.sendMessage(
                     targetEntry.data.players,

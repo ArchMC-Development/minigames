@@ -4,8 +4,8 @@ import gg.tropic.practice.map.metadata.toSanitizedCoordinate
 import net.evilblock.cubed.entity.EntityHandler
 import net.evilblock.cubed.entity.hologram.HologramEntity
 import net.evilblock.cubed.util.CC
+import com.cryptomorin.xseries.XSound
 import org.bukkit.Location
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import java.util.UUID
 
@@ -44,7 +44,7 @@ data class SyntheticSignHologram(
         EntityHandler.forgetEntity(this)
 
         player.sendMessage("${CC.RED}Removed!")
-        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
     }
 
     override fun getLines() = listOf(

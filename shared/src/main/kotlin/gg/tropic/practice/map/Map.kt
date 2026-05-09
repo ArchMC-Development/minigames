@@ -8,6 +8,7 @@ import gg.tropic.practice.map.metadata.impl.MapLevelMetadata
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.metadata.impl.MapZoneMetadata
 import gg.tropic.practice.map.utilities.MapMetadata
+import gg.tropic.practice.provider.MiniProviderVersion
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -31,7 +32,8 @@ data class Map(
         .build(),
     val associatedSlimeTemplate: String,
     val associatedKitGroups: MutableSet<String> =
-        mutableSetOf("__default__")
+        mutableSetOf("__default__"),
+    var version: MiniProviderVersion = MiniProviderVersion.LEGACY
 )
 {
     var locked = false

@@ -1,13 +1,10 @@
 package gg.solara.practice.editor
 
 import com.cryptomorin.xseries.XMaterial
-import com.sk89q.worldedit.Vector
-import gg.solara.practice.editor.EditorGenerator.VoidWorldGenerator
-import gg.solara.practice.utilities.WorldEditUtils
+import gg.tropic.practice.provider.MiniProviderVersion
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.World
-import org.bukkit.WorldCreator
 import org.bukkit.entity.Player
 import java.io.File
 import java.io.FileOutputStream
@@ -18,7 +15,10 @@ import java.util.zip.ZipInputStream
  * @author Subham
  * @since 6/24/25
  */
-class WorldEditable(private val file: File) : Editable
+class WorldEditable(
+    private val file: File,
+    override val version: MiniProviderVersion
+) : Editable
 {
     override val icon: XMaterial
         get() = XMaterial.GRASS_BLOCK
@@ -27,27 +27,20 @@ class WorldEditable(private val file: File) : Editable
 
     override fun prepareWorld(player: Player): World
     {
-        // Generate unique world directory name
         val worldName = "editor_temp_${UUID.randomUUID()}"
         val worldContainer = Bukkit.getWorldContainer()
         val worldDir = File(worldContainer, worldName)
-
-        // Create the world directory
         worldDir.mkdirs()
 
         player.sendMessage("${CC.GREEN}Unzipping file...")
-        // Unzip the file to the world directory
         unzipFile(file, worldDir)
 
-        // Create and load the world
-        val worldCreator = WorldCreator.name(worldName).generator(VoidWorldGenerator).generateStructures(false)
-        val newWorld = worldCreator
+        val newWorld = org.bukkit.WorldCreator.name(worldName)
+            .generateStructures(false)
             .createWorld()
-            .apply {
-                setGameRuleValue("doMobSpawning", "false")
-            }
             ?: throw RuntimeException("Failed to create world: $worldName")
 
+        newWorld.setGameRuleValue("doMobSpawning", "false")
         return newWorld
     }
 

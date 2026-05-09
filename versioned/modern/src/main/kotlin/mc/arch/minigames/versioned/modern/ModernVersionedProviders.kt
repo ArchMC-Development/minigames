@@ -14,4 +14,5 @@ object ModernVersionedProviders : VersionedProviders
     override fun getServerProvider() = ModernServerProvider
     override fun getKnockbackProvider() = ModernKnockbackProvider
     override fun getWorldProvider() = ModernWorldProvider
+    override fun getSchematicProvider() = ModernSchematicProvider
 }

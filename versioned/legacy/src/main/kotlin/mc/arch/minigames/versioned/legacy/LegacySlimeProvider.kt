@@ -129,4 +129,11 @@ object LegacySlimeProvider : SlimeProvider
             )
         }
     }
+
+    override fun importWorldFromBukkit(savedWorldFolder: java.io.File, newSlimeName: String)
+    {
+        slimePlugin.importWorld(savedWorldFolder, newSlimeName, mongoLoader)
+    }
+
+    override fun worldExists(name: String) = mongoLoader.worldExists(name)
 }

@@ -1,6 +1,7 @@
 package gg.solara.practice.editor
 
 import com.cryptomorin.xseries.XMaterial
+import com.cryptomorin.xseries.XSound
 import gg.scala.commons.spatial.Position
 import gg.scala.commons.spatial.plus
 import gg.scala.lemon.hotbar.HotbarPreset
@@ -11,6 +12,8 @@ import gg.solara.practice.map.MapManageServices
 import gg.tropic.practice.map.MapService
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.utilities.MapMetadataScanUtilities
+import gg.tropic.practice.provider.MiniProviderVersion
+import net.evilblock.cubed.util.ServerVersion
 import gg.tropic.practice.map.metadata.scanner.AbstractMapMetadataScanner
 import gg.tropic.practice.map.metadata.scanner.MetadataScannerUtilities
 import gg.tropic.practice.map.metadata.sign.MapSignMetadataModel
@@ -53,15 +56,21 @@ class Editor(private val player: Player) : SyntheticsEditor
     private val containers = Containers()
     private val editorID = "editor-${player.uniqueId}"
 
+    private val devtoolsVersion: MiniProviderVersion =
+        if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
+            MiniProviderVersion.LEGACY
+        else
+            MiniProviderVersion.MODERN
+
     var readOnly = false
 
     var visiting: EditorInstance? = null
     private val schematics = (containers.schematicsDirectory.listFiles()
         ?.filter { it.isFile }
-        ?.toList()?.filterNotNull() ?: emptyList()).map { SchematicEditable(it) } +
+        ?.toList()?.filterNotNull() ?: emptyList()).map { SchematicEditable(it, devtoolsVersion) } +
         (containers.devToolsWorldsDirectory.listFiles()
             ?.filter { it.isFile }
-            ?.toList()?.filterNotNull() ?: emptyList()).map { WorldEditable(it) }
+            ?.toList()?.filterNotNull() ?: emptyList()).map { WorldEditable(it, devtoolsVersion) }
 
     val terminable = CompositeTerminable.create()
 
@@ -302,7 +311,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                                         if (syntheticScanner!!.isAllExtra()) "${CC.GRAY}(all extra)" else ""
                                     }"
                                 )
-                                player.playSound(player.location, Sound.FIREWORK_BLAST, 1.0f, 1.0f)
+                                XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(player, 1.0f, 1.0f)
                             }
                             .start(player)
                     } else
@@ -314,12 +323,12 @@ class Editor(private val player: Player) : SyntheticsEditor
                     if (isEditingSynthetic && syntheticScanner != null)
                     {
                         player.sendMessage("${CC.GREEN}TRACKED! Enter lines comma-separated:")
-                        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+                        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
 
                         InputPrompt()
                             .acceptInput { player, string ->
                                 prepareSyntheticMeta(string)
-                                player.playSound(player.location, Sound.FIREWORK_BLAST, 1.0f, 1.0f)
+                                XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(player, 1.0f, 1.0f)
                             }
                             .start(player)
                     }
@@ -344,7 +353,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                         Schedulers
                             .sync()
                             .runRepeating({ _ ->
-                                player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 0.5f)
+                                XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 0.5f)
                             }, 0L, 5L)
                             .bindWith(sneakTerminable!!)
 
@@ -360,7 +369,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
                                     override fun getButtons(player: Player) = mapOf(
                                         4 to ItemBuilder
-                                            .of(Material.GLOWSTONE_DUST)
+                                            .of(XMaterial.GLOWSTONE_DUST)
                                             .name("${CC.GOLD}(EXPERIMENT) ${CC.YELLOW}K-Means Island Clustering")
                                             .addToLore("${CC.GREEN}Click to start experiment.")
                                             .toButton { _, _ ->
@@ -469,7 +478,7 @@ class Editor(private val player: Player) : SyntheticsEditor
             .replace(" ", "")
             .capitalize()
 
-        return MapManageServices.loader.worldExists("Map${newMapName.capitalize()}")
+        return MapManageServices.slime.worldExists("Map${newMapName.capitalize()}")
     }
 
     fun visit(editable: Editable)
@@ -490,7 +499,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         player.sendMessage("${CC.GREEN}Visiting ${CC.WHITE}${editable.displayName}${CC.GREEN}...")
 
-        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
 
         syntheticScanner = null
         synthetics.clear()
@@ -512,7 +521,7 @@ class Editor(private val player: Player) : SyntheticsEditor
         val hotbarPreset = HotbarPreset()
         hotbarPreset.addSlot(0, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.MELON)
+                ItemBuilder.of(XMaterial.MELON)
                     .glow()
                     .name("${CC.RED}Visit Previous ${CC.GRAY}(Right Click)")
                     .build()
@@ -532,7 +541,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(8, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.SPECKLED_MELON)
+                ItemBuilder.of(XMaterial.GLISTERING_MELON_SLICE)
                     .glow()
                     .name("${CC.GREEN}Visit Next ${CC.GRAY}(Right Click)")
                     .build()
@@ -552,7 +561,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(7, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.NAME_TAG)
+                ItemBuilder.of(XMaterial.NAME_TAG)
                     .glow()
                     .name("${CC.YELLOW}Read Only ${CC.GRAY}(Right Click)")
                     .build()
@@ -566,7 +575,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(6, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.PAINTING)
+                ItemBuilder.of(XMaterial.PAINTING)
                     .glow()
                     .name("${CC.GOLD}All Editables ${CC.GRAY}(Right Click)")
                     .build()
@@ -666,7 +675,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(4, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.GOLD_AXE)
+                ItemBuilder.of(XMaterial.GOLDEN_AXE)
                     .glow()
                     .name("${CC.B_YELLOW}Through ${CC.GRAY}(Right Click)")
                     .build()
@@ -686,14 +695,14 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(
             2, StaticHotbarPresetEntry(
-                ItemBuilder.of(Material.SIGN)
+                ItemBuilder.of(XMaterial.OAK_SIGN)
                     .name("${CC.WHITE}Metadata Sign")
             )
         )
 
         hotbarPreset.addSlot(1, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.ENDER_PORTAL_FRAME)
+                ItemBuilder.of(XMaterial.END_PORTAL_FRAME)
                     .glow()
                     .name("${CC.U_AQUA}Develop Map ${CC.GRAY}(Right Click)")
                     .build()
@@ -720,7 +729,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                     return@context
                 }
 
-                if (MapManageServices.loader.worldExists("Map${newMapName.capitalize()}"))
+                if (MapManageServices.slime.worldExists("Map${newMapName.capitalize()}"))
                 {
                     player.sendMessage("${CC.RED}A map with this name already exists! (MongoDB)")
                     return@context
@@ -736,14 +745,15 @@ class Editor(private val player: Player) : SyntheticsEditor
                     name = newMapName.lowercase(),
                     metadata = metadata,
                     displayName = newMapName.capitalize(),
-                    associatedSlimeTemplate = "Map${newMapName.capitalize()}"
+                    associatedSlimeTemplate = "Map${newMapName.capitalize()}",
+                    version = devtoolsVersion
                 )
 
                 with(MapService.cached()) {
                     maps[map.name] = map
                     MapService.sync(this)
 
-                    player.playSound(player.location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
+                    XSound.ENTITY_FIREWORK_ROCKET_LAUNCH.play(player, 1.0f, 1.0f)
                     player.sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Successfully created map ${CC.YELLOW}${map.name}${CC.GREEN}!")
                 }
             }
@@ -751,7 +761,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(3, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.ACTIVATOR_RAIL)
+                ItemBuilder.of(XMaterial.ACTIVATOR_RAIL)
                     .glow()
                     .name("${CC.D_RED}Update Map Metadata ${CC.GRAY}(Right Click)")
                     .build()
@@ -784,7 +794,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                                 maps[map.name] = map
                                 MapService.sync(this)
 
-                                player.playSound(player.location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
+                                XSound.ENTITY_FIREWORK_ROCKET_LAUNCH.play(player, 1.0f, 1.0f)
                                 player.sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Updated map ${CC.YELLOW}${map.name}${CC.GREEN}!")
                             }
                         } else
@@ -798,7 +808,7 @@ class Editor(private val player: Player) : SyntheticsEditor
 
         hotbarPreset.addSlot(5, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.PAPER)
+                ItemBuilder.of(XMaterial.PAPER)
                     .glow()
                     .name("${CC.AQUA}Report Metadata ${CC.GRAY}(Right Click)")
                     .build()
@@ -854,13 +864,12 @@ class Editor(private val player: Player) : SyntheticsEditor
         Bukkit.unloadWorld(visiting!!.world, true)
 
         player.sendMessage("${CC.GREEN}Importing into SWM -> MongoDB...")
-        MapManageServices.slimePlugin.importWorld(
+        MapManageServices.slime.importWorldFromBukkit(
             File(Bukkit.getWorldContainer(), worldName),
-            "Map${newWorldName.capitalize()}",
-            MapManageServices.loader
+            "Map${newWorldName.capitalize()}"
         )
 
-        player.playSound(player.location, Sound.LEVEL_UP, 1.0f, 1.0f)
+        XSound.ENTITY_PLAYER_LEVELUP.play(player, 1.0f, 1.0f)
         player.sendMessage("${CC.GREEN}Imported!")
 
         val oldSchematic = visiting?.associatedEditable

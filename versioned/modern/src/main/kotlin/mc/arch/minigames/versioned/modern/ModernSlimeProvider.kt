@@ -90,4 +90,11 @@ object ModernSlimeProvider : SlimeProvider
 
         api.saveWorld(modern.worldInstance)
     }
+
+    override fun importWorldFromBukkit(savedWorldFolder: java.io.File, newSlimeName: String)
+    {
+        api.readVanillaWorld(savedWorldFolder, newSlimeName, mongoDBLoader)
+    }
+
+    override fun worldExists(name: String) = mongoDBLoader.worldExists(name)
 }

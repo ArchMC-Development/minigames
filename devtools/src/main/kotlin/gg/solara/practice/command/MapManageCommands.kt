@@ -23,8 +23,8 @@ import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.InputPrompt
+import com.cryptomorin.xseries.XSound
 import org.bukkit.Bukkit
-import org.bukkit.Sound
 import java.io.File
 
 /**
@@ -118,6 +118,7 @@ object MapManageCommands : ScalaCommand()
         with(player.bukkit()) {
             val currentLocation = location
             val devToolsMap = Bukkit.getWorld(slimeTemplate)
+                ?: throw ConditionFailedException("Failed to load world: $slimeTemplate")
             teleport(devToolsMap.spawnLocation)
 
             allowFlight = true
@@ -140,10 +141,10 @@ object MapManageCommands : ScalaCommand()
                 with(MapService.cached()) {
                     maps[map.name] = map
                     MapService.sync(this)
-
-                    playSound(location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
-                    sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Successfully created map ${CC.YELLOW}${map.name}${CC.GREEN}!")
                 }
+
+                XSound.ENTITY_FIREWORK_ROCKET_LAUNCH.play(player.bukkit(), 1.0f, 1.0f)
+                sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Successfully created map ${CC.YELLOW}${map.name}${CC.GREEN}!")
 
                 success = true
             } else

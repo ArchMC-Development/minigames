@@ -20,10 +20,7 @@ class Containers
     )
 
     val devToolsWorldsDirectory = File(
-        File(
-            pluginsDirectory,
-            "DevTools"
-        ),
+        File(pluginsDirectory, "DevTools"),
         "worlds"
     )
 

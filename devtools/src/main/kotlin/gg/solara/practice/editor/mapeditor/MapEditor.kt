@@ -1,5 +1,7 @@
 package gg.solara.practice.editor.mapeditor
 
+import com.cryptomorin.xseries.XMaterial
+import com.cryptomorin.xseries.XSound
 import com.grinderwolf.swm.api.loaders.SlimeLoader
 import com.grinderwolf.swm.plugin.config.WorldData
 import gg.scala.commons.spatial.Position
@@ -152,7 +154,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
                                 player.sendMessage("${CC.GREEN}ENABLED! ${
                                     if (syntheticScanner!!.isAllExtra()) "${CC.GRAY}(all extra)" else ""
                                 }")
-                                player.playSound(player.location, Sound.FIREWORK_BLAST, 1.0f, 1.0f)
+                                XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(player, 1.0f, 1.0f)
                             }
                             .start(player)
                     } else
@@ -164,12 +166,12 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
                     if (isEditingSynthetic && syntheticScanner != null)
                     {
                         player.sendMessage("${CC.GREEN}TRACKED! Enter lines comma-separated:")
-                        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+                        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
 
                         InputPrompt()
                             .acceptInput { player, string ->
                                 prepareSyntheticMeta(string)
-                                player.playSound(player.location, Sound.FIREWORK_BLAST, 1.0f, 1.0f)
+                                XSound.ENTITY_FIREWORK_ROCKET_BLAST.play(player, 1.0f, 1.0f)
                             }
                             .start(player)
                     }
@@ -266,7 +268,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
         val newWorld = Bukkit.getWorld(template)
             ?: return run {
                 player.sendMessage("${CC.RED}Failed...")
-                player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 0.2f)
+                XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 0.2f)
             }
 
         val instance = MapEditorInstance(template, newWorld)
@@ -285,7 +287,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
         )
 
         player.sendMessage("${CC.GREEN}Visiting ${CC.WHITE}$template${CC.GREEN}...")
-        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
 
         visiting = instance
 
@@ -304,7 +306,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
         val hotbarPreset = HotbarPreset()
         hotbarPreset.addSlot(0, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.MELON)
+                ItemBuilder.of(XMaterial.MELON)
                     .glow()
                     .name("${CC.RED}Visit Previous ${CC.GRAY}(Right Click)")
                     .build()
@@ -324,7 +326,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(8, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.SPECKLED_MELON)
+                ItemBuilder.of(XMaterial.GLISTERING_MELON_SLICE)
                     .glow()
                     .name("${CC.GREEN}Visit Next ${CC.GRAY}(Right Click)")
                     .build()
@@ -344,7 +346,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(7, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.NAME_TAG)
+                ItemBuilder.of(XMaterial.NAME_TAG)
                     .glow()
                     .name("${CC.YELLOW}Search ${CC.GRAY}(Right Click)")
                     .build()
@@ -367,7 +369,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(6, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.PAINTING)
+                ItemBuilder.of(XMaterial.PAINTING)
                     .glow()
                     .name("${CC.GOLD}All Schematics ${CC.GRAY}(Right Click)")
                     .build()
@@ -382,7 +384,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
                         val mappings = mutableMapOf<Int, Button>()
                         schematics.forEach {
                             mappings[mappings.size] = ItemBuilder
-                                .of(Material.MAP)
+                                .of(XMaterial.MAP)
                                 .name("${CC.WHITE}$it")
                                 .addToLore(
                                     "${CC.GREEN}Click to visit!"
@@ -400,7 +402,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(4, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.GOLD_AXE)
+                ItemBuilder.of(XMaterial.GOLDEN_AXE)
                     .glow()
                     .name("${CC.B_YELLOW}Through ${CC.GRAY}(Right Click)")
                     .build()
@@ -413,14 +415,14 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(
             2, StaticHotbarPresetEntry(
-                ItemBuilder.of(Material.SIGN)
+                ItemBuilder.of(XMaterial.OAK_SIGN)
                     .name("${CC.WHITE}Metadata Sign")
             )
         )
 
         hotbarPreset.addSlot(1, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.ENDER_PORTAL_FRAME)
+                ItemBuilder.of(XMaterial.END_PORTAL_FRAME)
                     .glow()
                     .name("${CC.U_AQUA}Deploy Map ${CC.GRAY}(Right Click)")
                     .build()
@@ -444,7 +446,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(3, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.ACTIVATOR_RAIL)
+                ItemBuilder.of(XMaterial.ACTIVATOR_RAIL)
                     .glow()
                     .name("${CC.D_RED}Update Map Metadata ${CC.GRAY}(Right Click)")
                     .build()
@@ -474,7 +476,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
                         maps[map.name] = map
                         MapService.sync(this)
 
-                        player.playSound(player.location, Sound.FIREWORK_LAUNCH, 1.0f, 1.0f)
+                        XSound.ENTITY_FIREWORK_ROCKET_LAUNCH.play(player, 1.0f, 1.0f)
                         player.sendMessage("${CC.B_GREEN}(!)${CC.GREEN} Updated map ${CC.YELLOW}${map.name}${CC.GREEN}!")
                     }
                 } else
@@ -486,7 +488,7 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
 
         hotbarPreset.addSlot(5, DynamicHotbarPresetEntry().apply {
             onBuild = {
-                ItemBuilder.of(Material.PAPER)
+                ItemBuilder.of(XMaterial.PAPER)
                     .glow()
                     .name("${CC.AQUA}Report Metadata ${CC.GRAY}(Right Click)")
                     .build()

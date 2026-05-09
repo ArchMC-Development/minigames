@@ -12,4 +12,5 @@ interface VersionedProviders
     fun getServerProvider(): ServerProvider
     fun getKnockbackProvider(): KnockbackProvider
     fun getWorldProvider(): WorldProvider
+    fun getSchematicProvider(): SchematicProvider
 }

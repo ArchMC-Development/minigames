@@ -14,4 +14,5 @@ object LegacyVersionedProviders : VersionedProviders
     override fun getServerProvider() = LegacyServerProvider
     override fun getKnockbackProvider() = LegacyKnockbackProvider
     override fun getWorldProvider() = LegacyWorldProvider
+    override fun getSchematicProvider() = LegacySchematicProvider
 }

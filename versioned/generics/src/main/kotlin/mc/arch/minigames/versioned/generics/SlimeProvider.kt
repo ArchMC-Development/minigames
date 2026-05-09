@@ -13,4 +13,8 @@ interface SlimeProvider
     fun createEmptyHostedWorld(name: String): SlimeWorldGeneric<*>
 
     fun saveWorld(generic: SlimeWorldGeneric<*>)
+
+    fun importWorldFromBukkit(savedWorldFolder: java.io.File, newSlimeName: String)
+
+    fun worldExists(name: String): Boolean
 }

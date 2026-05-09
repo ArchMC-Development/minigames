@@ -1,6 +1,7 @@
 package gg.solara.practice.editor.skywars
 
 import com.cryptomorin.xseries.XMaterial
+import com.cryptomorin.xseries.XSound
 import gg.scala.lemon.hotbar.HotbarPreset
 import gg.scala.lemon.hotbar.HotbarPresetHandler
 import gg.scala.lemon.hotbar.entry.impl.DynamicHotbarPresetEntry
@@ -72,7 +73,7 @@ class SchemaCageEditorSystem(private val player: Player, private val instance: S
                         it.player.itemInHand.clone()
                     } else
                     {
-                        ItemStack(Material.GLASS)
+                        XMaterial.GLASS.parseItem()!!
                     }
 
                     it.player.sendMessage("${CC.GREEN}Replaced base block!")
@@ -80,7 +81,8 @@ class SchemaCageEditorSystem(private val player: Player, private val instance: S
                         .runLater({
                             val state = it.block.state
                             state.type = itemInHand.type
-                            state.rawData = itemInHand.data.data
+                            @Suppress("DEPRECATION")
+                            state.rawData = itemInHand.data?.data ?: 0
                             state.update(true, true)
 
                             editAndSaveSchema {
@@ -163,7 +165,7 @@ class SchemaCageEditorSystem(private val player: Player, private val instance: S
         )
 
         player.sendMessage("${CC.GREEN}Editing...")
-        player.playSound(player.location, Sound.NOTE_PLING, 1.0f, 1.0f)
+        XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 1.0f)
 
         val worldBaseBlock = newWorld.getBlockAt(baseBlock.toLocation(newWorld))
         instance.schemaCage.applyTo(worldBaseBlock)
@@ -181,7 +183,7 @@ class SchemaCageEditorSystem(private val player: Player, private val instance: S
             }
 
             onClick = context@{
-                player.playSound(player.location, Sound.NOTE_STICKS, 1.0f, 1.0f)
+                XSound.BLOCK_NOTE_BLOCK_HAT.play(player, 1.0f, 1.0f)
                 player.sendMessage("${CC.RED}Leaving...")
                 instances.remove(player.uniqueId)?.terminable?.closeAndReportException()
             }
