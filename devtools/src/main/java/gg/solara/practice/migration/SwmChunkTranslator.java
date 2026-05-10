@@ -62,7 +62,6 @@ public final class SwmChunkTranslator {
 
     private static int translateRegionFile(File file) throws IOException {
         HashMap<Integer, Chunk> translated = new HashMap<>();
-        boolean loggedFirstStatus = false;
         try (RegionFile rf = RegionFile.open(file.toPath())) {
             for (Integer idx : rf.listChunks()) {
                 Chunk chunk = rf.loadChunk(idx);
@@ -73,32 +72,16 @@ public final class SwmChunkTranslator {
                     root = chunk.readTag();
                 } catch (Exception ex) {
                     LOGGER.log(Level.WARNING,
-                        "Failed to read chunk index " + idx + " in " + file.getName() + " — skipping",
+                        "Failed to read chunk " + idx + " in " + file.getName() + " — skipping",
                         ex);
                     continue;
                 }
                 if (root == null) continue;
 
-                if (!loggedFirstStatus) {
-                    Tag<?> srcStatus = root.getValue().get("Status");
-                    if (srcStatus == null) srcStatus = root.getValue().get("status");
-                    LOGGER.info("First chunk in " + file.getName() + " — root keys=" + root.getValue().keySet()
-                        + " ; srcStatus=" + (srcStatus == null ? "<absent>" : srcStatus.getValue()));
-                }
-
-                CompoundTag rewritten = rewriteChunk(root);
-
-                if (!loggedFirstStatus) {
-                    Tag<?> level = rewritten.getValue().get("Level");
-                    if (level instanceof CompoundTag) {
-                        Tag<?> outStatus = ((CompoundTag) level).getValue().get("Status");
-                        LOGGER.info("After rewrite — Level keys=" + ((CompoundTag) level).getValue().keySet()
-                            + " ; Status=" + (outStatus == null ? "<absent>" : outStatus.getValue()));
-                    }
-                    loggedFirstStatus = true;
-                }
-
-                translated.put(idx, new Chunk(chunk.x, chunk.z, chunk.timestamp, rewritten, chunk.getCompression()));
+                translated.put(
+                    idx,
+                    new Chunk(chunk.x, chunk.z, chunk.timestamp, rewriteChunk(root), chunk.getCompression())
+                );
             }
         }
 

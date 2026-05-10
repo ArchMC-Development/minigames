@@ -1,12 +1,7 @@
 package gg.solara.practice.migration
 
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI
-import com.mongodb.client.gridfs.GridFSBuckets
-import com.mongodb.client.gridfs.model.GridFSUploadOptions
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.IndexOptions
-import com.mongodb.client.model.Indexes
-import gg.scala.store.ScalaDataStoreShared
 import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
@@ -28,100 +23,97 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 /**
- * Modern → legacy export: walk a v13 slime via ASP, copy blocks + sign/container state
- * into a vanilla Anvil world, zip the folder, and upload to `UGC.legacy-pending-import`.
- * The legacy fleet's `/maplegacyimport` finishes the round-trip.
- *
- * Tile-entity coverage is limited to Signs and Containers. Modern-only blocks lose
- * fidelity on legacy. Chunk copy runs on the main thread; large maps will pause it.
+ * Modern → legacy export: walks a v13 slime via ASP, copies blocks + sign/container
+ * state into a vanilla Anvil world, zips it, uploads to `UGC.legacy-pending-import`.
+ * Finish on legacy with `/maplegacyimport`.
  */
 object MapLegacyExporter
 {
-    private const val BUCKET_NAME = "legacy-pending-import"
-
-    private val database = ScalaDataStoreShared.INSTANCE
-        .getNewMongoConnection()
-        .getConnection()
-        .getDatabase("UGC")
-
-    private val bucket = GridFSBuckets.create(database, BUCKET_NAME)
-
-    init
-    {
-        database.getCollection("$BUCKET_NAME.files")
-            .createIndex(
-                Indexes.ascending("filename"),
-                IndexOptions().unique(true)
-            )
-    }
+    private val bucket = pendingBucket(LEGACY_PENDING_BUCKET)
 
     fun convertAndUpload(player: Player, sourceName: String)
     {
         val provider = Versioned.toProvider().getSlimeProvider()
 
-        // Skip the round-trip if the slime is already legacy-readable.
         val currentVersion = runCatching { provider.versionOf(sourceName) }.getOrNull()
         if (currentVersion != null && currentVersion <= 9)
         {
             player.sendMessage(
-                "${CC.YELLOW}${sourceName} is already legacy (slime v$currentVersion); no conversion needed."
+                "${CC.YELLOW}$sourceName is already legacy (slime v$currentVersion); no conversion needed."
             )
             return
         }
 
         player.sendMessage("${CC.YELLOW}Loading ${CC.WHITE}$sourceName${CC.YELLOW} read-only for export...")
 
-        runCatching {
-            provider.loadAndRegisterTemplate(sourceName, readOnly = true)
-        }.onFailure {
-            player.sendMessage("${CC.RED}Could not load $sourceName: ${it.message ?: it.javaClass.simpleName}")
-            return
-        }
+        runCatching { provider.loadAndRegisterTemplate(sourceName, readOnly = true) }
+            .onFailure {
+                player.sendMessage("${CC.RED}Could not load $sourceName: ${it.message ?: it.javaClass.simpleName}")
+                return
+            }
 
         val source = Bukkit.getWorld(sourceName)
-            ?: return run {
-                player.sendMessage("${CC.RED}World $sourceName did not register after load.")
-            }
+            ?: return fail(player, "World $sourceName did not register after load.")
 
         val targetName = "legacyexport_${sourceName}_${UUID.randomUUID().toString().take(8)}"
         val target = WorldCreator(targetName)
             .type(WorldType.FLAT)
             .generator(EmptyChunkGenerator)
             .createWorld()
-            ?: return run {
-                player.sendMessage("${CC.RED}Failed to create vanilla export world.")
-            }
+            ?: return fail(player, "Failed to create vanilla export world.")
 
-        // ASP keeps chunks lazy; the authoritative chunk list lives in SlimeWorld.chunkStorage.
-        val slimeInstance = AdvancedSlimePaperAPI.instance().getLoadedWorld(sourceName)
-            ?: return run {
-                player.sendMessage("${CC.RED}ASP did not return a SlimeWorldInstance for $sourceName.")
-            }
+        val chunkCoords = AdvancedSlimePaperAPI.instance().getLoadedWorld(sourceName)
+            ?.chunkStorage
+            ?.map { it.x to it.z }
+            ?: return fail(player, "ASP did not return a SlimeWorldInstance for $sourceName.")
 
-        val chunkCoords = slimeInstance.chunkStorage.map { it.x to it.z }
         player.sendMessage("${CC.YELLOW}Copying ${chunkCoords.size} chunks (this blocks the main thread; please wait)...")
 
-        var copiedTileEntities = 0
-        for ((cx, cz) in chunkCoords)
+        val tileEntities = copyChunks(source, target, chunkCoords)
+        player.sendMessage("${CC.YELLOW}Saved $tileEntities tile entities. Persisting world to disk...")
+
+        target.save()
+        Bukkit.unloadWorld(target, true)
+
+        val targetFolder = File(Bukkit.getWorldContainer(), targetName)
+        if (!targetFolder.isDirectory)
         {
-            val srcChunk = source.getChunkAt(cx, cz)
-            srcChunk.load(true)
-            val tgtChunk = target.getChunkAt(cx, cz)
-            tgtChunk.load(true)
+            return fail(player, "Vanilla export folder missing after unload — aborting.")
+        }
 
-            val maxY = source.maxHeight - 1
-            for (x in 0..15)
-            {
-                for (z in 0..15)
-                {
-                    for (y in 0..maxY)
-                    {
-                        val src = srcChunk.getBlock(x, y, z)
-                        if (src.type == Material.AIR) continue
-
-                        val tgt = tgtChunk.getBlock(x, y, z)
-                        tgt.blockData = src.blockData
+        Schedulers.async().run {
+            runCatching { uploadFolder(sourceName, targetFolder) }
+                .onFailure { ex ->
+                    Schedulers.sync().run {
+                        player.sendMessage("${CC.RED}GridFS upload failed: ${ex.message}")
                     }
+                }
+                .onSuccess {
+                    Schedulers.sync().run {
+                        player.sendMessage("${CC.GREEN}Uploaded export for ${CC.WHITE}$sourceName${CC.GREEN}.")
+                        player.sendMessage("${CC.GRAY}Run ${CC.YELLOW}/maplegacyimport $sourceName${CC.GRAY} on the legacy fleet to finish.")
+                        targetFolder.deleteRecursively()
+                    }
+                }
+        }
+    }
+
+    private fun copyChunks(source: World, target: World, coords: List<Pair<Int, Int>>): Int
+    {
+        val maxY = source.maxHeight - 1
+        var copiedTileEntities = 0
+
+        for ((cx, cz) in coords)
+        {
+            val srcChunk = source.getChunkAt(cx, cz).also { it.load(true) }
+            val tgtChunk = target.getChunkAt(cx, cz).also { it.load(true) }
+
+            for (x in 0..15) for (z in 0..15) for (y in 0..maxY)
+            {
+                val src = srcChunk.getBlock(x, y, z)
+                if (src.type != Material.AIR)
+                {
+                    tgtChunk.getBlock(x, y, z).blockData = src.blockData
                 }
             }
 
@@ -146,57 +138,36 @@ object MapLegacyExporter
                 }
             }
         }
-
-        player.sendMessage("${CC.YELLOW}Saved ${copiedTileEntities} tile entities. Persisting world to disk...")
-        target.save()
-        Bukkit.unloadWorld(target, true)
-
-        val targetFolder = File(Bukkit.getWorldContainer(), targetName)
-        if (!targetFolder.isDirectory)
-        {
-            player.sendMessage("${CC.RED}Vanilla export folder missing after unload — aborting.")
-            return
-        }
-
-        Schedulers.async().run {
-            runCatching { uploadFolder(sourceName, targetFolder) }
-                .onFailure { ex ->
-                    Schedulers.sync().run {
-                        player.sendMessage("${CC.RED}GridFS upload failed: ${ex.message}")
-                    }
-                }
-                .onSuccess {
-                    Schedulers.sync().run {
-                        player.sendMessage("${CC.GREEN}Uploaded export for ${CC.WHITE}$sourceName${CC.GREEN}.")
-                        player.sendMessage("${CC.GRAY}Run ${CC.YELLOW}/maplegacyimport $sourceName${CC.GRAY} on the legacy fleet to finish.")
-                        targetFolder.deleteRecursively()
-                    }
-                }
-        }
+        return copiedTileEntities
     }
 
     private fun uploadFolder(name: String, folder: File)
     {
-        val payload = ByteArrayOutputStream().use { baos ->
-            ZipOutputStream(baos).use { zip ->
-                // Both sides must be absolute or `relativize` throws on mixed paths
-                // when Bukkit's world container is configured relatively.
-                val basePath = folder.absoluteFile.toPath().normalize()
-                folder.walkTopDown()
-                    .filter { it.isFile }
-                    .forEach { file ->
-                        val rel = basePath.relativize(file.absoluteFile.toPath().normalize()).toString()
-                            .replace(File.separatorChar, '/')
-                        zip.putNextEntry(ZipEntry(rel))
-                        file.inputStream().use { it.copyTo(zip) }
-                        zip.closeEntry()
-                    }
-            }
-            baos.toByteArray()
-        }
-
+        val payload = zipFolder(folder)
         bucket.find(Filters.eq("filename", name)).firstOrNull()?.let { bucket.delete(it.objectId) }
-        bucket.openUploadStream(name, GridFSUploadOptions()).use { it.write(payload) }
+        bucket.openUploadStream(name).use { it.write(payload) }
+    }
+
+    private fun zipFolder(folder: File): ByteArray = ByteArrayOutputStream().use { baos ->
+        ZipOutputStream(baos).use { zip ->
+            // Both sides absolute or `relativize` rejects mixed paths when Bukkit's
+            // world container is configured relatively.
+            val basePath = folder.absoluteFile.toPath().normalize()
+            folder.walkTopDown().filter { it.isFile }.forEach { file ->
+                val rel = basePath.relativize(file.absoluteFile.toPath().normalize())
+                    .toString()
+                    .replace(File.separatorChar, '/')
+                zip.putNextEntry(ZipEntry(rel))
+                file.inputStream().use { it.copyTo(zip) }
+                zip.closeEntry()
+            }
+        }
+        baos.toByteArray()
+    }
+
+    private fun fail(player: Player, message: String)
+    {
+        player.sendMessage("${CC.RED}$message")
     }
 
     private object EmptyChunkGenerator : ChunkGenerator()
