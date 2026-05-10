@@ -16,6 +16,7 @@ interface SlimeProvider
 
     fun listTemplates(): List<String>
     fun loadAndRegisterTemplate(name: String, readOnly: Boolean)
+    fun deleteTemplate(name: String)
 
     /** Slime format version byte (v9 = legacy SWM, v10+ = modern ASP). Caller-cached. */
     fun versionOf(name: String): Int?

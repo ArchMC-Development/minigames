@@ -12,6 +12,7 @@ import gg.tropic.practice.kit.group.KitGroup
 import gg.tropic.practice.map.Map
 import gg.tropic.practice.map.MapService
 import gg.tropic.practice.metadata.SystemMetadataService
+import gg.tropic.practice.versioned.Versioned
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.Color
 import net.evilblock.cubed.util.bukkit.FancyMessage
@@ -158,8 +159,19 @@ object MapCommands : ScalaCommand()
                     MapService.sync(this)
                 }
 
+                val slimeName = map.associatedSlimeTemplate
+                val slimeDeleted = runCatching {
+                    Versioned.toProvider().getSlimeProvider().deleteTemplate(slimeName)
+                }.isSuccess
+
                 player.sendMessage(
                     "${CC.GREEN}You deleted the map with the ID ${CC.YELLOW}${map.name}${CC.GREEN}."
+                )
+                player.sendMessage(
+                    if (slimeDeleted)
+                        "${CC.GRAY}Slime template ${CC.YELLOW}$slimeName${CC.GRAY} also removed from the mongo collection."
+                    else
+                        "${CC.RED}Map row removed but slime template ${CC.YELLOW}$slimeName${CC.RED} could not be deleted — clean it up manually."
                 )
             }
     }

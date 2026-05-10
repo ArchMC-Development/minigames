@@ -317,7 +317,19 @@ class MapEditor(private val player: Player, private val slime: SlimeProvider) : 
         val instance = MapEditorInstance(template, newWorld)
         val map = MapService.mapWithSlime(instance.slimeWorldName)
             ?: return run {
-                player.sendMessage("${CC.RED}No map with that slime world!")
+                player.sendMessage("${CC.RED}No map row references slime ${CC.YELLOW}$template${CC.RED}.")
+
+                // Orphan slime — Bukkit world is registered but nothing claims it.
+                // Unload + drop the slime so the menu stops listing it next visit.
+                Bukkit.unloadWorld(newWorld, false)
+                val deleted = runCatching { slime.deleteTemplate(template) }.isSuccess
+                slimeVersionCache.remove(template)
+                player.sendMessage(
+                    if (deleted)
+                        "${CC.GRAY}Deleted orphan slime template from the mongo collection."
+                    else
+                        "${CC.RED}Couldn't delete the slime template — clean it up manually."
+                )
             }
 
         player.gameMode = GameMode.CREATIVE

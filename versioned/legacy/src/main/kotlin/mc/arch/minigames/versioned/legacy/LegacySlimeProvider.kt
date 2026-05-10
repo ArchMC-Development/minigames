@@ -139,6 +139,11 @@ object LegacySlimeProvider : SlimeProvider
 
     override fun listTemplates(): List<String> = mongoLoader.listWorlds()
 
+    override fun deleteTemplate(name: String)
+    {
+        if (mongoLoader.worldExists(name)) mongoLoader.deleteWorld(name)
+    }
+
     override fun versionOf(name: String): Int? = runCatching {
         // Slime format: 2-byte magic (0xB1 0x0B) + 1-byte version. readOnly=true so
         // we don't acquire SWM's write lock just to peek at the header.
