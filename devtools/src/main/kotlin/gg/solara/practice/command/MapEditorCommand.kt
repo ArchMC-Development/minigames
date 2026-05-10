@@ -38,7 +38,7 @@ object MapEditorCommand : ScalaCommand()
         }
 
         player.sendMessage("${CC.GOLD}Entering the editor...")
-        MapEditor(player.bukkit(), MapManageServices.loader).apply {
+        MapEditor(player.bukkit(), MapManageServices.slime).apply {
             terminable.bindWith(plugin)
         }.initialize()
     }

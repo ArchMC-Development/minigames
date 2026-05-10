@@ -1,9 +1,5 @@
 package mc.arch.minigames.versioned.generics
 
-/**
- * @author Subham
- * @since 8/5/25
- */
 interface SlimeProvider
 {
     fun queueGenerateWorld(worldGeneric: SlimeWorldGeneric<*>, newName: String)
@@ -17,4 +13,10 @@ interface SlimeProvider
     fun importWorldFromBukkit(savedWorldFolder: java.io.File, newSlimeName: String)
 
     fun worldExists(name: String): Boolean
+
+    fun listTemplates(): List<String>
+    fun loadAndRegisterTemplate(name: String, readOnly: Boolean)
+
+    /** Slime format version byte (v9 = legacy SWM, v10+ = modern ASP). Caller-cached. */
+    fun versionOf(name: String): Int?
 }

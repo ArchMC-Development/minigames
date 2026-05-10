@@ -136,4 +136,34 @@ object LegacySlimeProvider : SlimeProvider
     }
 
     override fun worldExists(name: String) = mongoLoader.worldExists(name)
+
+    override fun listTemplates(): List<String> = mongoLoader.listWorlds()
+
+    override fun versionOf(name: String): Int? = runCatching {
+        // Slime format: 2-byte magic (0xB1 0x0B) + 1-byte version. readOnly=true so
+        // we don't acquire SWM's write lock just to peek at the header.
+        val bytes = mongoLoader.loadWorld(name, true) ?: return null
+        if (bytes.size < 3) null else bytes[2].toInt() and 0xFF
+    }.getOrNull()
+
+    override fun loadAndRegisterTemplate(name: String, readOnly: Boolean)
+    {
+        val worldData = WorldData()
+        worldData.isPvp = true
+        worldData.difficulty = "normal"
+        worldData.environment = "NORMAL"
+        worldData.worldType = "DEFAULT"
+
+        worldData.isAllowAnimals = false
+        worldData.isAllowMonsters = false
+
+        val slimeWorld = slimePlugin.loadWorld(
+            mongoLoader,
+            name,
+            readOnly,
+            worldData.toPropertyMap()
+        )
+
+        slimePlugin.generateWorld(slimeWorld)
+    }
 }

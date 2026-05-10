@@ -2,8 +2,6 @@ package gg.solara.practice.editor.mapeditor
 
 import com.cryptomorin.xseries.XMaterial
 import com.cryptomorin.xseries.XSound
-import com.grinderwolf.swm.api.loaders.SlimeLoader
-import com.grinderwolf.swm.plugin.config.WorldData
 import gg.scala.commons.spatial.Position
 import gg.scala.lemon.hotbar.HotbarPreset
 import gg.scala.lemon.hotbar.HotbarPresetHandler
@@ -13,7 +11,7 @@ import gg.solara.practice.editor.SyntheticSignHologram
 import gg.solara.practice.editor.SyntheticsEditor
 import gg.solara.practice.editor.toBounds
 import gg.solara.practice.map.MapManageServices
-import gg.solara.practice.map.MapManageServices.slimePlugin
+import mc.arch.minigames.versioned.generics.SlimeProvider
 import gg.tropic.practice.map.MapService
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.metadata.scanner.AbstractMapMetadataScanner
@@ -38,24 +36,67 @@ import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.util.Collections
 import java.util.LinkedList
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author GrowlyX
  * @since 7/18/2024
  */
-class MapEditor(private val player: Player, private val loader: SlimeLoader) : SyntheticsEditor
+class MapEditor(private val player: Player, private val slime: SlimeProvider) : SyntheticsEditor
 {
     companion object
     {
         val instances = mutableMapOf<UUID, MapEditor>()
+
+        // SWM and ASP each ship their own `NewerFormatException` under different FQCNs,
+        // and only one is on the classpath per fleet — match by simple name.
+        private fun isNewerFormatException(throwable: Throwable): Boolean
+        {
+            var cursor: Throwable? = throwable
+            while (cursor != null)
+            {
+                if (cursor.javaClass.simpleName == "NewerFormatException") return true
+                cursor = cursor.cause
+            }
+            return false
+        }
     }
 
     private val editorID = "editor-${player.uniqueId}"
 
     private var visiting: MapEditorInstance? = null
-    private val schematics = loader.listWorlds()
+    private val schematics = slime.listTemplates()
+
+    // Lazy per-template version cache so the menu opens instantly; entries fill in
+    // asynchronously and surface on the next menu open.
+    private val slimeVersionCache = ConcurrentHashMap<String, Int>()
+    private val slimeVersionPending = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+
+    private fun ensureVersionResolved(template: String)
+    {
+        if (slimeVersionCache.containsKey(template)) return
+        if (!slimeVersionPending.add(template)) return
+
+        Schedulers.async().run {
+            val version = runCatching { slime.versionOf(template) }.getOrNull()
+            if (version != null) slimeVersionCache[template] = version
+            slimeVersionPending.remove(template)
+        }
+    }
+
+    private fun versionLore(template: String): String
+    {
+        val version = slimeVersionCache[template]
+            ?: return "${CC.GRAY}Detecting format…"
+
+        return if (version >= 10)
+            "${CC.AQUA}Modern ${CC.GRAY}(slime v$version)"
+        else
+            "${CC.GOLD}Legacy ${CC.GRAY}(slime v$version)"
+    }
 
     val terminable = CompositeTerminable.create()
 
@@ -246,24 +287,26 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
     {
         val previousInstance = visiting
 
-        val worldData = WorldData()
-        worldData.isPvp = true
-        worldData.difficulty = "normal"
-        worldData.environment = "NORMAL"
-        worldData.worldType = "DEFAULT"
+        try
+        {
+            // Read-only so visiting never triggers a re-save. On modern, a writable
+            // load round-trips v9 templates into v13 on auto-save / unload, silently
+            // breaking the legacy fleet's copy.
+            slime.loadAndRegisterTemplate(template, readOnly = true)
+        }
+        catch (ex: Throwable)
+        {
+            if (isNewerFormatException(ex))
+            {
+                player.sendMessage(
+                    "${CC.RED}Template ${CC.WHITE}$template${CC.RED} was saved in a newer slime format than this fleet supports. Edit it on modern devtools instead."
+                )
+                XSound.BLOCK_NOTE_BLOCK_PLING.play(player, 1.0f, 0.2f)
+                return
+            }
 
-        worldData.isAllowAnimals = false
-        worldData.isAllowMonsters = false
-
-        val slimeWorld = slimePlugin
-            .loadWorld(
-                loader,
-                template,
-                false,
-                worldData.toPropertyMap()
-            )
-
-        slimePlugin.generateWorld(slimeWorld)
+            throw ex
+        }
 
         val newWorld = Bukkit.getWorld(template)
             ?: return run {
@@ -383,12 +426,12 @@ class MapEditor(private val player: Player, private val loader: SlimeLoader) : S
                     {
                         val mappings = mutableMapOf<Int, Button>()
                         schematics.forEach {
+                            ensureVersionResolved(it)
+
                             mappings[mappings.size] = ItemBuilder
                                 .of(XMaterial.MAP)
                                 .name("${CC.WHITE}$it")
-                                .addToLore(
-                                    "${CC.GREEN}Click to visit!"
-                                )
+                                .addToLore(versionLore(it))
                                 .toButton { _, _ ->
                                     visit(it)
                                 }

@@ -1,6 +1,5 @@
 package gg.solara.practice.command
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.*
@@ -50,7 +49,7 @@ object MapManageCommands : ScalaCommand()
     fun customize(manager: ScalaCommandManager)
     {
         manager.commandCompletions.registerAsyncCompletion("slime-templates") {
-            MapManageServices.loader.listWorlds()
+            MapManageServices.slime.listTemplates()
         }
     }
 
@@ -102,18 +101,11 @@ object MapManageCommands : ScalaCommand()
             )
         }
 
-        val world = runCatching {
-            MapManageServices.slimePlugin.loadWorld(
-                MapManageServices.loader,
-                slimeTemplate,
-                true,
-                SlimePropertyMap()
-            )
+        runCatching {
+            MapManageServices.slime.loadAndRegisterTemplate(slimeTemplate, readOnly = true)
         }.getOrNull() ?: throw ConditionFailedException(
             "The world $slimeTemplate either does not exist or is a locked world due to write being enabled."
         )
-
-        MapManageServices.slimePlugin.generateWorld(world)
 
         with(player.bukkit()) {
             val currentLocation = location

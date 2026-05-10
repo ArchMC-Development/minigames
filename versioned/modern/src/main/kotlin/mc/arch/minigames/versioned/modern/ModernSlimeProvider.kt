@@ -97,4 +97,38 @@ object ModernSlimeProvider : SlimeProvider
     }
 
     override fun worldExists(name: String) = mongoDBLoader.worldExists(name)
+
+    override fun listTemplates(): List<String> = mongoDBLoader.listWorlds()
+
+    override fun versionOf(name: String): Int? = runCatching {
+        // Slime format: 2-byte magic (0xB1 0x0B) + 1-byte version.
+        val bytes = mongoDBLoader.readWorld(name) ?: return null
+        if (bytes.size < 3) null else bytes[2].toInt() and 0xFF
+    }.getOrNull()
+
+    override fun loadAndRegisterTemplate(name: String, readOnly: Boolean)
+    {
+        val slime = api.readWorld(mongoDBLoader, name, readOnly, SlimePropertyMap().apply {
+            setValue(SlimeProperties.PVP, true)
+            setValue(SlimeProperties.DIFFICULTY, "normal")
+            setValue(SlimeProperties.ENVIRONMENT, "NORMAL")
+            setValue(SlimeProperties.WORLD_TYPE, "DEFAULT")
+
+            setValue(SlimeProperties.ALLOW_MONSTERS, false)
+            setValue(SlimeProperties.ALLOW_ANIMALS, false)
+        })
+
+        api.loadWorld(slime, true)
+
+        // Force-materialise chunks for legacy slimes only — ASP keeps them lazy and
+        // `world.loadedChunks` would otherwise come back empty for the metadata scanner.
+        // Modern maps are skipped to avoid a per-visit chunk-walk pause.
+        val loaded = api.getLoadedWorld(name) ?: return
+        if (loaded.dataVersion >= 1500) return
+
+        val bukkitWorld = Bukkit.getWorld(name) ?: return
+        loaded.chunkStorage.forEach { sc ->
+            bukkitWorld.getChunkAt(sc.x, sc.z).load(true)
+        }
+    }
 }
