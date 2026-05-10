@@ -10,8 +10,12 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.bukkit.WorldType
+import org.bukkit.block.Banner
+import org.bukkit.block.CommandBlock
 import org.bukkit.block.Container
+import org.bukkit.block.CreatureSpawner
 import org.bukkit.block.Sign
+import org.bukkit.block.Skull
 import org.bukkit.entity.Player
 import org.bukkit.generator.BlockPopulator
 import org.bukkit.generator.ChunkGenerator
@@ -69,11 +73,18 @@ object MapLegacyExporter
 
         player.sendMessage("${CC.YELLOW}Copying ${chunkCoords.size} chunks (this blocks the main thread; please wait)...")
 
-        val tileEntities = copyChunks(source, target, chunkCoords)
+        // Run on main thread regardless of caller — Bukkit chunk + tile-entity reads
+        // race off-thread and can hand back stale or partially-loaded data.
+        val tileEntities = Schedulers.sync().supply {
+            copyChunks(source, target, chunkCoords)
+        }.join()
+
         player.sendMessage("${CC.YELLOW}Saved $tileEntities tile entities. Persisting world to disk...")
 
-        target.save()
-        Bukkit.unloadWorld(target, true)
+        Schedulers.sync().run {
+            target.save()
+            Bukkit.unloadWorld(target, true)
+        }.join()
 
         val targetFolder = File(Bukkit.getWorldContainer(), targetName)
         if (!targetFolder.isDirectory)
@@ -100,6 +111,9 @@ object MapLegacyExporter
 
     private fun copyChunks(source: World, target: World, coords: List<Pair<Int, Int>>): Int
     {
+        // Use the source's actual height range — modern worlds extend down to -64 and
+        // truncating at y=0 silently drops anything in cave/deepslate space.
+        val minY = source.minHeight
         val maxY = source.maxHeight - 1
         var copiedTileEntities = 0
 
@@ -108,7 +122,7 @@ object MapLegacyExporter
             val srcChunk = source.getChunkAt(cx, cz).also { it.load(true) }
             val tgtChunk = target.getChunkAt(cx, cz).also { it.load(true) }
 
-            for (x in 0..15) for (z in 0..15) for (y in 0..maxY)
+            for (x in 0..15) for (z in 0..15) for (y in minY..maxY)
             {
                 val src = srcChunk.getBlock(x, y, z)
                 if (src.type != Material.AIR)
@@ -120,25 +134,50 @@ object MapLegacyExporter
             for (te in srcChunk.tileEntities)
             {
                 val tgt = target.getBlockAt(te.x, te.y, te.z).state
-                when
-                {
-                    te is Sign && tgt is Sign ->
-                    {
-                        @Suppress("DEPRECATION")
-                        te.lines.forEachIndexed { i, line -> tgt.setLine(i, line) }
-                        tgt.update(true, false)
-                        copiedTileEntities++
-                    }
-                    te is Container && tgt is Container ->
-                    {
-                        tgt.inventory.contents = te.inventory.contents
-                        tgt.update(true, false)
-                        copiedTileEntities++
-                    }
-                }
+                if (copyTileEntity(te, tgt)) copiedTileEntities++
             }
         }
         return copiedTileEntities
+    }
+
+    private fun copyTileEntity(src: org.bukkit.block.BlockState, tgt: org.bukkit.block.BlockState): Boolean
+    {
+        when
+        {
+            src is Sign && tgt is Sign ->
+            {
+                @Suppress("DEPRECATION")
+                src.lines.forEachIndexed { i, line -> tgt.setLine(i, line) }
+            }
+            src is Container && tgt is Container ->
+            {
+                tgt.inventory.contents = src.inventory.contents
+            }
+            src is Banner && tgt is Banner ->
+            {
+                @Suppress("DEPRECATION")
+                tgt.baseColor = src.baseColor
+                tgt.patterns = src.patterns
+            }
+            src is CommandBlock && tgt is CommandBlock ->
+            {
+                tgt.setCommand(src.command)
+                tgt.setName(src.name)
+            }
+            src is CreatureSpawner && tgt is CreatureSpawner ->
+            {
+                tgt.spawnedType = src.spawnedType
+                tgt.delay = src.delay
+            }
+            src is Skull && tgt is Skull ->
+            {
+                @Suppress("DEPRECATION")
+                tgt.owner = src.owner
+            }
+            else -> return false
+        }
+        tgt.update(true, false)
+        return true
     }
 
     private fun uploadFolder(name: String, folder: File)
