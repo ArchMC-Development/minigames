@@ -171,8 +171,21 @@ object MapLegacyExporter
             }
             src is Skull && tgt is Skull ->
             {
-                @Suppress("DEPRECATION")
-                tgt.owner = src.owner
+                val block = tgt.block
+                return when (block.type)
+                {
+                    Material.PLAYER_HEAD ->
+                    {
+                        block.type = Material.SKELETON_SKULL
+                        true
+                    }
+                    Material.PLAYER_WALL_HEAD ->
+                    {
+                        block.type = Material.SKELETON_WALL_SKULL
+                        true
+                    }
+                    else -> false
+                }
             }
             else -> return false
         }
