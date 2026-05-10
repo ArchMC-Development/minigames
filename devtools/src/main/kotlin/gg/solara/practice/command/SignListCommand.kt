@@ -5,6 +5,7 @@ import gg.scala.commons.acf.annotation.Optional
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
+import gg.tropic.practice.map.metadata.sign.SignLineReader
 import net.evilblock.cubed.util.CC
 import org.bukkit.block.Sign
 
@@ -29,12 +30,12 @@ object SignListCommand : ScalaCommand()
             }
             .filterIsInstance<Sign>()
             .filter {
-                content == null || it.lines.any { line -> line.contains(content, true) }
+                content == null || SignLineReader.read(it).any { line -> line.contains(content, true) }
             }
             .forEach { sign ->
                 player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}------------")
                 player.sendMessage("${CC.B_WHITE}[${sign.location.x}, ${sign.location.y}, ${sign.location.z}]")
-                sign.lines.forEach {
+                SignLineReader.read(sign).forEach {
                     player.sendMessage("${CC.GRAY}$it")
                 }
                 player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}------------")

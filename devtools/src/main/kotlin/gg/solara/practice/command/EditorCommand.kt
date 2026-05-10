@@ -15,6 +15,7 @@ import gg.solara.practice.editor.mapeditor.MapEditor
 import gg.solara.practice.editor.template.IslandTemplate
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.metadata.sign.MapSignMetadataModel
+import gg.tropic.practice.map.metadata.sign.SignLineReader
 import gg.tropic.practice.map.metadata.sign.parseIntoMetadata
 import gg.tropic.practice.map.utilities.MapMetadataScanUtilities
 import net.evilblock.cubed.util.CC
@@ -146,7 +147,7 @@ object EditorCommand : ScalaCommand()
             val modelMappings = blocks
                 .filterIsInstance<Sign>()
                 .mapNotNull {
-                    it.lines.toList()
+                    SignLineReader.read(it)
                         .parseIntoMetadata(it.location)
                 }
 

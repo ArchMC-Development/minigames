@@ -65,13 +65,15 @@ val inverseValuesMappings = manualMappings.map { it.value to it.key }
 
 fun List<MapSignMetadataModel>.normalize(world: World) = map { model ->
     val location = model.location.toLocation(world).clone()
-    if (model.location.toLocation(world).block.state.data !is Sign)
+    val block = model.location.toLocation(world).block
+
+    val facing = SignFacingResolver.facingOf(block)
+    if (facing == null)
     {
         return@map location.toPosition()
     }
 
-    val sign = model.location.toLocation(world).block.state.data as Sign
-    location.yaw = manualMappings[sign.facing]!!
+    location.yaw = manualMappings[facing] ?: return@map location.toPosition()
 
     location.z += 0.500F
     location.x += 0.500F

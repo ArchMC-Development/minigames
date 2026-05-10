@@ -3,6 +3,7 @@ package gg.tropic.practice.map.utilities
 import gg.tropic.practice.map.metadata.AbstractMapMetadata
 import gg.scala.commons.spatial.Bounds
 import gg.tropic.practice.map.metadata.sign.MapSignMetadataModel
+import gg.tropic.practice.map.metadata.sign.SignLineReader
 import gg.tropic.practice.map.metadata.sign.parseIntoMetadata
 import org.bukkit.World
 import org.bukkit.block.Sign
@@ -25,7 +26,7 @@ object MapMetadataScanUtilities
         val modelMappings = blocks
             .filterIsInstance<Sign>()
             .mapNotNull {
-                val metadata = it.lines.toList()
+                val metadata = SignLineReader.read(it)
                     .parseIntoMetadata(it.location, usedSynthetically)
 
                 metadata
