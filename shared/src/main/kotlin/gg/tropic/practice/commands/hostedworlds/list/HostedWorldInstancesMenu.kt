@@ -6,7 +6,7 @@ import gg.scala.lemon.util.SplitUtil
 import gg.scala.staff.commands.StaffJumpCommand
 import gg.tropic.practice.metadata.SystemMetadataService
 import gg.tropic.practice.ugc.HostedWorldState
-import mc.arch.minigames.parties.toDisplayName
+import gg.tropic.practice.toDisplayName
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.menu.pagination.PaginatedMenu

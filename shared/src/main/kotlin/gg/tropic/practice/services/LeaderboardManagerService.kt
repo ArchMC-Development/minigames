@@ -11,7 +11,7 @@ import gg.tropic.practice.leaderboards.LeaderboardEntry
 import gg.tropic.practice.leaderboards.StatisticLeaderboard
 import gg.tropic.practice.profile.PracticeProfileService
 import gg.tropic.practice.statistics.StatisticService
-import mc.arch.minigames.parties.toDisplayName
+import gg.tropic.practice.toDisplayName
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.math.Numbers

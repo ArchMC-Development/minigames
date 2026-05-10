@@ -14,9 +14,9 @@ dependencies {
     api(project(":shared"))
     api(project(":minigames:skywars-shared"))
 
-    compileOnly(project(":versioned:generics"))
-    compileOnly(project(":versioned:legacy"))
-    compileOnly(project(":versioned:modern"))
+    api(project(":versioned:generics"))
+    api(project(":versioned:legacy"))
+    api(project(":versioned:modern"))
 
     compileOnly("com.grinderwolf:slimeworldmanager-plugin:2.2.1")
     compileOnly("com.infernalsuite.asp:api:4.0.0-SNAPSHOT")

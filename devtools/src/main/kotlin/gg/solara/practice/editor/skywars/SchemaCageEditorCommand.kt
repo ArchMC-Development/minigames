@@ -17,10 +17,6 @@ import net.evilblock.cubed.util.CC
 import org.bukkit.Material
 import org.bukkit.util.Vector
 
-/**
- * @author GrowlyX
- * @since 8/25/2024
- */
 @AutoRegister
 @CommandAlias("schemacage")
 @CommandPermission("op")
