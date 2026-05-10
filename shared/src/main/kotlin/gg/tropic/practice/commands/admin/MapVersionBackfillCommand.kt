@@ -7,12 +7,9 @@ import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.tropic.practice.map.MapService
 import gg.tropic.practice.provider.MiniProviderVersion
+import gg.tropic.practice.versioned.Versioned
 import net.evilblock.cubed.util.CC
 
-/**
- * Backfills a `version` field on every Map document missing it (legacy default).
- * Run once per environment after deploying the version-aware Map model.
- */
 @AutoRegister
 object MapVersionBackfillCommand : ScalaCommand()
 {
@@ -20,25 +17,37 @@ object MapVersionBackfillCommand : ScalaCommand()
     @CommandPermission("op")
     fun onBackfill(player: ScalaPlayer)
     {
+        val provider = Versioned.toProvider().getSlimeProvider()
         val cached = MapService.cached()
-        var touched = 0
+
+        var retagged = 0
+        var unresolved = 0
 
         cached.maps.values.forEach { map ->
-            // Property is non-null on the data class; the JSON deserializer applied the
-            // LEGACY default when the field was missing in MongoDB. Only re-sync if
-            // we want to materialize that default explicitly. We always do, so the
-            // serialized form has the field and downstream JSON readers see it.
-            if (map.version == MiniProviderVersion.LEGACY)
+            val formatByte = provider.versionOf(map.associatedSlimeTemplate)
+            if (formatByte == null)
             {
-                touched++
+                unresolved++
+                return@forEach
+            }
+
+            val detected = if (formatByte <= 9)
+                MiniProviderVersion.LEGACY
+            else
+                MiniProviderVersion.MODERN
+
+            if (map.version != detected)
+            {
+                map.version = detected
+                retagged++
             }
         }
 
         MapService.sync(cached)
 
         player.sendMessage(
-            "${CC.GREEN}Backfill complete. ${CC.WHITE}$touched${CC.GREEN} maps confirmed at " +
-                "${CC.WHITE}${MiniProviderVersion.LEGACY}${CC.GREEN}; full container re-synced."
+            "${CC.GREEN}Backfill complete. ${CC.WHITE}$retagged${CC.GREEN} maps retagged, " +
+                "${CC.WHITE}$unresolved${CC.GREEN} unresolved (template not visible to this provider)."
         )
     }
 }

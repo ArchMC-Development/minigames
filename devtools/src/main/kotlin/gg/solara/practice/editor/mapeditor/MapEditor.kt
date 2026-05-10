@@ -493,6 +493,14 @@ class MapEditor(private val player: Player, private val slime: SlimeProvider) : 
                 visiting!!.world.save()
 
                 with(MapService.cached()) {
+                    // Saving may have rewritten the slime in a different format; resync the
+                    // map row's version field from the actual bytes so queue/cache filters
+                    // see the truth.
+                    val slimeName = visiting!!.slimeWorldName
+                    MapService.mapWithSlime(slimeName)?.let { row ->
+                        row.version = MapManageServices.detectVersion(slimeName)
+                        maps[row.name] = row
+                    }
                     MapService.sync(this)
                     player.sendMessage("${CC.GREEN}Saved world!")
                 }

@@ -18,10 +18,8 @@ import gg.solara.practice.PracticeDevTools
 import gg.tropic.practice.map.MapContainer
 import gg.tropic.practice.map.metadata.impl.MapSpawnMetadata
 import gg.tropic.practice.map.utilities.MapMetadataScanUtilities
-import gg.tropic.practice.provider.MiniProviderVersion
 import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
-import net.evilblock.cubed.util.ServerVersion
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.InputPrompt
 import com.cryptomorin.xseries.XSound
@@ -130,10 +128,7 @@ object MapManageCommands : ScalaCommand()
                     metadata = metadata,
                     displayName = mapName,
                     associatedSlimeTemplate = slimeTemplate,
-                    version = if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
-                        MiniProviderVersion.LEGACY
-                    else
-                        MiniProviderVersion.MODERN
+                    version = MapManageServices.detectVersion(slimeTemplate)
                 )
 
                 with(MapService.cached()) {

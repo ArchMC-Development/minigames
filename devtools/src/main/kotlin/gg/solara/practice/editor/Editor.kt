@@ -761,7 +761,7 @@ class Editor(private val player: Player) : SyntheticsEditor
                     metadata = metadata,
                     displayName = newMapName.capitalize(),
                     associatedSlimeTemplate = slimeName,
-                    version = devtoolsVersion
+                    version = MapManageServices.detectVersion(slimeName)
                 )
 
                 with(MapService.cached()) {
