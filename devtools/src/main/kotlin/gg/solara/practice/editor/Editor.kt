@@ -739,13 +739,28 @@ class Editor(private val player: Player) : SyntheticsEditor
                 metadata.synthetic = synthetics.map(PreparedSyntheticSignModel::signMetadataModel)
 
                 player.sendMessage("${CC.B_GRAY}(!)${CC.GRAY} Created a metadata copy! We're now going to build the map data model & store the map in MongoDB...")
-                prepareSlimeWorld(newMapName)
+
+                val slimeName = "Map${newMapName.capitalize()}"
+                val prepared = runCatching { prepareSlimeWorld(newMapName) }
+                    .onFailure {
+                        Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "Slime import failed for $slimeName", it)
+                        player.sendMessage("${CC.RED}Slime import failed: ${it.javaClass.simpleName}${it.message?.let { msg -> ": $msg" } ?: ""}")
+                        player.sendMessage("${CC.GRAY}Map row was not created. See the server console for the full stack trace.")
+                    }
+
+                if (prepared.isFailure) return@context
+
+                if (!MapManageServices.slime.worldExists(slimeName))
+                {
+                    player.sendMessage("${CC.RED}Import reported success but $slimeName isn't in the slime mongo collection — refusing to create the map row.")
+                    return@context
+                }
 
                 val map = gg.tropic.practice.map.Map(
                     name = newMapName.lowercase(),
                     metadata = metadata,
                     displayName = newMapName.capitalize(),
-                    associatedSlimeTemplate = "Map${newMapName.capitalize()}",
+                    associatedSlimeTemplate = slimeName,
                     version = devtoolsVersion
                 )
 

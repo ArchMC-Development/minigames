@@ -93,12 +93,22 @@ object ModernSlimeProvider : SlimeProvider
 
     override fun importWorldFromBukkit(savedWorldFolder: java.io.File, newSlimeName: String)
     {
-        api.readVanillaWorld(savedWorldFolder, newSlimeName, mongoDBLoader)
+        // readVanillaWorld parses the vanilla folder into a SlimeWorld bound to the given
+        // loader, but doesn't necessarily flush it — saveWorld is what actually writes the
+        // bytes through the loader into mongo. Without this follow-up the import "succeeds"
+        // and worldExists returns false moments later.
+        val slime = api.readVanillaWorld(savedWorldFolder, newSlimeName, mongoDBLoader)
+        api.saveWorld(slime)
     }
 
     override fun worldExists(name: String) = mongoDBLoader.worldExists(name)
 
     override fun listTemplates(): List<String> = mongoDBLoader.listWorlds()
+
+    override fun deleteTemplate(name: String)
+    {
+        if (mongoDBLoader.worldExists(name)) mongoDBLoader.deleteWorld(name)
+    }
 
     override fun versionOf(name: String): Int? = runCatching {
         // Slime format: 2-byte magic (0xB1 0x0B) + 1-byte version.

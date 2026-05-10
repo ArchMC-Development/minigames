@@ -28,6 +28,7 @@ import gg.tropic.practice.replication.ServerAvailableReplicationState
 import gg.tropic.practice.replication.generation.ReplicationGenerationRequestHandler
 import gg.tropic.practice.replication.generation.ReplicationGeneratorService
 import gg.tropic.practice.replication.generation.rpc.GenerationResult
+import gg.tropic.practice.provider.MiniProviderVersion
 import gg.tropic.practice.versioned.Versioned
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.util.ServerVersion
@@ -399,14 +400,23 @@ object MapReplicationService
     private fun preGenerateMapReplications(): CompletableFuture<Void>
     {
         return generateMapReplications(
-            MapService.maps().associateWith { TARGET_PRE_GEN_REPLICATIONS }
+            MapService.maps().filter { it.version == fleetVersion }
+                .associateWith { TARGET_PRE_GEN_REPLICATIONS }
         )
     }
+
+    private val fleetVersion: MiniProviderVersion =
+        if (ServerVersion.getVersion().isOlderThan(ServerVersion.v1_9))
+            MiniProviderVersion.LEGACY
+        else
+            MiniProviderVersion.MODERN
 
     private fun populateSlimeCache()
     {
         for (arena in MapService.maps())
         {
+            if (arena.version != fleetVersion) continue
+
             kotlin.runCatching {
                 readyMaps[arena.name] = ReadyMapTemplate(
                     slimeWorld = Versioned.toProvider()
@@ -419,7 +429,7 @@ object MapReplicationService
                 )
             }.onFailure {
                 plugin.logger.log(
-                    Level.SEVERE, "Failed to populate cache", it
+                    Level.SEVERE, "Failed to populate cache for ${arena.name}", it
                 )
             }
         }
