@@ -26,6 +26,8 @@ class EventsSubscribableMinigamePlayerQueue(
     miniProvider = type.providerVersion
 )
 {
+    override val createsFallbackGameOnJoinFailure: Boolean = false
+
     override fun constructConfigurationForInitiatorEntry(entry: QueueEntry) =
         EventsMiniGameConfiguration(eventType = type, hostedBy = entry.leader)
 
@@ -38,17 +40,36 @@ class EventsSubscribableMinigamePlayerQueue(
             ?: return emptyList()
 
         val existing = GameManager.allGames().firstOrNull { it.queueId == id }
-        if (existing != null && existing.state != GameState.Waiting && existing.state != GameState.Starting)
+        if (existing != null)
         {
-            RedisShared.sendMessage(
-                targetEntry.players,
-                listOf("&cThis event is already in progress and cannot be joined right now.")
-            )
-            return listOf(targetEntry)
+            if (existing.state != GameState.Waiting && existing.state != GameState.Starting)
+            {
+                RedisShared.sendMessage(
+                    targetEntry.players,
+                    listOf("&cThis event is already in progress and cannot be joined right now.")
+                )
+                return listOf(targetEntry)
+            }
+
+            // Singleton invariant: a joinable event already exists. Don't let the
+            // base class spawn a parallel one just because the host's instance has
+            // been flagged failing — make the player wait instead.
+            if (existing.server in AbstractSubscribableMinigamePlayerQueue.getFailingInstances())
+            {
+                RedisShared.sendMessage(
+                    targetEntry.players,
+                    listOf("&cThe ${type.name.lowercase()} event host is having issues. Please try again in a moment.")
+                )
+                return listOf(targetEntry)
+            }
+
+            return super.onProcess()
         }
 
-        val willCreateNew = existing == null
-        if (willCreateNew && System.currentTimeMillis() - lastCreationInitiatedAt < CREATION_GUARD_MS)
+        // No existing event yet. The just-created game can take several seconds to
+        // show up in GameManager's cache; gate the create-new path so a second
+        // joiner during that window doesn't spawn a parallel event.
+        if (System.currentTimeMillis() - lastCreationInitiatedAt < CREATION_GUARD_MS)
         {
             RedisShared.sendMessage(
                 targetEntry.players,
@@ -57,13 +78,12 @@ class EventsSubscribableMinigamePlayerQueue(
             return listOf(targetEntry)
         }
 
-        val result = super.onProcess()
-        if (willCreateNew) lastCreationInitiatedAt = System.currentTimeMillis()
-        return result
+        lastCreationInitiatedAt = System.currentTimeMillis()
+        return super.onProcess()
     }
 
     private companion object
     {
-        const val CREATION_GUARD_MS = 5_000L
+        const val CREATION_GUARD_MS = 30_000L
     }
 }
