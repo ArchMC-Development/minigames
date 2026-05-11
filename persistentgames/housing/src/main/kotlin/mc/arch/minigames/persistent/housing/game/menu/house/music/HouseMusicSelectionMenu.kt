@@ -31,6 +31,7 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
     init
     {
         placeholdBorders = true
+        updateAfterClick = true
     }
 
     override fun size(buttons: Map<Int, Button>) = 45
@@ -38,6 +39,27 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
     override fun getAllPagesButtonSlots() = (10..16).toList() + (19..25).toList() + (28..34).toList()
 
     override fun getGlobalButtons(player: Player): Map<Int, Button> = mutableMapOf(
+        38 to ItemBuilder.of(XMaterial.BARRIER)
+            .name("${CC.RED}Stop Music")
+            .addToLore(
+                "${CC.GRAY}Stop playing music in",
+                "${CC.GRAY}your creative.",
+                "",
+                if (house.music != null) "${CC.YELLOW}Click to stop the current track!" else "${CC.GRAY}No track is currently selected."
+            )
+            .toButton { _, _ ->
+                house.music = null
+                house.save()
+
+                house.getReference()?.onlinePlayers?.mapNotNull {
+                    Bukkit.getPlayer(it)
+                }?.forEach { other ->
+                    HousingMusicService.stopPlayingSong(other)
+                }
+
+                player.sendMessage("${CC.YELLOW}Music has been turned off for your creative.")
+                Button.playNeutral(player)
+            },
         40 to MainHouseMenu.mainMenuButton(house)
     )
 
@@ -45,14 +67,23 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> = mutableMapOf<Int, Button>().also { buttons ->
         HousingMusicService.listSongs().forEach { song ->
+            val isCurrent = house.music == song.name
+
             buttons[buttons.size] = ItemBuilder.of(discTypes.random())
-                .name("${CC.GREEN}${normalize(song.name)}")
+                .name("${if (isCurrent) CC.B_GREEN else CC.GREEN}${normalize(song.name)}")
                 .addFlags(ItemFlag.HIDE_ATTRIBUTES)
                 .addToLore(
                     "",
-                    if (house.music != song.name) "${CC.YELLOW}Click to select this track!" else "${CC.AQUA}This is your current track!",
+                    if (isCurrent) "${CC.AQUA}This is your current track!" else "${CC.YELLOW}Click to select this track!",
                 )
                 .toButton { _, _ ->
+                    if (house.music == song.name)
+                    {
+                        player.sendMessage("${CC.YELLOW}That track is already selected!")
+                        Button.playFail(player)
+                        return@toButton
+                    }
+
                     house.music = song.name
                     house.save()
 
@@ -68,7 +99,6 @@ class HouseMusicSelectionMenu(val house: PlayerHouse) : PaginatedMenu()
         }
     }
 
-    // this won't catch everything, but most
     fun normalize(text: String) = text.split("_").joinToString(" ") { str ->
         str.lowercase().replaceFirstChar { it.uppercaseChar() }
     }

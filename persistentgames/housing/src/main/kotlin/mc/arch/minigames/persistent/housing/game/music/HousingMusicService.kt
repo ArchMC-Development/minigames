@@ -1,7 +1,6 @@
 package mc.arch.minigames.persistent.housing.game.music
 
-import com.xxmicloxx.NoteBlockAPI.NoteBlockAPI
-import com.xxmicloxx.NoteBlockAPI.model.Song
+import com.xxmicloxx.NoteBlockAPI.model.RepeatMode
 import com.xxmicloxx.NoteBlockAPI.songplayer.RadioSongPlayer
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder
 import gg.scala.flavor.service.Configure
@@ -38,16 +37,21 @@ object HousingMusicService
         val song = songs[name]
             ?: return
 
-        val songPlayer = songPlayers[name]
-            ?: RadioSongPlayer(NBSDecoder.parse(song.file))
+        stopPlayingSong(player)
 
-        // make sure tracks don't overlap here
-        if (isPlayingSong(player))
-        {
-            stopPlayingSong(player)
+        val songPlayer = songPlayers.getOrPut(name) {
+            RadioSongPlayer(NBSDecoder.parse(song.file)).apply {
+                isAutoDestroy = false
+                repeatMode = RepeatMode.ONE
+                isPlaying = true
+            }
         }
 
-        songPlayer.isPlaying = true
+        if (!songPlayer.isPlaying)
+        {
+            songPlayer.isPlaying = true
+        }
+
         songPlayer.addPlayer(player)
         songTracker[player.uniqueId] = name
     }
@@ -56,13 +60,12 @@ object HousingMusicService
 
     fun stopPlayingSong(player: Player)
     {
-        val songName = songTracker[player.uniqueId]
+        val songName = songTracker.remove(player.uniqueId)
             ?: return
 
         val currentRadio = songPlayers[songName]
             ?: return
 
         currentRadio.removePlayer(player)
-        songTracker.remove(player.uniqueId)
     }
 }

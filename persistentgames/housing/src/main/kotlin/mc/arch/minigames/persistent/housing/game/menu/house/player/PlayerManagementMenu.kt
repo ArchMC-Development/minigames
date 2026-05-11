@@ -11,20 +11,15 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
 import kotlin.math.roundToInt
 
-/**
- * Class created on 12/29/2025
- *
- * @author Max C.
- * @project arch-minigames
- * @website https://solo.to/redis
- */
 class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
 {
     init
     {
         placeholdBorders = true
+        updateAfterClick = true
     }
 
     override fun size(buttons: Map<Int, Button>) = 36
@@ -41,6 +36,9 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
         val onlinePlayers = house.getReference()?.onlinePlayers
             ?.mapNotNull { Bukkit.getPlayer(it) } ?: listOf()
 
+        val viewerCanManage = house.playerIsOrAboveAdministrator(player.uniqueId)
+        val viewerCanAssignRoles = viewerCanManage || house.hasPermission(player.uniqueId, "house.manage")
+
         onlinePlayers.forEach { other ->
             val role = house.getRole(other.uniqueId)
             val location = other.location
@@ -49,16 +47,24 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
             val maxHealth = other.maxHealth
             val healthPercentage = ((health / maxHealth) * 100).roundToInt()
 
+            val isOwnerTarget = house.owner == other.uniqueId
+            val targetingSelf = other.uniqueId == player.uniqueId
+            val canKickThisPlayer = viewerCanManage && !targetingSelf && !isOwnerTarget
+
             buttons[buttons.size] = ItemBuilder.of(XMaterial.PLAYER_HEAD)
                 .name("${CC.GREEN}${other.name}")
                 .addToLore(
                     "${CC.YELLOW}Role: ${role.coloredName()}",
                     "${CC.YELLOW}Health: ${CC.WHITE}$healthPercentage% ${CC.GRAY}(${health.roundToInt()}/${maxHealth.roundToInt()})",
                     "${CC.YELLOW}Location: ${CC.WHITE}${location.blockX}, ${location.blockY}, ${location.blockZ}",
-                    "",
-                    "${CC.GREEN}Left-Click to manage roles"
+                    ""
                 ).also { button ->
-                    if (house.owner != player.uniqueId)
+                    if (viewerCanAssignRoles)
+                    {
+                        button.addToLore("${CC.GREEN}Left-Click to manage roles")
+                    }
+
+                    if (canKickThisPlayer)
                     {
                         button.addToLore(
                             "${CC.YELLOW}Middle-Click to kick player",
@@ -67,20 +73,38 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
                     }
                 }
                 .toButton { _, click ->
-                    if (click!!.isLeftClick)
-                    {
-                        if (house.owner == player.uniqueId || house.hasPermission(player.uniqueId, "house.manage")) {
-                            PlayerRoleAssignMenu(house, other.uniqueId).openMenu(player)
-                        } else {
-                            player.sendMessage("${CC.RED}You do not have permission to manage roles!")
-                        }
-                    }
+                    val clickType = click?.click ?: return@toButton
 
-                    // don't let people ban or kick themselves
-                    if (house.owner != player.uniqueId)
+                    when (clickType)
                     {
-                        if (click.isCreativeAction)
+                        ClickType.LEFT, ClickType.SHIFT_LEFT, ClickType.DOUBLE_CLICK ->
                         {
+                            if (viewerCanAssignRoles)
+                            {
+                                PlayerRoleAssignMenu(house, other.uniqueId).openMenu(player)
+                            } else
+                            {
+                                player.sendMessage("${CC.RED}You do not have permission to manage roles!")
+                            }
+                        }
+
+                        ClickType.MIDDLE, ClickType.CREATIVE ->
+                        {
+                            if (!canKickThisPlayer)
+                            {
+                                if (targetingSelf)
+                                {
+                                    player.sendMessage("${CC.RED}You cannot kick yourself!")
+                                } else if (isOwnerTarget)
+                                {
+                                    player.sendMessage("${CC.RED}You cannot kick the realm owner!")
+                                } else
+                                {
+                                    player.sendMessage("${CC.RED}You do not have permission to kick players!")
+                                }
+                                return@toButton
+                            }
+
                             ConfirmMenu("Kick ${other.name}?") { confirmed ->
                                 if (confirmed)
                                 {
@@ -90,8 +114,25 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
 
                                 PlayerManagementMenu(house).openMenu(player)
                             }.openMenu(player)
-                        } else if (click.isRightClick)
+                        }
+
+                        ClickType.RIGHT, ClickType.SHIFT_RIGHT ->
                         {
+                            if (!canKickThisPlayer)
+                            {
+                                if (targetingSelf)
+                                {
+                                    player.sendMessage("${CC.RED}You cannot ban yourself!")
+                                } else if (isOwnerTarget)
+                                {
+                                    player.sendMessage("${CC.RED}You cannot ban the realm owner!")
+                                } else
+                                {
+                                    player.sendMessage("${CC.RED}You do not have permission to ban players!")
+                                }
+                                return@toButton
+                            }
+
                             ConfirmMenu("Ban ${other.name}?") { confirmed ->
                                 if (confirmed)
                                 {
@@ -108,6 +149,8 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
                                 PlayerManagementMenu(house).openMenu(player)
                             }.openMenu(player)
                         }
+
+                        else -> { }
                     }
                 }
         }

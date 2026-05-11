@@ -1,7 +1,7 @@
 package mc.arch.minigames.persistent.housing.game.spatial
 
+import gg.scala.commons.playerstatus.isVirtuallyInvisibleToSomeExtent
 import gg.scala.commons.spatial.toLocation
-import gg.scala.commons.spatial.toPosition
 import gg.tropic.practice.map.metadata.impl.MapZoneMetadata
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.game.resources.getPlayerHouseFromInstance
@@ -16,16 +16,91 @@ import org.bukkit.event.block.BlockPlaceEvent
 
 object SpatialZoneService
 {
-    fun configure(playerHouse: PlayerHouse, bounds: Int, mapZoneMetadata: MapZoneMetadata, world: World)
+    private var listenersRegistered = false
+
+    fun applyWorldBorder(playerHouse: PlayerHouse, world: World)
     {
+        val border = world.worldBorder
+
+        border.setCenter(0.0, 0.0)
+        border.setSize(playerHouse.plotSizeBlocks.toDouble(), 0)
+        border.warningDistance = 5
+    }
+
+    private fun ensureListenersRegistered()
+    {
+        if (listenersRegistered) return
+        listenersRegistered = true
+
+        Events.subscribe(BlockBreakEvent::class.java)
+            .handler { event ->
+                val player = event.player
+                val house = player.getPlayerHouseFromInstance()
+                    ?: return@handler
+
+                if (player.isVirtuallyInvisibleToSomeExtent())
+                {
+                    event.isCancelled = true
+                    return@handler
+                }
+
+                val region = house.region
+                    ?: return@handler
+
+                if (house.playerIsOrAboveAdministrator(player.uniqueId))
+                {
+                    return@handler
+                }
+
+                if (!region.contains(event.block.location))
+                {
+                    if (house.allowsMutatingOutsideRegion != true)
+                    {
+                        event.isCancelled = true
+                    }
+                }
+            }
+
+        Events.subscribe(BlockPlaceEvent::class.java)
+            .handler { event ->
+                val player = event.player
+                val house = player.getPlayerHouseFromInstance()
+                    ?: return@handler
+
+                if (player.isVirtuallyInvisibleToSomeExtent())
+                {
+                    event.isCancelled = true
+                    return@handler
+                }
+
+                val region = house.region
+                    ?: return@handler
+
+                if (house.playerIsOrAboveAdministrator(player.uniqueId))
+                {
+                    return@handler
+                }
+
+                if (!region.contains(event.block.location))
+                {
+                    if (house.allowsMutatingOutsideRegion != true)
+                    {
+                        event.isCancelled = true
+                    }
+                }
+            }
+    }
+
+    fun configure(playerHouse: PlayerHouse, bounds: Int, mapZoneMetadata: MapZoneMetadata?, world: World)
+    {
+        ensureListenersRegistered()
+
         val zero = Location(world, 0.0, 100.0, 0.0)
         val regionAsCuboid = Cuboid(
             zero.clone().subtract(bounds.toDouble(), 100.0, bounds.toDouble()),
             zero.clone().add(bounds.toDouble(), 156.0, bounds.toDouble())
         )
 
-        // is this jank? Yes
-        // is this how we forcibly load shit? Also yes
         Tasks.sync {
             regionAsCuboid.getChunks().forEach { chunk ->
                 val center = Location(
@@ -50,65 +125,18 @@ object SpatialZoneService
                     .setType(
                         originalType, true
                     )
-
-                println("Placing block to update chunk ${chunk.x},${chunk.z}")
             }
         }
 
-        // update border to house specifications
-        val border = world.worldBorder
+        applyWorldBorder(playerHouse, world)
 
-        border.setCenter(0.0,0.0)
-        border.setSize(playerHouse.plotSizeBlocks.toDouble(), 0)
-        border.warningDistance = 5
-
-        playerHouse.region = Cuboid(mapZoneMetadata.bounds.lowerLeft.toLocation(world), mapZoneMetadata.bounds.upperRight.toLocation(world))
-        playerHouse.save()
-
-        Events.subscribe(BlockBreakEvent::class.java)
-            .handler { event ->
-                val player = event.player
-                val location = event.block.location
-                val house = player.getPlayerHouseFromInstance()
-                    ?: return@handler
-                val region = house.region
-                    ?: return@handler
-
-                if (house.playerIsOrAboveAdministrator(player.uniqueId))
-                {
-                    return@handler
-                }
-
-                if (!region.contains(location))
-                {
-                    if (house.allowsMutatingOutsideRegion != true)
-                    {
-                        event.isCancelled = true
-                    }
-                }
-            }
-
-        Events.subscribe(BlockPlaceEvent::class.java)
-            .handler { event ->
-                val player = event.player
-                val location = event.block.location
-                val house = player.getPlayerHouseFromInstance()
-                    ?: return@handler
-                val region = house.region
-                    ?: return@handler
-
-                if (house.playerIsOrAboveAdministrator(player.uniqueId))
-                {
-                    return@handler
-                }
-
-                if (!region.contains(location))
-                {
-                    if (house.allowsMutatingOutsideRegion != true)
-                    {
-                        event.isCancelled = true
-                    }
-                }
-            }
+        if (mapZoneMetadata != null)
+        {
+            playerHouse.region = Cuboid(
+                mapZoneMetadata.bounds.lowerLeft.toLocation(world),
+                mapZoneMetadata.bounds.upperRight.toLocation(world)
+            )
+            playerHouse.save()
+        }
     }
 }

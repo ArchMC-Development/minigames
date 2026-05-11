@@ -88,6 +88,11 @@ data class PlayerHouse(
     fun visitationStatusApplies(status: VisitationStatus) = visitationStatuses[status] == true
 
     fun playerCanJoin(uuid: UUID): CompletableFuture<Boolean> {
+        if (uuid != owner && housingBans.contains(uuid))
+        {
+            return CompletableFuture.completedFuture(false)
+        }
+
         if (visitationStatuses[VisitationStatus.PUBLIC] == true)
         {
             return CompletableFuture.completedFuture(true)

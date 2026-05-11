@@ -7,6 +7,7 @@ import mc.arch.minigames.persistent.housing.api.formatName
 import mc.arch.minigames.persistent.housing.api.model.PlayerHouse
 import mc.arch.minigames.persistent.housing.api.model.VisitationStatus
 import mc.arch.minigames.persistent.housing.game.menu.house.MainHouseMenu
+import mc.arch.minigames.persistent.housing.game.spatial.SpatialZoneService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -111,6 +112,8 @@ class HouseSettingsMenu(val house: PlayerHouse): Menu("House Settings")
                         house.plotSizeBlocks = 100
                     }
                 }
+
+                SpatialZoneService.applyWorldBorder(house, player.world)
 
                 Button.playNeutral(player)
                 house.save()
