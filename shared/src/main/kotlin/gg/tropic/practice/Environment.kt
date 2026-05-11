@@ -4,7 +4,8 @@ import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.commons.playerstatus.PlayerStatusTrackerService
 import gg.scala.lemon.util.QuickAccess.username
 import net.evilblock.cubed.util.CC
-import java.util.UUID
+import net.evilblock.cubed.util.ServerVersion
+import java.util.*
 
 /**
  * @author GrowlyX
@@ -27,6 +28,7 @@ fun String.suffixWhenDev() = (if (isDev()) "${if (this == "tropicpractice")
 
 fun isMiniGameServer() = "mipgame" in ServerSync.local.groups
 fun isModernDuelsServer() = "duelsmodernlobby" in ServerSync.local.groups
+fun isModernKitFormat() = ServerVersion.getVersion().isNewerThanOrEquals(ServerVersion.v1_20) && isModernDuelsServer()
 
 fun UUID.toDisplayName() = PlayerStatusTrackerService.loadStatusOf(this)
     .join()

@@ -5,6 +5,7 @@ import gg.scala.commons.persist.datasync.DataSyncService
 import gg.scala.commons.persist.datasync.DataSyncSource
 import gg.scala.flavor.service.Service
 import gg.tropic.practice.PracticeShared
+import gg.tropic.practice.isModernKitFormat
 import gg.tropic.practice.namespace
 import gg.tropic.practice.namespaceShortened
 import gg.tropic.practice.suffixWhenDev
@@ -19,10 +20,14 @@ object KitService : DataSyncService<KitContainer>()
 {
     object KitKeys : DataSyncKeys
     {
-        override fun newStore() = "mi-practice-kits"
+        override fun newStore() = if (isModernKitFormat())
+            "mi-practice-kits-modern" else "mi-practice-kits"
 
         override fun store() = Key.key(namespace(), "kits")
-        override fun sync() = Key.key(namespaceShortened().suffixWhenDev(), "ksync")
+        override fun sync() = Key.key(
+            namespaceShortened().suffixWhenDev(),
+            if (isModernKitFormat()) "ksync-modern" else "ksync"
+        )
     }
 
     override fun locatedIn() = DataSyncSource.Mongo
