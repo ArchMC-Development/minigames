@@ -269,6 +269,7 @@ object ExpectationService
 
         Events
             .subscribe(PlayerInteractEvent::class.java)
+            .filter { !it.isCancelled }
             .filter {
                 it.hasItem() &&
                     (it.action == Action.RIGHT_CLICK_BLOCK || it.action == Action.RIGHT_CLICK_AIR) &&
