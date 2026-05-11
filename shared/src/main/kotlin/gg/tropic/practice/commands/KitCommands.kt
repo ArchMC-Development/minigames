@@ -8,6 +8,7 @@ import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.tropic.practice.extensions.deepClone
+import gg.tropic.practice.isModernDuelsServer
 import gg.tropic.practice.metadata.SystemMetadataService
 import gg.tropic.practice.kit.Kit
 import gg.tropic.practice.kit.KitService
@@ -66,6 +67,19 @@ object KitCommands : ScalaCommand()
                     "${CC.GREEN}You deleted the kit with the ID ${CC.YELLOW}${kit.id}${CC.GREEN}."
                 )
             }
+    }
+
+    @AssignPermission
+    @Subcommand("push-to-datasync")
+    @CommandCompletion("@kits")
+    @Description("Takes the current registered kits and re-saves them (meant from legacy -> modern conversions)")
+    fun onPush(player: ScalaPlayer)
+    {
+        with (KitService.cached())
+        {
+            KitService.sync(this)
+            player.sendMessage("${CC.YELLOW}Re-saved your kits to DataSync. Modern: ${if (isModernDuelsServer()) "${CC.GREEN}Yes" else "${CC.RED}No"}")
+        }
     }
 
     @AssignPermission
