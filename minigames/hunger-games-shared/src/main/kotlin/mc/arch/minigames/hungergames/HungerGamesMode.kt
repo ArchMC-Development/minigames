@@ -10,7 +10,7 @@ import gg.tropic.practice.queue.QueueType
 enum class HungerGamesMode(
     val displayName: String,
     val queueType: QueueType,
-    val providerVersion: MiniProviderVersion
+    override val providerVersion: MiniProviderVersion
 ) : MiniGameMode
 {
     SOLO_NORMAL("Solo Normal", QueueType.Casual, MiniProviderVersion.LEGACY)

@@ -9,11 +9,15 @@ import gg.tropic.practice.kit.KitService
 import gg.tropic.practice.minigame.menu.MinigameMapSelectorMenu
 import gg.tropic.practice.player.LobbyPlayerService
 import gg.tropic.practice.player.PlayerState
+import gg.tropic.practice.provider.MiniProviderVersion
 import gg.tropic.practice.queue.QueueService
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.nms.MinecraftProtocol
 import org.bukkit.entity.Player
+
+private const val MIN_MODERN_PROTOCOL = 335 // 1.12
 
 /**
  * @author Subham
@@ -43,6 +47,16 @@ fun MiniGameModeMetadata.joinGame(player: Player, configuration: MiniGameQueueCo
         if (basicsProfile.setting("auto-vanish", StateSettingValue.DISABLED) == StateSettingValue.ENABLED)
         {
             player.sendMessage("${CC.RED}You currently have AutoVanish enabled! Use ${CC.B}/toggleautovanish${CC.RED} to be able to join a queue.")
+            return
+        }
+    }
+
+    if (mode.providerVersion == MiniProviderVersion.MODERN)
+    {
+        val protocol = MinecraftProtocol.getPlayerVersion(player)
+        if (protocol in 1 until MIN_MODERN_PROTOCOL)
+        {
+            player.sendMessage("${CC.RED}You cannot join this game on legacy Minecraft versions. Please use ${CC.B}1.12${CC.RED} or newer.")
             return
         }
     }
