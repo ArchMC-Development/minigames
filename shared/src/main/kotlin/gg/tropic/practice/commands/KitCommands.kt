@@ -71,7 +71,6 @@ object KitCommands : ScalaCommand()
 
     @AssignPermission
     @Subcommand("push-to-datasync")
-    @CommandCompletion("@kits")
     @Description("Takes the current registered kits and re-saves them (meant from legacy -> modern conversions)")
     fun onPush(player: ScalaPlayer)
     {
