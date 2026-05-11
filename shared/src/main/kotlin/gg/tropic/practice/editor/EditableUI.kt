@@ -1,5 +1,6 @@
 package gg.tropic.practice.editor
 
+import com.cryptomorin.xseries.XMaterial
 import gg.tropic.practice.replacements.toTemplatePlayerCounts
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -8,6 +9,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemStack
 
 /**
  * @author Subham
@@ -33,7 +35,7 @@ data class EditableUI(
         override fun getButtons(player: Player) = this@EditableUI.buttons
             .mapValues { entry ->
                 ItemBuilder
-                    .copyOf(entry.value.icon)
+                    .copyOf((entry.value.icon as ItemStack?) ?: XMaterial.BARRIER.parseItem()!!)
                     .name(entry.value.displayName)
                     .setLore(
                         entry.value.lore.map { text ->
