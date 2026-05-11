@@ -285,14 +285,33 @@ class MapEditor(private val player: Player, private val slime: SlimeProvider) : 
 
     fun visit(template: String)
     {
-        val previousInstance = visiting
+        var previousInstance = visiting
+
+        // Re-clicking the currently-visited template (or one whose world is still
+        // registered from a previous attempt) would otherwise blow up inside ASP with
+        // "World X is already loaded". Close the previous instance first so its Bukkit
+        // world is unregistered before we ask ASP to load again — and null out the
+        // local reference so the trailing close at the bottom doesn't unload the
+        // freshly-loaded world (same name, different World object).
+        if (previousInstance?.slimeWorldName == template || Bukkit.getWorld(template) != null)
+        {
+            previousInstance?.closeAndReportException()
+            previousInstance = null
+            visiting = null
+        }
 
         try
         {
-            // Read-only so visiting never triggers a re-save. On modern, a writable
-            // load round-trips v9 templates into v13 on auto-save / unload, silently
-            // breaking the legacy fleet's copy.
-            slime.loadAndRegisterTemplate(template, readOnly = true)
+            // Legacy-format (v9) slimes are loaded read-only so a writable load doesn't
+            // round-trip them into v13 and clobber the legacy fleet's copy. Modern-format
+            // (v10+) slimes load writable so block edits (sign text, placements) actually
+            // stick — a read-only ASP world silently rejects all mutations.
+            val formatByte = slimeVersionCache[template]
+                ?: runCatching { slime.versionOf(template) }.getOrNull()?.also {
+                    slimeVersionCache[template] = it
+                }
+            val readOnly = formatByte == null || formatByte <= 9
+            slime.loadAndRegisterTemplate(template, readOnly = readOnly)
         }
         catch (ex: Throwable)
         {

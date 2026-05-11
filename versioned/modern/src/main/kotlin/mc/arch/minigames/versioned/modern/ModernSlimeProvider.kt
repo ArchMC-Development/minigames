@@ -132,7 +132,8 @@ object ModernSlimeProvider : SlimeProvider
 
         // Force-materialise chunks for legacy slimes only — ASP keeps them lazy and
         // `world.loadedChunks` would otherwise come back empty for the metadata scanner.
-        // Modern maps are skipped to avoid a per-visit chunk-walk pause.
+        // Modern slimes are skipped: iterating ASP's chunkStorage while triggering
+        // Bukkit chunk loads NPEs in the fastutil map iterator (concurrent mutation).
         val loaded = api.getLoadedWorld(name) ?: return
         if (loaded.dataVersion >= 1500) return
 
