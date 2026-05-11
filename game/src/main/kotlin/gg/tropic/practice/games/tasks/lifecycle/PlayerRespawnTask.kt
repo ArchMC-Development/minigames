@@ -35,6 +35,9 @@ class PlayerRespawnTask(
     {
         private val activeTasks = mutableMapOf<UUID, PlayerRespawnTask>()
 
+        @JvmStatic
+        fun isRespawning(uuid: UUID): Boolean = activeTasks.containsKey(uuid)
+
         fun cancel(uuid: UUID)
         {
             activeTasks.remove(uuid)?.task?.closeAndReportException()
