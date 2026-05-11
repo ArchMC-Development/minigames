@@ -1,6 +1,7 @@
 package gg.tropic.practice.menu
 
 import com.cryptomorin.xseries.XMaterial
+import gg.tropic.practice.player.hotbar.LobbyHotbarService
 import gg.tropic.practice.queue.QueueType
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -36,7 +37,7 @@ class CasualQueueSelectSizeMenu : Menu("Casual Queue")
             )
             .toButton { _, _ ->
                 Button.playNeutral(player)
-                JoinQueueMenu(player, QueueType.Casual, 1).openMenu(player)
+                LobbyHotbarService.openQueueMenuWithFormatSelect(player, QueueType.Casual, 1)
             },
         14 to ItemBuilder
             .of(XMaterial.LIGHT_BLUE_DYE)
@@ -52,7 +53,7 @@ class CasualQueueSelectSizeMenu : Menu("Casual Queue")
             )
             .toButton { _, _ ->
                 Button.playNeutral(player)
-                JoinQueueMenu(player, QueueType.Casual, 2).openMenu(player)
+                LobbyHotbarService.openQueueMenuWithFormatSelect(player, QueueType.Casual, 2)
             }
     )
 }

@@ -3,7 +3,6 @@ package gg.tropic.practice.player.hotbar
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.basics.plugin.settings.SettingMenu
 import gg.scala.commons.acf.ConditionFailedException
-import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.commons.metadata.SpigotNetworkMetadataDataSync
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
@@ -19,7 +18,9 @@ import gg.tropic.practice.Globals
 import gg.tropic.practice.PracticeLobby
 import gg.tropic.practice.configuration.PracticeConfigurationService
 import gg.tropic.practice.extensions.unbreakable
+import gg.tropic.practice.isModernDuelsServer
 import gg.tropic.practice.kit.KitService
+import gg.tropic.practice.menu.MultiplexingDuelsSelectionMenu
 import gg.tropic.practice.menu.JoinQueueMenu
 import gg.tropic.practice.menu.LeaderboardsMenu
 import gg.tropic.practice.menu.PlayerMainMenu
@@ -123,8 +124,21 @@ object LobbyHotbarService
                     return@run
                 }
 
-                JoinQueueMenu(player, QueueType.Ranked, 1).openMenu(player)
+                openQueueMenuWithFormatSelect(player, QueueType.Ranked, 1)
             }
+    }
+
+    fun openQueueMenuWithFormatSelect(player: Player, queueType: QueueType, teamSize: Int)
+    {
+        if (!isModernDuelsServer())
+        {
+            JoinQueueMenu(player, queueType, teamSize).openMenu(player)
+            return
+        }
+
+        MultiplexingDuelsSelectionMenu { modern ->
+            JoinQueueMenu(player, queueType, teamSize, modernMode = modern).openMenu(player)
+        }.openMenu(player)
     }
 
     @Configure
@@ -342,7 +356,7 @@ object LobbyHotbarService
                         return@context
                     }
 
-                    JoinQueueMenu(player, QueueType.Casual, 1).openMenu(player)
+                    openQueueMenuWithFormatSelect(player, QueueType.Casual, 1)
                 }
             }
         )

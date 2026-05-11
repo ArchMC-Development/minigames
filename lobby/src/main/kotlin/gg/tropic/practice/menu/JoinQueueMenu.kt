@@ -29,7 +29,8 @@ import org.bukkit.event.inventory.ClickType
 class JoinQueueMenu(
     player: Player,
     private val queueType: QueueType,
-    private val teamSize: Int
+    private val teamSize: Int,
+    private val modernMode: Boolean? = null
 ) : TemplateKitMenu(player, dynamic = true)
 {
     init
@@ -46,10 +47,20 @@ class JoinQueueMenu(
         .coerceIn(1..64)
 
     override fun getAutoUpdateTicks() = 500L
-    override fun filterDisplayOfKit(player: Player, kit: Kit) = kit.queueSizes
-        .any {
+    override fun filterDisplayOfKit(player: Player, kit: Kit): Boolean
+    {
+        val matchesQueue = kit.queueSizes.any {
             it.first == teamSize && queueType in it.second
         }
+        if (!matchesQueue) return false
+
+        val isModernKit = kit.features(FeatureFlag.Modern)
+        return when (modernMode)
+        {
+            true -> isModernKit
+            else -> !isModernKit
+        }
+    }
 
     override fun itemTitleFor(player: Player, kit: Kit) = "${CC.PRI}${kit.displayName}${
         if (kit.features(FeatureFlag.NewlyCreated)) " ${CC.B_AQUA}NEW!" else ""

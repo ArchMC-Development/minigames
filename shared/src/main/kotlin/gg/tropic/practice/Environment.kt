@@ -26,6 +26,7 @@ fun String.suffixWhenDev() = (if (isDev()) "${if (this == "tropicpractice")
     "tropicprac" else this}dev" else this)
 
 fun isMiniGameServer() = "mipgame" in ServerSync.local.groups
+fun isModernDuelsServer() = "duelsmodernlobby" in ServerSync.local.groups
 
 fun UUID.toDisplayName() = PlayerStatusTrackerService.loadStatusOf(this)
     .join()
