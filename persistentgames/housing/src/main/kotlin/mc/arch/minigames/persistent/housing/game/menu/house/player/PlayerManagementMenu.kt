@@ -73,7 +73,7 @@ class PlayerManagementMenu(val house: PlayerHouse) : PaginatedMenu()
                     }
                 }
                 .toButton { _, click ->
-                    val clickType = click?.click ?: return@toButton
+                    val clickType = click ?: return@toButton
 
                     when (clickType)
                     {
