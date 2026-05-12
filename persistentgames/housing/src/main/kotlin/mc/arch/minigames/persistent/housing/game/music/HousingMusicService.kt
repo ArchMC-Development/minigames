@@ -41,7 +41,6 @@ object HousingMusicService
 
         val songPlayer = songPlayers.getOrPut(name) {
             RadioSongPlayer(NBSDecoder.parse(song.file)).apply {
-                isAutoDestroy = false
                 repeatMode = RepeatMode.ONE
                 isPlaying = true
             }
