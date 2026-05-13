@@ -61,7 +61,9 @@ class SpecificMapEditorMenu(val map: Map): Menu()
                     MapEditorSelectionMenu().openMenu(player)
                 }
 
-            it[13] = ItemBuilder.copyOf(map.displayIcon)
+            it[13] = ItemBuilder.copyOf(map.displayIcon ?: ItemBuilder
+                .of(XMaterial.MAP)
+                .build())
                 .name("${CC.B_YELLOW}${map.displayName}")
                 .addToLore(
                     "${CC.GRAY}You are currently in the management menu",

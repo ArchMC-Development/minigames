@@ -1,5 +1,6 @@
 package gg.tropic.practice.menu
 
+import com.cryptomorin.xseries.XMaterial
 import gg.tropic.practice.map.MapService
 import gg.tropic.practice.map.rating.MapRating
 import gg.tropic.practice.map.rating.MapRatingService
@@ -63,7 +64,9 @@ abstract class TemplateMapMenu : PaginatedMenu()
 
         filteredMaps.forEach {
             buttons[buttons.size] = ItemBuilder
-                .copyOf(it.displayIcon)
+                .copyOf(it.displayIcon ?: ItemBuilder
+                    .of(XMaterial.MAP)
+                    .build())
                 .name(itemTitleFor(player, it))
                 .addFlags(
                     ItemFlag.HIDE_ATTRIBUTES,

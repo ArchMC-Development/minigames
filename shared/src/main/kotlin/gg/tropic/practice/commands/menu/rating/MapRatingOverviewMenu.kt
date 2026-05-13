@@ -7,6 +7,7 @@ import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.Color
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.bukkit.Material
 import org.bukkit.entity.Player
 
 /**
@@ -24,7 +25,7 @@ class MapRatingOverviewMenu : PaginatedMenu()
 
         MapService.cached().maps.values
             .forEach {
-                buttons[buttons.size] = ItemBuilder.of(it.displayIcon.type)
+                buttons[buttons.size] = ItemBuilder.of(it.displayIcon?.type ?: Material.MAP)
                     .name(Color.translate(it.displayName))
                     .addToLore(
                         "${CC.GRAY}Average Rating: ${CC.WHITE}${MapRatingService.averageRatings[it.name] ?: 1}"
