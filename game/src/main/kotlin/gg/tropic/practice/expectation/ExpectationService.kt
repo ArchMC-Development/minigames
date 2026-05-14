@@ -20,6 +20,7 @@ import gg.tropic.practice.games.event.PlayerSelectSpawnLocationEvent
 import gg.tropic.practice.minigame.AbstractMiniGameGameImpl
 import gg.tropic.practice.minigame.PlayerMiniGameAttemptRejoinWithTokenEvent
 import gg.tropic.practice.minigame.event.PlayerMiniGameRejoinWithTokenEvent
+import gg.tropic.practice.minigame.event.PlayerMiniGameSpectateEvent
 import gg.tropic.practice.minigame.event.PlayerMiniGameSpectateWithTokenEvent
 import gg.tropic.practice.minigame.menu.SpectatorMenu
 import gg.tropic.practice.minigame.rejoin.RejoinToken
@@ -439,6 +440,11 @@ object ExpectationService
                             Bukkit.getPluginManager().callEvent(PlayerMiniGameSpectateWithTokenEvent(game.miniGameLifecycle!!, it.player))
                             (game as AbstractMiniGameGameImpl<*>).playerTracker.removeToken(it.player)
                         }
+                    }
+
+                    if (game.miniGameLifecycle != null)
+                    {
+                        Bukkit.getPluginManager().callEvent(PlayerMiniGameSpectateEvent(game.miniGameLifecycle!!, it.player))
                     }
                 } else
                 {
