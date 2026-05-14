@@ -63,6 +63,18 @@ class EventsSubscribableMinigamePlayerQueue(
                 return listOf(targetEntry)
             }
 
+            // Singleton invariant: when the event is at capacity, base.onProcess()
+            // would filter the existing game out (it can't fit the joiner) and fall
+            // through to spawning a parallel event. Reject instead.
+            if (existing.players.size + targetEntry.players.size > type.maxPlayers())
+            {
+                RedisShared.sendMessage(
+                    targetEntry.players,
+                    listOf("&cThis ${type.name.lowercase()} event is full.")
+                )
+                return listOf(targetEntry)
+            }
+
             return super.onProcess()
         }
 

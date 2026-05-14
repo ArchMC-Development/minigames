@@ -56,6 +56,7 @@ class PracticeDevTools : ExtendedScalaPlugin()
     @ContainerEnable
     fun containerEnable()
     {
+        MojangProfileLookupLogFilter.install()
         BlockChanger.load(this, false)
         Bukkit.getWorldContainer().listFiles()
             ?.filter { it.name.startsWith("editor") }
