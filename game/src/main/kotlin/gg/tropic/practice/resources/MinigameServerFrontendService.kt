@@ -13,7 +13,6 @@ import gg.scala.lemon.handler.PlayerHandler
 import gg.scala.lemon.player.LemonPlayer
 import gg.scala.lemon.player.spatial.tablist.events.TabSyncSubscribeEvent
 import gg.scala.lemon.util.QuickAccess
-import gg.scala.lemon.util.QuickAccess.username
 import gg.tropic.practice.PracticeGame
 import gg.tropic.practice.games.GameService
 import gg.tropic.practice.games.GameState
@@ -31,7 +30,6 @@ import net.evilblock.cubed.util.ServerVersion
 import net.evilblock.cubed.visibility.PlayerListVisibilityPolicy
 import net.evilblock.cubed.visibility.VisibilityHandler
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -113,14 +111,10 @@ object MinigameServerFrontendService
         val spectatorSpecificChannel = ChatChannelBuilder.Companion.newBuilder()
             .identifier("minigame-spectator")
             .format { sender, receiver, message, server, rank ->
-                // Respect disguise privacy
-                val bukkitUsernameOrUsername = Bukkit
-                    .getPlayer(sender)?.name
-                    ?: sender.username()
-
-                Component
-                    .text("[Spectator] $bukkitUsernameOrUsername: $message")
-                    .color(NamedTextColor.GRAY)
+                Component.text("${CC.GRAY}[Spectator] ")
+                    .append(
+                        DefaultChatChannel.format(sender, receiver, message, server, rank)
+                    )
             }
             .compose()
 
@@ -170,8 +164,9 @@ object MinigameServerFrontendService
 
             return@override game.miniGameLifecycle != null
                 && game.ensurePlaying()
-                && game.miniGameLifecycle!!.configuration.maximumPlayersPerTeam > 1 &&
-                !game.shouldKeepCentralChat
+                && game.miniGameLifecycle!!.configuration.maximumPlayersPerTeam > 1
+                && game.teams.size > 1
+                && !game.shouldKeepCentralChat
         }
 
         teamSpecificChannel.monitor()

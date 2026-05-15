@@ -154,6 +154,9 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
     }
 
     abstract fun constructConfigurationForInitiatorEntry(entry: QueueEntry): MiniGameConfiguration
+
+    protected open val createsFallbackGameOnJoinFailure: Boolean = true
+
     override fun onProcess(): List<QueueEntry>
     {
         if (internalQueue.isEmpty())
@@ -263,7 +266,7 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                             game = existingGameRequiringPlayers
                         )
                     )
-                    .orTimeout(500, TimeUnit.MILLISECONDS)
+                    .orTimeout(5, TimeUnit.SECONDS)
                     .thenAccept { joinGameResult ->
                         if (joinGameResult.status == JoinIntoGameStatus.SUCCESS) {
                             RedisShared.redirect(
@@ -271,8 +274,10 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                                 serverId
                             )
                         } else {
-                            // Record the failure
-                            recordInstanceFailure(serverId)
+                            // FAILED_ALREADY_STARTED isn't an instance fault — don't count it.
+                            if (joinGameResult.status != JoinIntoGameStatus.FAILED_ALREADY_STARTED) {
+                                recordInstanceFailure(serverId)
+                            }
                             io.sentry.Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
                                 category = "queue.join_failed"
                                 message = "Failed to join game on $serverId: ${joinGameResult.status}"
@@ -280,14 +285,13 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                                 setData("server", serverId)
                                 setData("status", joinGameResult.status.name)
                             })
-                            println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status}) - will create new game")
+                            println("Failed to join into game for ${targetEntry.data.leader} (${joinGameResult.status})")
 
-                            // Create a new game for these players since join failed
-                            handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
+                            handleJoinFailure(targetEntry, preferredRegion, map, joinGameResult.status.name)
                         }
                     }
                     .exceptionally { ex ->
-                        // RPC timeout or failure - record and create new game
+                        // RPC timeout or failure
                         recordInstanceFailure(serverId)
                         io.sentry.Sentry.captureException(ex) { scope ->
                             scope.setTag("rpc_service", "joinIntoGameService")
@@ -296,10 +300,9 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
                             scope.setExtra("game_id", existingGameRequiringPlayers.uniqueId.toString())
                             scope.setExtra("failure_count", getInstanceFailureCount(serverId).toString())
                         }
-                        println("RPC failed for join into game on $serverId - creating new game")
+                        println("RPC failed for join into game on $serverId")
 
-                        // Create a new game for these players since RPC failed
-                        handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
+                        handleJoinFailure(targetEntry, preferredRegion, map, "RPC_FAILURE")
                         null
                     }
 
@@ -386,6 +389,24 @@ abstract class AbstractSubscribableMinigamePlayerQueue(
             }
 
         return listOf(targetEntry.data)
+    }
+
+    private fun handleJoinFailure(
+        targetEntry: InternalQueueEntry<QueueEntry>,
+        preferredRegion: Region,
+        map: gg.tropic.practice.application.api.defaults.map.ImmutableMap,
+        reason: String
+    ) {
+        if (createsFallbackGameOnJoinFailure) {
+            handleFailedJoinWithNewGame(targetEntry, preferredRegion, map)
+            return
+        }
+
+        // Singleton queues (e.g. events): never spawn a parallel game on failure.
+        RedisShared.sendMessage(
+            targetEntry.data.players,
+            listOf("&cWe couldn't add you to the current game. Please try again in a moment. ($reason)")
+        )
     }
 
     /**

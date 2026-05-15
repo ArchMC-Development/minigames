@@ -34,7 +34,11 @@ object MapMetadataScanUtilities
             .onEach {
                 scheduledRemoval += it.location.toVector()
             }
-            .groupBy { "${it.metaType}${it.id}" }
+            .groupBy {
+                if (it.metaType == "spawn")
+                    "${it.metaType}${it.id}@${it.location.x},${it.location.y},${it.location.z}"
+                else "${it.metaType}${it.id}"
+            }
             .toMutableMap()
 
         val metadata = mutableListOf<AbstractMapMetadata>()
@@ -45,7 +49,9 @@ object MapMetadataScanUtilities
 
             val scannedMetadata = runCatching {
                 scanner.scan(
-                    modelMapping.key.removePrefix(model.metaType),
+                    if (model.metaType == "spawn")
+                        model.id
+                    else modelMapping.key.removePrefix(model.metaType),
                     modelMapping.value,
                     world
                 )
