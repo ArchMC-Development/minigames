@@ -546,11 +546,13 @@ object MapReplicationService
                     .sync()
                     .run {
                         it.setGameRuleValue("doDaylightCycle", "false")
+                        it.setGameRuleValue("announceAdvancements", "false")
                     }
                     .join()
             } else
             {
                 it.setGameRuleValue("doDaylightCycle", "false")
+                it.setGameRuleValue("announceAdvancements", "false")
             }
 
             BuiltMapReplication(arena, it)
