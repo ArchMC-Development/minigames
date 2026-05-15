@@ -58,7 +58,7 @@ class EventsSubscribableMinigamePlayerQueue(
             {
                 RedisShared.sendMessage(
                     targetEntry.players,
-                    listOf("&cThe ${type.name.lowercase()} event host is having issues. Please try again in a moment.")
+                    listOf("&cThe ${type.name.lowercase()} event is unavailable. Please try again later.")
                 )
                 return listOf(targetEntry)
             }
