@@ -26,6 +26,17 @@ enum class HousePermission(val displayName: String, val description: List<String
             "etc"
         ),
         "house.interact"
+    ),
+    WORLD_EDIT(
+        "World Edit",
+        listOf(
+            "Allows users to use the in-house",
+            "world edit tooling (//wand, //set,",
+            "//cut, //sphere, //copy, //paste).",
+            "Operations are still bounded by the",
+            "house region for non-administrators."
+        ),
+        "worldedit.use"
     );
 
     fun fromNode(node: String) = entries.firstOrNull { it.node == node }
