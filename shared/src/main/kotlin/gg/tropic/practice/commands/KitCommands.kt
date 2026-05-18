@@ -29,7 +29,7 @@ import java.util.*
  * @since 9/17/2023
  */
 @AutoRegister
-@CommandAlias("kit")
+@CommandAlias("practice-kit|pkit")
 @CommandPermission("practice.command.kit")
 object KitCommands : ScalaCommand()
 {
