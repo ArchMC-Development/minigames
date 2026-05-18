@@ -322,7 +322,7 @@ object PartyCommand : ScalaCommand()
     @Description("Invite a player to your party!")
     fun onInvite(player: Player, target: AsyncLemonPlayer) =
         target.validatePlayers(player, false) {
-            if (DisguiseService.isNetworkDisguised(it.uniqueId).join())
+            if (DisguiseService.getApplicantProfileMapping(it.uniqueId).join() != null)
             {
                 throw ConditionFailedException(
                     "No user entry matching the username ${CC.YELLOW}${it.name}${CC.RED} was found."
