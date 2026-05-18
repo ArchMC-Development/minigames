@@ -588,7 +588,7 @@ object GameService
         Events
             .subscribe(EntityTargetLivingEntityEvent::class.java)
             .filter { event ->
-                !event.isCancelled && 
+                !event.isCancelled &&
                     event.target is Player &&
                     event.entityType != EntityType.PLAYER &&
                     byPlayer(event.target as Player) != null
@@ -617,7 +617,7 @@ object GameService
 
         Events
             .subscribe(BlockFromToEvent::class.java)
-            .filter { 
+            .filter {
                 !it.isCancelled
             }
             .handler { event ->
@@ -731,9 +731,6 @@ object GameService
 
         Events
             .subscribe(PlayerInteractEvent::class.java)
-            .filter { 
-                !it.isCancelled
-            }
             .handler {
                 if (isSpectating(it.player))
                 {
@@ -781,7 +778,7 @@ object GameService
         Events
             .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                !it.isCancelled && 
+                !it.isCancelled &&
                     it.item.type == XMaterial.POTION.parseMaterial()
                     && byPlayer(it.player) != null
             }
@@ -800,7 +797,7 @@ object GameService
 
         Events
             .subscribe(ProjectileLaunchEvent::class.java)
-            .filter { 
+            .filter {
                 !it.isCancelled
             }
             .handler {
@@ -816,7 +813,7 @@ object GameService
 
         Events
             .subscribe(ProjectileLaunchEvent::class.java)
-            .filter { 
+            .filter {
                 !it.isCancelled
             }
             .handler {
@@ -865,7 +862,7 @@ object GameService
 
         Events
             .subscribe(CraftItemEvent::class.java)
-            .filter { 
+            .filter {
                 !it.isCancelled
             }
             .handler {
@@ -891,7 +888,7 @@ object GameService
         Events
             .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                !it.isCancelled && it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Heal Apple")
+                it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Heal Apple")
             }
             .handler {
                 it.player.health = it.player.maxHealth
@@ -901,7 +898,7 @@ object GameService
         Events
             .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
-                !it.isCancelled && it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Golden Head")
+                it.item.hasItemMeta() && it.item.itemMeta.displayName.contains("Golden Head")
             }
             .handler {
                 it.player.playSound(
@@ -982,7 +979,7 @@ object GameService
             .subscribe(PlayerItemConsumeEvent::class.java)
             .filter {
                 if (it.isCancelled) return@filter false
-                
+
                 val game = byPlayer(it.player)
                 it.item.type == Material.GOLDEN_APPLE &&
                     game != null &&
