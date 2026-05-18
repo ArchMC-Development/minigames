@@ -1,5 +1,6 @@
 package mc.arch.minigames.parties.command
 
+import gg.scala.basics.plugin.disguise.DisguiseService
 import gg.scala.basics.plugin.profile.BasicsProfile
 import gg.scala.basics.plugin.settings.defaults.values.StateSettingValue
 import gg.scala.commons.ScalaCommons
@@ -321,6 +322,13 @@ object PartyCommand : ScalaCommand()
     @Description("Invite a player to your party!")
     fun onInvite(player: Player, target: AsyncLemonPlayer) =
         target.validatePlayers(player, false) {
+            if (DisguiseService.isNetworkDisguised(it.uniqueId).join())
+            {
+                throw ConditionFailedException(
+                    "No user entry matching the username ${CC.YELLOW}${it.name}${CC.RED} was found."
+                )
+            }
+
             val existing = player.toParty()
             if (it.uniqueId == player.uniqueId)
             {
